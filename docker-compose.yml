@@ -1,0 +1,36 @@
+services:
+  pptmaster:
+    build: .
+    image: pptmaster-service:latest
+    container_name: pptmaster-service
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    env_file:
+      - .env
+    environment:
+      # Force these to point at the in-container mount paths regardless of
+      # what the operator's .env says.
+      - STORAGE_LOCAL_ROOT=/data
+      - PPTMASTER_REPO_DIR=/opt/ppt-master
+    volumes:
+      # Persistent job data (uploads + exports + jobs.json)
+      - pptmaster_data:/data
+      # Cached PPT Master repo (avoid re-clone on every restart)
+      - pptmaster_repo:/opt/ppt-master
+    # Single worker because the in-process asyncio queue + event bus are
+    # not designed for multi-worker horizontal scale. For HA, put a load
+    # balancer in front of N single-worker replicas and switch STORAGE_BACKEND
+    # to s3 + add Redis pub/sub (future work).
+    deploy:
+      replicas: 1
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 120s
+      retries: 3
+
+volumes:
+  pptmaster_data:
+  pptmaster_repo:

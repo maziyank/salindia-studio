@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PPT Master — Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..900&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #14110d;
+    --paper: #efe7d6;
+    --paper-2: #e5dbc6;
+    --rule: #2b2620;
+    --clay: #c4572e;
+    --clay-deep: #9d3f1d;
+    --cobalt: #1f3a6e;
+    --sage: #6b7a52;
+    --muted: #7a6f5d;
+    --card: #f6f1e6;
+    --errc: #b02a1f;
+    --okc: #3f6b2c;
+    --shadow: 6px 6px 0 var(--rule);
+    --shadow-sm: 3px 3px 0 var(--rule);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: "Public Sans", sans-serif;
+    background-color: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(circle at 18% 12%, rgba(196,87,46,.07), transparent 28%),
+      radial-gradient(circle at 82% 88%, rgba(31,58,110,.06), transparent 30%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
+  }
+
+  ::selection { background: var(--clay); color: var(--paper); }
+
+  /* ---------- Header ---------- */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 28px;
+    border-bottom: 2px solid var(--rule);
+    background: rgba(239,231,214,.82);
+    backdrop-filter: blur(10px);
+  }
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .brand .mark {
+    font-family: "Fraunces", serif;
+    font-weight: 900;
+    font-size: 1.55rem;
+    letter-spacing: -.02em;
+    font-style: italic;
+  }
+  .brand .mark::after {
+    content: "";
+    display: inline-block;
+    width: 9px; height: 9px;
+    margin-left: 4px;
+    background: var(--clay);
+    border-radius: 50%;
+    vertical-align: super;
+  }
+  .brand .sub {
+    font-size: .68rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 13px;
+    border: 1.5px solid var(--rule);
+    border-radius: 999px;
+    background: var(--card);
+    font-size: .74rem;
+    font-weight: 600;
+    letter-spacing: .02em;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+  .dot.ok { background: var(--okc); box-shadow: 0 0 0 0 rgba(63,107,44,.5); animation: pulse 2.4s infinite; }
+  .dot.warn { background: var(--clay); }
+  .dot.off { background: var(--errc); }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(63,107,44,.45); }
+    70% { box-shadow: 0 0 0 7px rgba(63,107,44,0); }
+    100% { box-shadow: 0 0 0 0 rgba(63,107,44,0); }
+  }
+
+  /* ---------- Layout ---------- */
+  .wrap {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 40px 28px 80px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: 34px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .wrap { grid-template-columns: 1fr; padding: 26px 18px 64px; gap: 26px; }
+  }
+
+  .hero {
+    grid-column: 1 / -1;
+    margin-bottom: 6px;
+    animation: rise .6s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .hero h1 {
+    font-family: "Fraunces", serif;
+    font-weight: 500;
+    font-size: clamp(2rem, 4.4vw, 3.35rem);
+    line-height: 1.02;
+    letter-spacing: -.025em;
+    max-width: 17ch;
+  }
+  .hero h1 em { font-style: italic; color: var(--clay); }
+  .hero p {
+    margin-top: 14px;
+    max-width: 52ch;
+    color: #4a4235;
+    font-size: 1rem;
+  }
+
+  /* ---------- Panel / Card ---------- */
+  .panel {
+    background: var(--card);
+    border: 2px solid var(--rule);
+    border-radius: 4px;
+    box-shadow: var(--shadow);
+    padding: 26px;
+    animation: rise .6s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .panel:nth-of-type(1) { animation-delay: .05s; }
+  .panel:nth-of-type(2) { animation-delay: .12s; }
+
+  .panel-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .panel-title .num {
+    font-family: "JetBrains Mono", monospace;
+    font-size: .72rem;
+    font-weight: 500;
+    color: var(--paper);
+    background: var(--ink);
+    padding: 3px 8px;
+    border-radius: 3px;
+  }
+  .panel-title h2 {
+    font-family: "Fraunces", serif;
+    font-weight: 600;
+    font-size: 1.3rem;
+    letter-spacing: -.01em;
+  }
+
+  /* ---------- Form ---------- */
+  .field { margin-bottom: 18px; }
+  .field:last-of-type { margin-bottom: 0; }
+  label.lbl {
+    display: block;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 7px;
+  }
+  textarea, input[type="text"], input[type="password"], select {
+    width: 100%;
+    font-family: inherit;
+    font-size: .95rem;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1.5px solid var(--rule);
+    border-radius: 3px;
+    padding: 11px 13px;
+    transition: box-shadow .15s, border-color .15s, background .15s;
+  }
+  textarea { min-height: 128px; resize: vertical; line-height: 1.55; }
+  textarea:focus, input:focus, select:focus {
+    outline: none;
+    background: #fffaf0;
+    border-color: var(--clay);
+    box-shadow: 0 0 0 3px rgba(196,87,46,.14);
+  }
+  .hint { font-size: .78rem; color: var(--muted); margin-top: 6px; }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 520px) { .row2 { grid-template-columns: 1fr; } }
+
+  /* Design spec */
+  .spec {
+    border: 1.5px solid var(--rule);
+    border-radius: 4px;
+    background: var(--card);
+    padding: 16px;
+    margin-bottom: 18px;
+  }
+  .spec-head {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+    margin-bottom: 14px;
+  }
+  .spec-head h3 {
+    font-family: "Fraunces", serif; font-weight: 600; font-size: 1rem;
+    letter-spacing: -.01em;
+  }
+  .spec-head .reset {
+    background: none; border: none; padding: 0; cursor: pointer;
+    font-family: "JetBrains Mono", monospace; font-size: .68rem;
+    color: var(--muted); text-decoration: underline; text-underline-offset: 2px;
+  }
+  .spec-head .reset:hover { color: var(--clay-deep); }
+  .spec .field { margin-bottom: 14px; }
+  .spec .field:last-of-type { margin-bottom: 0; }
+
+  /* Canvas picker (card radios) */
+  .canvas-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
+  @media (max-width: 520px) { .canvas-grid { grid-template-columns: repeat(2, 1fr); } }
+  .canvas-opt { position: relative; display: block; cursor: pointer; }
+  .canvas-opt input { position: absolute; opacity: 0; pointer-events: none; }
+  .canvas-opt .card {
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    padding: 10px 6px 8px;
+    background: var(--paper); border: 1.5px solid #cdbfa3; border-radius: 3px;
+    transition: border-color .15s, background .15s, transform .1s, box-shadow .1s;
+  }
+  .canvas-opt:hover .card { border-color: var(--rule); }
+  .canvas-opt input:focus-visible + .card { box-shadow: 0 0 0 3px rgba(196,87,46,.18); }
+  .canvas-opt input:checked + .card {
+    background: #fffaf0; border-color: var(--clay);
+    box-shadow: var(--shadow-sm); transform: translate(-1px,-1px);
+  }
+  .canvas-opt .thumb {
+    border: 1.5px solid var(--rule); border-radius: 2px; background: #fffdf7;
+  }
+  .canvas-opt .cname { font-size: .7rem; font-weight: 700; letter-spacing: .02em; }
+  .canvas-opt .cdim { font-family: "JetBrains Mono", monospace; font-size: .6rem; color: var(--muted); }
+
+  /* Slide count presets */
+  .presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chip {
+    font-family: "JetBrains Mono", monospace; font-size: .7rem;
+    padding: 4px 10px; border: 1.5px solid #cdbfa3; border-radius: 999px;
+    background: var(--paper); color: var(--ink); cursor: pointer;
+    transition: border-color .15s, background .15s, color .15s;
+  }
+  .chip:hover { border-color: var(--rule); }
+  .chip.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  .inline-toggle {
+    display: flex; align-items: center; gap: 8px; margin-top: 8px;
+    font-size: .8rem; color: var(--muted);
+  }
+  .inline-toggle input { width: auto; accent-color: var(--clay); }
+
+  /* File drop */
+  .drop {
+    border: 2px dashed var(--rule);
+    border-radius: 4px;
+    background: var(--paper);
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: background .15s, border-color .15s, transform .1s;
+  }
+  .drop:hover { background: #fbf6ea; border-color: var(--clay); }
+  .drop.drag { background: rgba(196,87,46,.08); border-color: var(--clay); transform: scale(.995); }
+  .drop .big { font-family: "Fraunces", serif; font-size: 1.02rem; font-weight: 600; }
+  .drop .small { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+  .files { list-style: none; margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+  .files li {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    font-size: .82rem; background: var(--paper-2); border: 1px solid #cdbfa3;
+    padding: 7px 11px; border-radius: 3px;
+  }
+  .files li .fname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+  .files li .fsize { color: var(--muted); font-family: "JetBrains Mono", monospace; font-size: .72rem; flex: none; }
+  .files li button {
+    border: none; background: none; cursor: pointer; color: var(--errc);
+    font-size: 1rem; line-height: 1; padding: 0 2px; flex: none;
+  }
+
+  /* API key collapsible */
+  details.keybox {
+    border: 1.5px solid #cdbfa3;
+    border-radius: 4px;
+    background: var(--paper);
+    padding: 10px 13px;
+  }
+  details.keybox summary {
+    cursor: pointer;
+    font-size: .8rem;
+    font-weight: 600;
+    color: #4a4235;
+    list-style: none;
+    display: flex; align-items: center; gap: 8px;
+  }
+  details.keybox summary::-webkit-details-marker { display: none; }
+  details.keybox summary::before {
+    content: "▸"; color: var(--clay); transition: transform .15s; display: inline-block;
+  }
+  details.keybox[open] summary::before { transform: rotate(90deg); }
+  details.keybox .inner { margin-top: 10px; }
+  details.keybox .inner .hint { margin-top: 6px; }
+
+  /* Generate button */
+  .btn-generate {
+    width: 100%;
+    margin-top: 22px;
+    font-family: "Fraunces", serif;
+    font-weight: 700;
+    font-size: 1.08rem;
+    letter-spacing: .01em;
+    color: var(--paper);
+    background: var(--ink);
+    border: 2px solid var(--rule);
+    border-radius: 4px;
+    padding: 15px 20px;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform .1s, box-shadow .1s, background .15s;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .btn-generate:hover:not(:disabled) { background: #2a241c; transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--rule); }
+  .btn-generate:active:not(:disabled) { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--rule); }
+  .btn-generate:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+
+  .btn-ghost {
+    font-family: inherit; font-size: .82rem; font-weight: 600;
+    color: var(--ink); background: var(--paper);
+    border: 1.5px solid var(--rule); border-radius: 3px;
+    padding: 7px 14px; cursor: pointer;
+    transition: background .15s, transform .1s;
+  }
+  .btn-ghost:hover { background: var(--paper-2); }
+  .btn-ghost:active { transform: translate(1px,1px); }
+  .btn-ghost.danger { color: var(--errc); border-color: var(--errc); }
+  .btn-ghost.danger:hover { background: rgba(176,42,31,.07); }
+  .btn-ghost:disabled { opacity: .4; cursor: not-allowed; }
+
+  /* ---------- Progress panel ---------- */
+  .progress-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    margin-bottom: 14px;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    padding: 5px 11px; border-radius: 999px; border: 1.5px solid var(--rule);
+    background: var(--paper-2); color: #4a4235;
+  }
+  .badge.running { background: rgba(196,87,46,.14); border-color: var(--clay); color: var(--clay-deep); }
+  .badge.completed { background: rgba(63,107,44,.14); border-color: var(--okc); color: var(--okc); }
+  .badge.failed { background: rgba(176,42,31,.12); border-color: var(--errc); color: var(--errc); }
+  .badge.cancelled { background: var(--paper-2); border-color: var(--muted); color: var(--muted); }
+
+  .jobid {
+    font-family: "JetBrains Mono", monospace; font-size: .72rem; color: var(--muted);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 46%;
+  }
+
+  .bar {
+    position: relative;
+    height: 30px;
+    background: var(--paper-2);
+    border: 2px solid var(--rule);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .bar .fill {
+    position: absolute; inset: 0 auto 0 0; width: 0%;
+    background: repeating-linear-gradient(45deg, var(--clay), var(--clay) 11px, var(--clay-deep) 11px, var(--clay-deep) 22px);
+    transition: width .5s cubic-bezier(.3,.8,.3,1);
+  }
+  .bar.indeterminate .fill {
+    width: 38% !important;
+    animation: slide 1.6s ease-in-out infinite;
+  }
+  .bar .fill::after {
+    content: attr(data-pct);
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    font-family: "JetBrains Mono", monospace; font-size: .72rem; font-weight: 500;
+    color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.4);
+  }
+  @keyframes slide {
+    0% { left: -40%; }
+    100% { left: 100%; }
+  }
+
+  .stage-line {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+    margin-top: 12px;
+  }
+  .stage-name {
+    font-family: "Fraunces", serif; font-size: 1.08rem; font-weight: 600;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .elapsed { font-family: "JetBrains Mono", monospace; font-size: .74rem; color: var(--muted); flex: none; }
+
+  /* Log */
+  .log {
+    margin-top: 16px;
+    background: #1a1712;
+    border: 2px solid var(--rule);
+    border-radius: 4px;
+    height: 320px;
+    overflow-y: auto;
+    padding: 12px 14px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: .74rem;
+    line-height: 1.55;
+    color: #d8cdb8;
+    scroll-behavior: smooth;
+  }
+  .log::-webkit-scrollbar { width: 9px; }
+  .log::-webkit-scrollbar-track { background: #0f0d09; }
+  .log::-webkit-scrollbar-thumb { background: #4a4133; border-radius: 5px; }
+  .log .ln { display: grid; grid-template-columns: 58px 1fr; gap: 9px; padding: 2px 0; }
+  .log .ts { color: #6b6151; }
+  .log .txt { word-break: break-word; white-space: pre-wrap; }
+  .ln.thought .txt { color: #bfb49c; font-style: italic; }
+  .ln.tool_call .txt { color: #f0a968; }
+  .ln.tool_result .txt { color: #8fae72; }
+  .ln.progress .txt { color: #e0c469; }
+  .ln.done .txt { color: #7fbf5c; font-weight: 500; }
+  .ln.warn .txt { color: #e6b34d; }
+  .ln.err .txt { color: #e77a6e; }
+  .ln.meta .txt { color: #7d7263; }
+  .log .empty { color: #5c5345; font-style: italic; }
+
+  /* Result */
+  .result {
+    margin-top: 16px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    background: rgba(63,107,44,.08);
+    border: 1.5px solid var(--okc);
+    border-radius: 4px;
+    padding: 14px 16px;
+  }
+  .result.show { display: flex; animation: pop .4s cubic-bezier(.2,.8,.2,1) both; }
+  .result .rtxt { font-size: .88rem; font-weight: 500; }
+  .result .rtxt small { display: block; color: var(--muted); font-weight: 400; font-size: .76rem; }
+  .btn-download {
+    font-family: "Fraunces", serif; font-weight: 700; font-size: .92rem;
+    color: var(--paper); background: var(--okc);
+    border: 2px solid var(--rule); border-radius: 4px;
+    padding: 10px 18px; cursor: pointer; text-decoration: none;
+    box-shadow: var(--shadow-sm); transition: transform .1s, box-shadow .1s;
+    display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+  }
+  .btn-download:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--rule); }
+  .btn-download:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--rule); }
+
+  /* Recent jobs */
+  .recent { margin-top: 22px; }
+  .recent h3 {
+    font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px;
+  }
+  .recent ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .recent li {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px;
+    background: var(--paper); border: 1.5px solid #cdbfa3; border-radius: 3px;
+    font-size: .8rem; cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .recent li:hover { border-color: var(--clay); background: #fbf6ea; }
+  .recent li .rname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+  .recent li .rtime { font-family: "JetBrains Mono", monospace; font-size: .68rem; color: var(--muted); flex: none; }
+  .recent .empty { color: var(--muted); font-size: .82rem; font-style: italic; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(120%);
+    background: var(--ink); color: var(--paper);
+    padding: 12px 20px; border-radius: 4px; border: 2px solid var(--clay);
+    font-size: .85rem; font-weight: 500; z-index: 100;
+    box-shadow: 0 8px 30px rgba(0,0,0,.25);
+    transition: transform .35s cubic-bezier(.2,.8,.2,1);
+    max-width: 90vw;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.err { border-color: var(--errc); }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @keyframes pop { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }
+
+  .spinner {
+    width: 15px; height: 15px; border-radius: 50%;
+    border: 2px solid rgba(239,231,214,.35); border-top-color: var(--paper);
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="mark">PPT&nbsp;Master</span>
+    <span class="sub">Studio</span>
+  </div>
+  <div class="status-pill" id="svc">
+    <span class="dot" id="svcDot"></span>
+    <span id="svcText">Checking service…</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="hero">
+    <h1>Turn a prompt into a <em>deck</em>, and watch it happen.</h1>
+    <p>Describe the presentation you want — optionally drop in source documents. The agent plans, designs, and exports a <strong>.pptx</strong>, streaming every step back to you here.</p>
+  </section>
+
+  <!-- ============ Generate ============ -->
+  <section class="panel" aria-label="Generate slides">
+    <div class="panel-title">
+      <span class="num">01</span>
+      <h2>Generate slides</h2>
+    </div>
+
+    <form id="form">
+      <div class="field">
+        <label class="lbl" for="prompt">Prompt</label>
+        <textarea id="prompt" placeholder="e.g. Create a 10-slide investor pitch deck for a climate-tech startup building solar microgrids in Southeast Asia. Use a confident, editorial tone." required></textarea>
+        <div class="hint">Be specific about topic, audience, slide count, and tone.</div>
+      </div>
+
+      <div class="field">
+        <label class="lbl">Source files <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted)">(optional)</span></label>
+        <div class="drop" id="drop" tabindex="0" role="button" aria-label="Add source files">
+          <div class="big">Drop files here or click to browse</div>
+          <div class="small">PDF, DOCX, PPTX, TXT, MD, images…</div>
+        </div>
+        <input type="file" id="fileInput" multiple hidden />
+        <ul class="files" id="fileList"></ul>
+      </div>
+
+      <fieldset class="spec" aria-label="Design spec">
+        <div class="spec-head">
+          <h3>Design spec</h3>
+          <button type="button" class="reset" id="specReset">reset to defaults</button>
+        </div>
+
+        <div class="field">
+          <label class="lbl">Slide size</label>
+          <div class="canvas-grid" id="canvasGrid" role="radiogroup" aria-label="Slide size">
+            <label class="canvas-opt">
+              <input type="radio" name="canvas" value="ppt169" data-dim="1280 × 720" checked />
+              <span class="card">
+                <span class="thumb" style="width:40px;height:22.5px"></span>
+                <span class="cname">16:9</span>
+                <span class="cdim">PPT 16:9</span>
+              </span>
+            </label>
+            <label class="canvas-opt">
+              <input type="radio" name="canvas" value="ppt43" data-dim="1024 × 768" />
+              <span class="card">
+                <span class="thumb" style="width:32px;height:24px"></span>
+                <span class="cname">4:3</span>
+                <span class="cdim">PPT 4:3</span>
+              </span>
+            </label>
+            <label class="canvas-opt">
+              <input type="radio" name="canvas" value="story" data-dim="1080 × 1920" />
+              <span class="card">
+                <span class="thumb" style="width:17px;height:28px"></span>
+                <span class="cname">Story</span>
+                <span class="cdim">9:16</span>
+              </span>
+            </label>
+            <label class="canvas-opt">
+              <input type="radio" name="canvas" value="moments" data-dim="1080 × 1080" />
+              <span class="card">
+                <span class="thumb" style="width:26px;height:26px"></span>
+                <span class="cname">Square</span>
+                <span class="cdim">1:1</span>
+              </span>
+            </label>
+            <label class="canvas-opt">
+              <input type="radio" name="canvas" value="a4" data-dim="1240 × 1754" />
+              <span class="card">
+                <span class="thumb" style="width:20px;height:28px"></span>
+                <span class="cname">A4</span>
+                <span class="cdim">Print</span>
+              </span>
+            </label>
+            <label class="canvas-opt">
+              <input type="radio" name="canvas" value="banner" data-dim="1920 × 1080" />
+              <span class="card">
+                <span class="thumb" style="width:40px;height:22.5px"></span>
+                <span class="cname">Banner</span>
+                <span class="cdim">1920×1080</span>
+              </span>
+            </label>
+          </div>
+          <div class="inline-toggle">
+            <input type="checkbox" id="autoCanvas" />
+            <label for="autoCanvas">Let the designer choose the best size for the content</label>
+          </div>
+        </div>
+
+        <div class="field row2">
+          <div>
+            <label class="lbl" for="slideCount">Number of slides</label>
+            <input type="text" id="slideCount" value="10" inputmode="numeric" placeholder="e.g. 10 or 12–15" />
+            <div class="presets" id="slideCountPresets">
+              <button type="button" class="chip" data-n="5">5</button>
+              <button type="button" class="chip active" data-n="10">10</button>
+              <button type="button" class="chip" data-n="15">15</button>
+              <button type="button" class="chip" data-n="20">20</button>
+            </div>
+          </div>
+          <div>
+            <label class="lbl" for="template">Template</label>
+            <select id="template">
+              <option value="">Free design (no template)</option>
+              <option value="中国电信">中国电信 — red/grey corporate</option>
+              <option value="中汽研">中汽研 — deep-blue engineering</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field row2">
+          <div>
+            <label class="lbl" for="tone">Tone</label>
+            <select id="tone">
+              <option value="">Designer's judgment</option>
+              <option value="confident, editorial">Confident, editorial</option>
+              <option value="formal, corporate">Formal, corporate</option>
+              <option value="bold, high-energy">Bold, high-energy</option>
+              <option value="minimal, clean">Minimal, clean</option>
+              <option value="playful, expressive">Playful, expressive</option>
+              <option value="technical, precise">Technical, precise</option>
+            </select>
+          </div>
+          <div>
+            <label class="lbl" for="language">Language</label>
+            <select id="language">
+              <option value="id-ID">Bahasa Indonesia</option>
+              <option value="en-US" selected>English</option>
+              <option value="zh-CN">中文</option>
+              <option value="auto">Match the source files</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="lbl" for="notes">Additional constraints <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted)">(optional)</span></label>
+          <input type="text" id="notes" placeholder="e.g. include a pricing table, avoid stock photos, use brand color #1F3A6E" />
+        </div>
+      </fieldset>
+
+      <div class="field row2">
+        <div>
+          <label class="lbl" for="route">Route</label>
+          <select id="route">
+            <option value="create">create — new deck</option>
+            <option value="edit">edit — modify a deck</option>
+            <option value="template">template — from a template</option>
+            <option value="postprocess">postprocess</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl" for="provider">LLM provider</label>
+          <select id="provider">
+            <option value="">default</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <details class="keybox" id="keyBox">
+          <summary>API key</summary>
+          <div class="inner">
+            <input type="password" id="apiKey" placeholder="X-API-Key (e.g. changeme-dev-key)" autocomplete="off" />
+            <div class="hint">Sent as the <code>X-API-Key</code> header. Remembered only in this browser tab.</div>
+          </div>
+        </details>
+      </div>
+
+      <button type="submit" class="btn-generate" id="genBtn">
+        <span id="genLabel">Generate deck</span>
+      </button>
+    </form>
+  </section>
+
+  <!-- ============ Progress ============ -->
+  <section class="panel" aria-label="Progress">
+    <div class="panel-title">
+      <span class="num">02</span>
+      <h2>Progress</h2>
+    </div>
+
+    <div class="progress-head">
+      <span class="badge" id="stateBadge">idle</span>
+      <span class="jobid" id="jobId"></span>
+    </div>
+
+    <div class="bar" id="bar">
+      <div class="fill" id="fill" data-pct=""></div>
+    </div>
+
+    <div class="stage-line">
+      <span class="stage-name" id="stageName">Waiting to start…</span>
+      <span class="elapsed" id="elapsed">0s</span>
+    </div>
+
+    <div class="log" id="log">
+      <div class="empty">Events will stream here once a job starts.</div>
+    </div>
+
+    <div class="result" id="result">
+      <div class="rtxt">
+        Your deck is ready.
+        <small id="resultName"></small>
+      </div>
+      <a class="btn-download" id="dlBtn" href="#" download>↓ Download .pptx</a>
+    </div>
+
+    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+      <button type="button" class="btn-ghost danger" id="cancelBtn" disabled>Cancel job</button>
+      <button type="button" class="btn-ghost" id="clearBtn">Clear log</button>
+    </div>
+
+    <div class="recent">
+      <h3>Recent jobs</h3>
+      <ul id="recent"><li class="empty" style="cursor:default;border:none;background:none;padding:0">No jobs yet this session.</li></ul>
+    </div>
+  </section>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  "use strict";
+
+  const $ = (id) => document.getElementById(id);
+  const state = {
+    files: [],
+    jobId: null,
+    eventSource: null,
+    pollTimer: null,
+    tickTimer: null,
+    startedAt: 0,
+    done: false,
+    providersLoaded: false,
+  };
+
+  // -------- toast --------
+  let toastTimer;
+  function toast(msg, isErr) {
+    const t = $("toast");
+    t.textContent = msg;
+    t.className = "toast show" + (isErr ? " err" : "");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => (t.className = "toast"), 3600);
+  }
+
+  // -------- api key ----------
+  function apiKey() { return $("apiKey").value.trim(); }
+
+  // -------- health ----------
+  async function loadHealth() {
+    try {
+      const r = await fetch("/health");
+      const d = await r.json();
+      const dot = $("svcDot"), txt = $("svcText");
+      if (d.ppt_master_ready) {
+        dot.className = "dot ok";
+        txt.textContent = "Service ready · " + (d.llm_provider || "?");
+      } else {
+        dot.className = "dot warn";
+        txt.textContent = "Service degraded";
+        if (d.ppt_master_error) txt.title = d.ppt_master_error;
+      }
+      // populate providers
+      const sel = $("provider");
+      (d.available_providers || []).forEach((p) => {
+        const o = document.createElement("option");
+        o.value = p; o.textContent = p;
+        sel.appendChild(o);
+      });
+      state.providersLoaded = true;
+    } catch (e) {
+      $("svcDot").className = "dot off";
+      $("svcText").textContent = "Service unreachable";
+    }
+  }
+
+  // -------- file drop ----------
+  const drop = $("drop"), fileInput = $("fileInput"), fileList = $("fileList");
+
+  function fmtSize(b) {
+    if (b < 1024) return b + " B";
+    if (b < 1024 * 1024) return (b / 1024).toFixed(1) + " KB";
+    return (b / 1024 / 1024).toFixed(1) + " MB";
+  }
+
+  function renderFiles() {
+    fileList.innerHTML = "";
+    state.files.forEach((f, i) => {
+      const li = document.createElement("li");
+      const name = document.createElement("span");
+      name.className = "fname"; name.textContent = f.name; name.title = f.name;
+      const size = document.createElement("span");
+      size.className = "fsize"; size.textContent = fmtSize(f.size);
+      const rm = document.createElement("button");
+      rm.type = "button"; rm.textContent = "✕"; rm.title = "Remove";
+      rm.onclick = () => { state.files.splice(i, 1); renderFiles(); };
+      li.append(name, size, rm);
+      fileList.appendChild(li);
+    });
+  }
+
+  function addFiles(list) {
+    for (const f of list) {
+      if (!state.files.some((x) => x.name === f.name && x.size === f.size)) {
+        state.files.push(f);
+      }
+    }
+    renderFiles();
+  }
+
+  drop.addEventListener("click", () => fileInput.click());
+  drop.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInput.click(); } });
+  fileInput.addEventListener("change", () => { addFiles(fileInput.files); fileInput.value = ""; });
+  ["dragenter", "dragover"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("drag"); }));
+  ["dragleave", "drop"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove("drag"); }));
+  drop.addEventListener("drop", (e) => { if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files); });
+
+  // -------- log ----------
+  function clearLog() {
+    $("log").innerHTML = '<div class="empty">Events will stream here once a job starts.</div>';
+  }
+  function logLine(kind, text) {
+    const log = $("log");
+    const empty = log.querySelector(".empty");
+    if (empty) empty.remove();
+    const ln = document.createElement("div");
+    ln.className = "ln " + kind;
+    const ts = document.createElement("span");
+    ts.className = "ts";
+    ts.textContent = new Date().toLocaleTimeString([], { hour12: false });
+    const t = document.createElement("span");
+    t.className = "txt"; t.textContent = text;
+    ln.append(ts, t);
+    log.appendChild(ln);
+    // cap
+    while (log.children.length > 600) log.firstChild.remove();
+    log.scrollTop = log.scrollHeight;
+  }
+
+  // -------- progress UI ----------
+  function setState(s) {
+    const b = $("stateBadge");
+    const map = {
+      idle: ["idle", "idle"], queued: ["queued", "queued"],
+      running: ["running", "running"], completed: ["completed", "completed"],
+      failed: ["failed", "failed"], cancelled: ["cancelled", "cancelled"],
+    };
+    const [cls, label] = map[s] || ["idle", s];
+    b.className = "badge " + cls;
+    b.textContent = label;
+  }
+  function setPercent(pct) {
+    const bar = $("bar"), fill = $("fill");
+    if (pct === null || pct === undefined || isNaN(pct)) {
+      bar.classList.add("indeterminate");
+      fill.dataset.pct = "";
+      return;
+    }
+    bar.classList.remove("indeterminate");
+    pct = Math.max(0, Math.min(100, pct));
+    fill.style.width = pct + "%";
+    fill.dataset.pct = Math.round(pct) + "%";
+  }
+  function setStage(name) {
+    if (name) $("stageName").textContent = name;
+  }
+  function startTimer() {
+    state.startedAt = Date.now();
+    stopTimer();
+    state.tickTimer = setInterval(() => {
+      const s = Math.floor((Date.now() - state.startedAt) / 1000);
+      $("elapsed").textContent =
+        s < 60 ? s + "s" : Math.floor(s / 60) + "m " + (s % 60) + "s";
+    }, 1000);
+  }
+  function stopTimer() { if (state.tickTimer) { clearInterval(state.tickTimer); state.tickTimer = null; } }
+
+  // -------- event handling ----------
+  function handleEvent(ev) {
+    if (!ev || !ev.type) return;
+    if (ev.type === "ping") return;
+    const d = ev.data || {};
+    switch (ev.type) {
+      case "job.created":
+        setState("queued"); logLine("meta", "Job created, queued."); break;
+      case "job.started":
+        setState("running"); logLine("meta", "Job started."); setStage("Running agent…"); break;
+      case "job.progress": {
+        const stage = d.stage || d.message || "Working…";
+        setStage(stage);
+        if (d.percent !== null && d.percent !== undefined) setPercent(Number(d.percent));
+        else if (d.stage === "analyze") setPercent(8);
+        else if (d.stage === "design") setPercent(35);
+        else if (d.stage === "render") setPercent(65);
+        else if (d.stage === "export") setPercent(90);
+        logLine("progress", "▸ " + (d.message || stage));
+        break;
+      }
+      case "job.thought":
+        logLine("thought", d.text || "");
+        break;
+      case "job.tool_call": {
+        const name = d.name || d.tool || "tool";
+        const args = d.args ? JSON.stringify(d.args) : "";
+        logLine("tool_call", "→ " + name + (args ? " " + args.slice(0, 300) : ""));
+        if (/finalize/i.test(name)) setPercent(97);
+        break;
+      }
+      case "job.tool_result": {
+        const name = d.name || d.tool || "tool";
+        const res = typeof d.result === "string" ? d.result : JSON.stringify(d.result);
+        logLine("tool_result", "← " + name + ": " + String(res || "").slice(0, 400));
+        break;
+      }
+      case "job.warning":
+        logLine("warn", "! " + (d.message || d.error || "warning")); break;
+      case "job.completed":
+        onComplete(d); break;
+      case "job.failed":
+        onFailed(d.error || d.reason || "agent failed"); break;
+      case "job.cancelled":
+        onCancelled(); break;
+    }
+  }
+
+  function onComplete(d) {
+    state.done = true;
+    stopTimer();
+    setState("completed");
+    setPercent(100);
+    setStage("Deck ready");
+    logLine("done", "✓ Job completed.");
+    const dl = $("dlBtn");
+    dl.href = "/jobs/" + state.jobId + "/export";
+    dl.setAttribute("download", "");
+    $("resultName").textContent = d.export_path ? String(d.export_path).split("/").pop() : (state.jobId + ".pptx");
+    $("result").classList.add("show");
+    closeStreams();
+    setBusy(false);
+    addRecent(state.jobId, "completed");
+    toast("Deck ready — download available.");
+  }
+  function onFailed(err) {
+    state.done = true;
+    stopTimer();
+    setState("failed");
+    setStage("Failed");
+    $("bar").classList.remove("indeterminate");
+    logLine("err", "✕ Job failed: " + err);
+    closeStreams();
+    setBusy(false);
+    addRecent(state.jobId, "failed");
+    toast("Job failed: " + err, true);
+  }
+  function onCancelled() {
+    state.done = true;
+    stopTimer();
+    setState("cancelled");
+    setStage("Cancelled");
+    $("bar").classList.remove("indeterminate");
+    logLine("warn", "Job cancelled.");
+    closeStreams();
+    setBusy(false);
+    addRecent(state.jobId, "cancelled");
+  }
+
+  // -------- streaming ----------
+  function openStream(jobId) {
+    closeStreams();
+    const ES = window.EventSource;
+    if (ES) {
+      // EventSource cannot send custom headers, so pass the key as a query param.
+      const k = apiKey();
+      const url = "/jobs/" + jobId + "/events" + (k ? "?api_key=" + encodeURIComponent(k) : "");
+      const es = new ES(url);
+      state.eventSource = es;
+      es.onmessage = (m) => {
+        try { handleEvent(JSON.parse(m.data)); } catch (e) { /* ignore */ }
+      };
+      es.onerror = () => {
+        // EventSource retries automatically; fall back to polling if closed.
+        if (state.done) return;
+        logLine("meta", "Stream interrupted — polling for status…");
+        startPolling(jobId);
+      };
+    } else {
+      startPolling(jobId);
+    }
+  }
+
+  function startPolling(jobId) {
+    if (state.pollTimer || state.done) return;
+    state.pollTimer = setInterval(async () => {
+      try {
+        const r = await fetch("/jobs/" + jobId, { headers: authHeaders() });
+        if (!r.ok) return;
+        const rec = await r.json();
+        if (rec.status === "completed") { onComplete({ export_path: rec.export_path }); }
+        else if (rec.status === "failed") { onFailed(rec.error || "failed"); }
+        else if (rec.status === "cancelled") { onCancelled(); }
+      } catch (e) { /* keep polling */ }
+    }, 2500);
+  }
+
+  function closeStreams() {
+    if (state.eventSource) { state.eventSource.close(); state.eventSource = null; }
+    if (state.pollTimer) { clearInterval(state.pollTimer); state.pollTimer = null; }
+  }
+
+  function setBusy(busy) {
+    const btn = $("genBtn");
+    btn.disabled = busy;
+    $("cancelBtn").disabled = !busy;
+    if (busy) {
+      btn.innerHTML = '<span class="spinner"></span><span>Generating…</span>';
+    } else {
+      btn.innerHTML = '<span id="genLabel">Generate deck</span>';
+    }
+  }
+
+  function authHeaders() {
+    const k = apiKey();
+    return k ? { "X-API-Key": k } : {};
+  }
+
+  // -------- recent --------
+  function addRecent(jobId, status) {
+    const ul = $("recent");
+    const empty = ul.querySelector(".empty");
+    if (empty) empty.remove();
+    const li = document.createElement("li");
+    const name = document.createElement("span");
+    name.className = "rname"; name.textContent = jobId.slice(0, 12) + "…";
+    const st = document.createElement("span");
+    st.className = "rstate"; st.style.fontSize = ".7rem";
+    st.style.fontWeight = "700"; st.style.textTransform = "uppercase"; st.style.flex = "none";
+    st.textContent = status;
+    st.style.color = status === "completed" ? "var(--okc)" : status === "failed" ? "var(--errc)" : "var(--muted)";
+    const tm = document.createElement("span");
+    tm.className = "rtime"; tm.textContent = new Date().toLocaleTimeString([], { hour12: false });
+    li.append(name, st, tm);
+    li.title = "Reopen job " + jobId;
+    li.onclick = () => reopen(jobId);
+    ul.prepend(li);
+    while (ul.children.length > 8) ul.lastChild.remove();
+  }
+
+  async function reopen(jobId) {
+    // Reset view, then attach to an existing job.
+    $("result").classList.remove("show");
+    clearLog();
+    state.done = false;
+    state.jobId = jobId;
+    $("jobId").textContent = jobId.slice(0, 16) + "…";
+    setState("running");
+    setPercent(null);
+    startTimer();
+    logLine("meta", "Re-attached to job " + jobId + ".");
+    openStream(jobId);
+    // Also do one status read to catch terminal states that won't re-emit.
+    try {
+      const r = await fetch("/jobs/" + jobId, { headers: authHeaders() });
+      if (r.ok) {
+        const rec = await r.json();
+        if (rec.status === "completed") onComplete({ export_path: rec.export_path });
+        else if (rec.status === "failed") onFailed(rec.error || "failed");
+        else if (rec.status === "cancelled") onCancelled();
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  // -------- design spec ----------
+  const CANVAS_LABELS = {
+    ppt169: "PPT 16:9 (1280×720)",
+    ppt43: "PPT 4:3 (1024×768)",
+    story: "Story 9:16 (1080×1920)",
+    moments: "Square 1:1 (1080×1080)",
+    a4: "A4 print (1240×1754)",
+    banner: "Banner 16:9 (1920×1080)",
+  };
+
+  function selectedCanvas() {
+    const el = document.querySelector('input[name="canvas"]:checked');
+    return el ? el.value : "ppt169";
+  }
+
+  // canvas card radios: keep enabled state consistent with the auto checkbox
+  function syncCanvasEnabled() {
+    const auto = $("autoCanvas").checked;
+    document.querySelectorAll('input[name="canvas"]').forEach((r) => { r.disabled = auto; });
+    $("canvasGrid").style.opacity = auto ? ".45" : "1";
+  }
+  $("autoCanvas").addEventListener("change", syncCanvasEnabled);
+
+  // slide-count preset chips
+  $("slideCountPresets").addEventListener("click", (e) => {
+    const chip = e.target.closest(".chip");
+    if (!chip) return;
+    $("slideCount").value = chip.dataset.n;
+    document.querySelectorAll("#slideCountPresets .chip").forEach((c) => c.classList.toggle("active", c === chip));
+  });
+  $("slideCount").addEventListener("input", () => {
+    const v = $("slideCount").value.trim();
+    document.querySelectorAll("#slideCountPresets .chip").forEach((c) => c.classList.toggle("active", c.dataset.n === v));
+  });
+
+  // template selection implies the template route
+  $("template").addEventListener("change", () => {
+    if ($("template").value) $("route").value = "template";
+  });
+
+  $("specReset").addEventListener("click", () => {
+    document.querySelector('input[name="canvas"][value="ppt169"]').checked = true;
+    $("autoCanvas").checked = false; syncCanvasEnabled();
+    $("slideCount").value = "10";
+    document.querySelectorAll("#slideCountPresets .chip").forEach((c) => c.classList.toggle("active", c.dataset.n === "10"));
+    $("template").value = "";
+    $("tone").value = "";
+    $("language").value = "en-US";
+    $("notes").value = "";
+    if ($("route").value === "template") $("route").value = "create";
+    toast("Design spec reset to defaults.");
+  });
+
+  // Build the structured design spec from the form.
+  function readSpec() {
+    const autoCanvas = $("autoCanvas").checked;
+    return {
+      canvas_format: autoCanvas ? "auto" : selectedCanvas(),
+      canvas_label: autoCanvas ? "" : CANVAS_LABELS[selectedCanvas()],
+      page_count: $("slideCount").value.trim(),
+      template: $("template").value,
+      tone: $("tone").value,
+      language: $("language").value,
+      notes: $("notes").value.trim(),
+    };
+  }
+
+  // Fold the spec into the natural-language prompt so the agent receives it.
+  function composePrompt(base, spec) {
+    const lines = [base.trim()];
+    const reqs = [];
+    if (spec.canvas_format === "auto") reqs.push("- Slide size: choose the most appropriate canvas for the content");
+    else reqs.push("- Slide size: " + spec.canvas_label + " (canvas format `" + spec.canvas_format + "`)");
+    if (spec.page_count) reqs.push("- Number of slides: " + spec.page_count);
+    if (spec.template) reqs.push("- Template: use the registered \"" + spec.template + "\" template");
+    else reqs.push("- Template: free design (no template)");
+    if (spec.tone) reqs.push("- Tone: " + spec.tone);
+    if (spec.language && spec.language !== "auto") reqs.push("- Language: " + spec.language);
+    else if (spec.language === "auto") reqs.push("- Language: match the source files");
+    if (spec.notes) reqs.push("- Additional constraints: " + spec.notes);
+    lines.push("", "Design spec requirements:", ...reqs);
+    return lines.join("\n");
+  }
+
+  // -------- submit ----------
+  $("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const basePrompt = $("prompt").value.trim();
+    if (!basePrompt) { toast("Please enter a prompt.", true); return; }
+    if (!apiKey()) { $("keyBox").open = true; toast("Enter your API key first.", true); return; }
+    const spec = readSpec();
+    const prompt = composePrompt(basePrompt, spec);
+
+    // reset view
+    $("result").classList.remove("show");
+    clearLog();
+    state.done = false;
+    setPercent(null);
+    setStage("Submitting…");
+    setState("queued");
+    setBusy(true);
+    startTimer();
+
+    const fd = new FormData();
+    fd.append("prompt", prompt);
+    fd.append("route", $("route").value);
+    const prov = $("provider").value;
+    if (prov) fd.append("provider_override", prov);
+    fd.append("no_confirm", "true");
+    fd.append("options", JSON.stringify(spec));
+    state.files.forEach((f) => fd.append("files", f, f.name));
+
+    logLine("meta", "Design spec: " + (spec.canvas_format === "auto" ? "auto size" : spec.canvas_label)
+      + " · " + (spec.page_count || "auto") + " slides"
+      + " · " + (spec.template || "free design")
+      + (spec.tone ? " · " + spec.tone : ""));
+    logLine("meta", "Submitting job" + (state.files.length ? " with " + state.files.length + " file(s)" : "") + "…");
+
+    try {
+      const r = await fetch("/jobs", { method: "POST", headers: authHeaders(), body: fd });
+      if (!r.ok) {
+        let detail = r.status + " " + r.statusText;
+        try { const j = await r.json(); detail = j.detail || j.error || detail; } catch (_) {}
+        throw new Error(detail);
+      }
+      const d = await r.json();
+      state.jobId = d.job_id;
+      $("jobId").textContent = d.job_id.slice(0, 16) + "…";
+      logLine("meta", "Job " + d.job_id.slice(0, 12) + "… created.");
+      setStage("Queued");
+      openStream(d.job_id);
+    } catch (err) {
+      onFailed(err.message || String(err));
+    }
+  });
+
+  // -------- cancel / clear --------
+  $("cancelBtn").addEventListener("click", async () => {
+    if (!state.jobId) return;
+    try {
+      const r = await fetch("/jobs/" + state.jobId + "/cancel", { method: "POST", headers: authHeaders() });
+      if (r.ok) { logLine("meta", "Cancellation requested…"); }
+      else { toast("Cancel failed (" + r.status + ")", true); }
+    } catch (e) { toast("Cancel failed", true); }
+  });
+  $("clearBtn").addEventListener("click", clearLog);
+
+  // remember api key for the tab
+  try {
+    const saved = sessionStorage.getItem("pptm_key");
+    if (saved) { $("apiKey").value = saved; }
+  } catch (_) {}
+  $("apiKey").addEventListener("input", () => {
+    try { sessionStorage.setItem("pptm_key", apiKey()); } catch (_) {}
+  });
+
+  // init
+  loadHealth();
+})();
+</script>
+</body>
+</html>
