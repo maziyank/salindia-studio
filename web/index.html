@@ -645,7 +645,26 @@
             <label class="lbl" for="template">Template</label>
             <select id="template">
               <option value="">Free design (no template)</option>
+              <option value="accenture">Accenture — violet on black</option>
+              <option value="alibaba">Alibaba — signature orange on black</option>
+              <option value="anthropic">Anthropic / Claude — warm coral</option>
+              <option value="aws">AWS — orange on deep navy</option>
+              <option value="bain">Bain — scarlet red neutrals</option>
+              <option value="bcg">BCG — forest green neutrals</option>
+              <option value="deloitte">Deloitte — green on black</option>
+              <option value="google">Google — multi-product blue</option>
+              <option value="huawei">Huawei — restrained red</option>
+              <option value="ibm">IBM — Carbon blue / gray</option>
+              <option value="jpmorgan">JPMorgan — corporate blue</option>
+              <option value="mckinsey">McKinsey — deep navy / electric blue</option>
+              <option value="microsoft">Microsoft — four-square spectrum</option>
+              <option value="nvidia">NVIDIA — signature green on near-black</option>
+              <option value="pwc">PwC — orange-to-rose</option>
+              <option value="tencent">Tencent — measured blue</option>
+              <option value="xiaomi">Xiaomi — orange on white</option>
+              <option value="zcare-rescue">子鹊救援 — navy rescue</option>
               <option value="中国电信">中国电信 — red/grey corporate</option>
+              <option value="中国电建">中国电建 — POWERCHINA blue</option>
               <option value="中汽研">中汽研 — deep-blue engineering</option>
             </select>
           </div>
@@ -733,7 +752,7 @@
 
     <div class="stage-line">
       <span class="stage-name" id="stageName">Waiting to start…</span>
-      <span class="elapsed" id="elapsed">0s</span>
+      <span class="elapsed" id="elapsed">0s · 0 tokens</span>
     </div>
 
     <div class="log" id="log">
@@ -775,6 +794,7 @@
     pollTimer: null,
     tickTimer: null,
     startedAt: 0,
+    tokens: { input: 0, output: 0 },
     done: false,
     providersLoaded: false,
   };
@@ -808,9 +828,16 @@
       }
       // populate providers
       const sel = $("provider");
-      (d.available_providers || []).forEach((p) => {
+      sel.innerHTML = '<option value="">default' + (d.llm_provider ? " (" + d.llm_provider + ")" : "") + "</option>";
+      const list = d.providers && d.providers.length
+        ? d.providers
+        : (d.available_providers || []).map((p) => ({ id: p, label: p, configured: true }));
+      list.forEach((p) => {
         const o = document.createElement("option");
-        o.value = p; o.textContent = p;
+        o.value = p.id;
+        o.textContent = p.label + (p.configured ? "" : " — not configured");
+        o.disabled = !p.configured;
+        if (!p.configured) o.title = "Set " + p.env + " in .env to enable";
         sel.appendChild(o);
       });
       state.providersLoaded = true;
@@ -912,12 +939,38 @@
   }
   function startTimer() {
     state.startedAt = Date.now();
+    state.tokens = { input: 0, output: 0 };
     stopTimer();
-    state.tickTimer = setInterval(() => {
+    const tick = () => {
       const s = Math.floor((Date.now() - state.startedAt) / 1000);
-      $("elapsed").textContent =
-        s < 60 ? s + "s" : Math.floor(s / 60) + "m " + (s % 60) + "s";
-    }, 1000);
+      const elapsed = s < 60 ? s + "s" : Math.floor(s / 60) + "m " + (s % 60) + "s";
+      const total = state.tokens.input + state.tokens.output;
+      $("elapsed").textContent = elapsed + " · " + fmtTokens(total) + " tokens";
+    };
+    tick();
+    state.tickTimer = setInterval(tick, 1000);
+  }
+  function fmtTokens(n) { return Number(n || 0).toLocaleString(); }
+  function usageSuffix(d) {
+    const u = d && d.usage;
+    if (!u) return ".";
+    const total = Number(u.input_tokens || 0) + Number(u.output_tokens || 0);
+    const parts = ["time " + (d.duration_seconds != null ? d.duration_seconds + "s" : "—")];
+    parts.push(fmtTokens(total) + " tokens (" + fmtTokens(u.input_tokens) + " in / " + fmtTokens(u.output_tokens) + " out)");
+    if (u.tool_calls != null) parts.push(fmtTokens(u.tool_calls) + " tool calls");
+    return " · " + parts.join(" · ") + ".";
+  }
+  function setTokens(usage) {
+    if (!usage) return;
+    state.tokens = {
+      input: Number(usage.input_tokens || 0),
+      output: Number(usage.output_tokens || 0),
+    };
+    const total = state.tokens.input + state.tokens.output;
+    $("elapsed").textContent = $("elapsed").textContent.replace(
+      /·\s*[\d,]*\s*tokens$/,
+      "· " + fmtTokens(total) + " tokens"
+    );
   }
   function stopTimer() { if (state.tickTimer) { clearInterval(state.tickTimer); state.tickTimer = null; } }
 
@@ -932,6 +985,9 @@
       case "job.started":
         setState("running"); logLine("meta", "Job started."); setStage("Running agent…"); break;
       case "job.progress": {
+        if (d.usage) setTokens(d.usage);
+        // Usage-only updates carry no stage; don't spam the log for them.
+        if (!d.stage && !d.message) break;
         const stage = d.stage || d.message || "Working…";
         setStage(stage);
         if (d.percent !== null && d.percent !== undefined) setPercent(Number(d.percent));
@@ -972,10 +1028,11 @@
   function onComplete(d) {
     state.done = true;
     stopTimer();
+    setTokens(d.usage);
     setState("completed");
     setPercent(100);
     setStage("Deck ready");
-    logLine("done", "✓ Job completed.");
+    logLine("done", "✓ Job completed" + usageSuffix(d));
     const dl = $("dlBtn");
     dl.href = "/jobs/" + state.jobId + "/export";
     dl.setAttribute("download", "");

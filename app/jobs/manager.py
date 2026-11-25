@@ -60,6 +60,7 @@ class JobRecord:
     export_name: Optional[str] = None
     error: Optional[str] = None
     usage: Dict[str, int] = field(default_factory=dict)
+    duration_seconds: Optional[float] = None
     source_files: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -158,6 +159,7 @@ class JobManager:
                     rec.status = JobStatus.COMPLETED.value
                     rec.export_path = result.get("export_path")
                     rec.export_name = Path(rec.export_path).name if rec.export_path else None
+                    rec.duration_seconds = result.get("duration_seconds")
                 elif result.get("status") == "cancelled":
                     rec.status = JobStatus.CANCELLED.value
                     rec.error = "cancelled"

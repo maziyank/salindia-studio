@@ -230,6 +230,9 @@ class AgentLoop:
             self._total_input_tokens += resp.usage_input_tokens
             self._total_output_tokens += resp.usage_output_tokens
 
+            # Surface running token usage so clients can show live cost
+            await self._emit(EventType.JOB_PROGRESS, {"usage": self.usage})
+
             # Surface assistant text as a thought event
             if resp.text:
                 await self._emit(EventType.JOB_THOUGHT, {"text": resp.text, "iteration": iteration})

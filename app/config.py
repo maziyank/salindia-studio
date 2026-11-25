@@ -57,6 +57,13 @@ class Settings(BaseSettings):
     azure_api_version: str = "2024-02-15-preview"
     openai_base_url: str = ""
     kimi_base_url: str = "https://api.moonshot.cn/v1"
+    # Generic OpenAI-compatible provider (any endpoint speaking the OpenAI
+    # Chat Completions API, e.g. Groq, OpenRouter, vLLM, Ollama, Together...).
+    llm_model_custom: str = ""
+    custom_api_key: str = ""
+    custom_base_url: str = ""
+    # Optional display name shown in the web UI (defaults to "Custom").
+    custom_label: str = ""
     llm_temperature: float = 0.4
     llm_max_tokens: int = 8192
     llm_max_iterations: int = 40
@@ -86,8 +93,10 @@ class Settings(BaseSettings):
     @classmethod
     def _validate_provider(cls, v: str) -> str:
         v = v.lower()
-        if v not in {"openai", "anthropic", "gemini", "kimi", "azure"}:
-            raise ValueError("LLM_PROVIDER must be one of openai|anthropic|gemini|kimi|azure")
+        if v not in {"openai", "anthropic", "gemini", "kimi", "azure", "custom"}:
+            raise ValueError(
+                "LLM_PROVIDER must be one of openai|anthropic|gemini|kimi|azure|custom"
+            )
         return v
 
 

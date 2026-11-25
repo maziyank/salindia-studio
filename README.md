@@ -103,8 +103,9 @@ All settings live in `.env` (see `.env.example`). The most important:
 | Var | Purpose |
 |---|---|
 | `API_KEYS` | Comma-separated valid client keys (sent as `X-API-Key`). |
-| `LLM_PROVIDER` | `openai` \| `anthropic` \| `gemini` \| `kimi`. |
+| `LLM_PROVIDER` | `openai` \| `anthropic` \| `gemini` \| `kimi` \| `azure` \| `custom`. |
 | `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` / `GEMINI_API_KEY` / `KIMI_API_KEY` | The corresponding SDK key. |
+| `CUSTOM_BASE_URL` / `LLM_MODEL_CUSTOM` / `CUSTOM_API_KEY` | Enable the **custom** provider for any OpenAI-compatible endpoint (key optional for local servers). `CUSTOM_LABEL` renames it in the UI. |
 | `LLM_MAX_ITERATIONS` | Hard cap on agent turns (default 40). Bounding cost. |
 | `MAX_CONCURRENT_JOBS` | In-process semaphore bound (default 2). |
 | `MAX_JOB_TIMEOUT_SECONDS` | Per-job wall-clock cap (default 1800). |
@@ -209,6 +210,7 @@ The system prompt is `SKILL.md + a short operating preamble` that constrains the
 - **Anthropic Claude** (recommended): native content-block tool calling, matches PPT Master's intended design.
 - **OpenAI / Kimi**: OpenAI-compatible; Kimi uses `https://api.moonshot.cn/v1` and a 128K–1M context model.
 - **Gemini**: 1M+ context, ideal for long source documents.
+- **Custom (OpenAI-compatible)**: point `CUSTOM_BASE_URL` + `LLM_MODEL_CUSTOM` at any endpoint speaking the OpenAI Chat Completions API (Groq, OpenRouter, Together, vLLM, Ollama, LM Studio, DeepSeek, your own gateway). Set `CUSTOM_API_KEY` if the endpoint needs auth; `CUSTOM_LABEL` renames it in the web UI.
 - Switch at runtime via `LLM_PROVIDER` env var, or per-job via `provider_override` in the JSON request body.
 
 The provider abstraction (`app/llm/base.py`) normalizes every provider's response into the same shape (`LLMContent[]` with `text` and `tool_use` blocks), so the agent loop is provider-agnostic.

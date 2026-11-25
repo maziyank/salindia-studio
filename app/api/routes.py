@@ -40,7 +40,7 @@ from app.api.auth import require_api_key, require_api_key_sse, require_api_key_w
 from app.config import get_settings
 from app.events import EventBus, EventType, bus
 from app.jobs.manager import JobManager, JobSpec, get_job_manager
-from app.llm.factory import list_available_providers
+from app.llm.factory import list_available_providers, list_provider_catalog
 from app.pptmaster.runtime import get_runtime
 from app.storage.factory import get_storage
 
@@ -76,6 +76,7 @@ async def health() -> dict:
         "storage_backend": s.storage_backend,
         "llm_provider": s.llm_provider,
         "available_providers": list_available_providers(),
+        "providers": list_provider_catalog(),
         "allowed_routes": s.allowed_routes,
         "max_concurrent_jobs": s.max_concurrent_jobs,
     }
