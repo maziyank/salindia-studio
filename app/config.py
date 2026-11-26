@@ -72,6 +72,13 @@ class Settings(BaseSettings):
     webhook_default_url: str = ""
     webhook_secret: str = ""
 
+    # MCP server (exposes this service as Model Context Protocol tools)
+    mcp_enabled: bool = True
+    mcp_path: str = "/mcp"
+    # Comma-separated Host values the MCP endpoint accepts. Empty = no Host
+    # filtering (needed behind a reverse proxy/domain).
+    mcp_allowed_hosts_raw: str = Field(default="", alias="MCP_ALLOWED_HOSTS")
+
     # ----- Derived -----
     @property
     def api_keys(self) -> List[str]:
@@ -80,6 +87,10 @@ class Settings(BaseSettings):
     @property
     def allowed_routes(self) -> List[str]:
         return [r.strip().lower() for r in self.allowed_routes_raw.split(",") if r.strip()]
+
+    @property
+    def mcp_allowed_hosts(self) -> List[str]:
+        return [h.strip() for h in self.mcp_allowed_hosts_raw.split(",") if h.strip()]
 
     @field_validator("storage_backend")
     @classmethod

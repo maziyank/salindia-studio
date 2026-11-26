@@ -116,6 +116,9 @@ All settings live in `.env` (see `.env.example`). The most important:
 | `PPTMASTER_REPO_DIR` | Where the upstream repo lives (default `/opt/ppt-master`). |
 | `ALLOWED_ROUTES` | Subset of `create,edit,template,postprocess` this instance accepts. |
 | `WEBHOOK_DEFAULT_URL` / `WEBHOOK_SECRET` | Default webhook target + HMAC secret. |
+| `MCP_ENABLED` | Expose the MCP server at `MCP_PATH` (default `true`). |
+| `MCP_PATH` | Path the MCP endpoint is mounted at (default `/mcp`). |
+| `MCP_ALLOWED_HOSTS` | Comma-separated `Host` values the MCP endpoint accepts (anti DNS-rebinding). Empty = no filtering; set it when serving behind a domain. |
 
 ## API
 
@@ -185,6 +188,35 @@ curl -X POST http://localhost:8000/jobs/$JOB_ID/cancel -H "X-API-Key: $KEY"
 
 Sets a stop flag the agent loop checks between iterations (cancellation is cooperative, not preemptive).
 
+## MCP server
+
+The service also speaks the [Model Context Protocol](https://modelcontextprotocol.io) over **streamable HTTP**, so [CC] / Cursor / any MCP client can generate decks without writing HTTP glue. It is mounted at `MCP_PATH` (default `/mcp`) and requires the same `X-API-Key` as the REST API (or `Authorization: Bearer <key>`).
+
+| MCP tool | REST equivalent |
+|---|---|
+| `create_deck_job` | `POST /jobs` (accepts inline base64 `files`) |
+| `get_job` | `GET /jobs/{id}` |
+| `list_jobs` | `GET /jobs` |
+| `cancel_job` | `POST /jobs/{id}/cancel` |
+
+Resource `salindia://jobs/{job_id}/deck` returns the produced `.pptx` as a binary blob once the job is `completed`.
+
+Typical flow: `create_deck_job` → poll `get_job` until `completed` → read `salindia://jobs/{job_id}/deck`.
+
+Client config (Claude Code / Cursor `mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "salindia": {
+      "type": "http",
+      "url": "http://localhost:8000/mcp",
+      "headers": { "X-API-Key": "<your key>" }
+    }
+  }
+}
+```
+
 ## How the agent drives PPT Master
 
 The agent loop exposes these tools to the LLM:
@@ -249,7 +281,7 @@ Smoke tests (no LLM calls, no API keys needed):
 python tests/test_smoke.py
 ```
 
-Checks: imports clean, `/health` responds, API key auth enforced, route validation works.
+Checks: imports clean, `/health` responds, API key auth enforced, route validation works, and the MCP endpoint enforces auth, lists its tools/resource template, and reports tool errors.
 
 ## Project layout
 
@@ -268,8 +300,9 @@ app/
   pptmaster/
     runtime.py         # auto-clone + deps + path helpers
   api/
-    auth.py            # X-API-Key header + WS query param
+    auth.py            # X-API-Key header + WS query param + MCP middleware
     routes.py          # REST + WS + SSE
+  mcp_server.py        # MCP server (FastMCP tools + deck resource)
   main.py              # FastAPI app + lifespan
 tests/test_smoke.py
 Dockerfile

@@ -158,34 +158,9 @@ async def create_job(
         options=parsed_options if isinstance(parsed_options, dict) else {},
     )
     # The manager will mint its own job_id; to keep uploads aligned we pass
-    # the pre-staged paths and let the manager stage them into the workdir.
-    # To avoid id mismatch, override the manager's id by re-staging: simplest
-    # is to call a variant. We'll just create with our id:
-    rec = await _create_with_id(mgr, job_id, spec)
+    # the pre-staged paths and create the job under our pre-generated id.
+    rec = await mgr.create_job_with_id(job_id, spec)
     return {"job_id": rec.job_id, "status": rec.status, "sources": sources}
-
-
-async def _create_with_id(mgr: JobManager, job_id: str, spec: JobSpec):
-    """Bypass the manager's UUID generation so uploads land in the same
-    namespace as the agent's workdir."""
-    import time
-    from app.jobs.manager import JobRecord
-    from app.events import Event, EventType, bus
-    rec = JobRecord(
-        job_id=job_id,
-        status="queued",
-        spec=spec.__dict__,
-        created_at=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        source_files=list(spec.sources),
-    )
-    mgr._records[job_id] = rec
-    await mgr._persist()
-    await bus.publish(Event(job_id=job_id, type=EventType.JOB_CREATED, data={"spec": spec.__dict__}))
-    wh_url = spec.webhook_url or mgr.settings.webhook_default_url
-    if wh_url:
-        asyncio.create_task(mgr._webhook_dispatcher(job_id, wh_url, spec.webhook_secret or mgr.settings.webhook_secret))
-    mgr._tasks[job_id] = asyncio.create_task(mgr._run_job(job_id, spec))
-    return rec
 
 
 @router.post("/jobs/json", tags=["jobs"], dependencies=[Depends(require_api_key)])

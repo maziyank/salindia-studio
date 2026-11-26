@@ -113,9 +113,13 @@ class JobManager:
 
     # ----- public API -----
     async def create_job(self, spec: JobSpec) -> JobRecord:
+        return await self.create_job_with_id(uuid.uuid4().hex, spec)
+
+    async def create_job_with_id(self, job_id: str, spec: JobSpec) -> JobRecord:
+        """Create a job under a caller-supplied id. Used when uploads were
+        already staged under that id (multipart REST upload, MCP upload)."""
         if spec.route.lower() not in self.settings.allowed_routes:
             raise ValueError(f"route '{spec.route}' not allowed (allowed: {self.settings.allowed_routes})")
-        job_id = uuid.uuid4().hex
         now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         rec = JobRecord(
             job_id=job_id,

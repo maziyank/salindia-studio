@@ -4,6 +4,10 @@ uvicorn[standard]==0.32.1
 python-multipart==0.0.20
 websockets==14.1
 
+# MCP server (streamable HTTP). Pinned to 1.x: mcp 2.x renamed FastMCP and
+# requires a newer Starlette than fastapi 0.115.6 allows.
+mcp==1.27.2
+
 # Settings
 pydantic==2.12.5
 pydantic-settings==2.7.1

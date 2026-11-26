@@ -88,9 +88,67 @@ def test_job_create_validation():
         print("OK: route validation")
 
 
+def _mcp_call(client, method, params=None, req_id=1, key="test-key"):
+    """POST a JSON-RPC message to the mounted MCP endpoint.
+
+    The server runs stateless, so every request is independent and no session
+    id or prior `initialize` is required.
+    """
+    body = {"jsonrpc": "2.0", "id": req_id, "method": method}
+    if params is not None:
+        body["params"] = params
+    headers = {"Accept": "application/json, text/event-stream"}
+    if key is not None:
+        headers["X-API-Key"] = key
+    return client.post("/mcp", json=body, headers=headers)
+
+
+def test_mcp_auth_enforced():
+    from fastapi.testclient import TestClient
+    from app.main import app
+    with TestClient(app) as client:
+        assert _mcp_call(client, "tools/list", key=None).status_code == 401
+        assert _mcp_call(client, "tools/list", key="wrong").status_code == 401
+        r = _mcp_call(client, "tools/list")
+        assert r.status_code == 200, r.text
+        print("OK: MCP API key auth enforced")
+
+
+def test_mcp_tools_and_resources_listed():
+    from fastapi.testclient import TestClient
+    from app.main import app
+    with TestClient(app) as client:
+        r = _mcp_call(client, "tools/list")
+        assert r.status_code == 200, r.text
+        names = {t["name"] for t in r.json()["result"]["tools"]}
+        assert names == {"create_deck_job", "get_job", "list_jobs", "cancel_job"}, names
+
+        r = _mcp_call(client, "resources/templates/list")
+        assert r.status_code == 200, r.text
+        uris = {t["uriTemplate"] for t in r.json()["result"]["resourceTemplates"]}
+        assert "salindia://jobs/{job_id}/deck" in uris, uris
+        print("OK: MCP tools + resource templates")
+
+
+def test_mcp_tool_error_is_reported():
+    from fastapi.testclient import TestClient
+    from app.main import app
+    with TestClient(app) as client:
+        r = _mcp_call(client, "tools/call",
+                      {"name": "get_job", "arguments": {"job_id": "does-not-exist"}})
+        assert r.status_code == 200, r.text
+        result = r.json()["result"]
+        assert result["isError"] is True, result
+        assert "job not found" in result["content"][0]["text"]
+        print("OK: MCP tool errors surface to the client")
+
+
 if __name__ == "__main__":
     test_imports()
     test_health_endpoint()
     test_auth_enforced()
     test_job_create_validation()
+    test_mcp_auth_enforced()
+    test_mcp_tools_and_resources_listed()
+    test_mcp_tool_error_is_reported()
     print("\nAll smoke tests passed.")

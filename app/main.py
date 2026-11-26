@@ -2,7 +2,7 @@
 
 Lifespan:
   - On startup: provision the PPT Master repo (async, runs in thread),
-    load persisted job records, configure logging.
+    load persisted job records, run the MCP session manager, configure logging.
   - On shutdown: cancel running jobs gracefully.
 
 Run with:  uvicorn app.main:app --host 0.0.0.0 --port 8000
@@ -11,15 +11,17 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from contextlib import asynccontextmanager
+from contextlib import AsyncExitStack, asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.api.auth import MCPAuthMiddleware
 from app.api.routes import router
 from app.config import get_settings
 from app.jobs.manager import get_job_manager
+from app.mcp_server import MCPMount, get_mcp_http_app, mcp, reset_mcp_http_app
 from app.pptmaster.runtime import get_runtime
 
 
@@ -42,7 +44,16 @@ async def lifespan(app: FastAPI):
     mgr = get_job_manager()
     await mgr.load_persisted()
 
-    yield
+    async with AsyncExitStack() as stack:
+        if s.mcp_enabled:
+            # A mounted app's own lifespan never runs, so drive the MCP
+            # session manager from here. Rebuild it each lifespan: the manager
+            # can only be run once per instance.
+            reset_mcp_http_app()
+            get_mcp_http_app()  # creates the session manager lazily
+            await stack.enter_async_context(mcp.session_manager.run())
+            log.info("MCP server enabled at %s", s.mcp_path)
+        yield
 
     # Shutdown: cancel running tasks
     log.info("shutdown: cancelling %d running jobs", len(mgr._tasks))
@@ -58,6 +69,10 @@ def create_app() -> FastAPI:
         version="0.1.0",
         lifespan=lifespan,
     )
+    if s.mcp_enabled:
+        # Added before CORS so CORS stays the outermost middleware (its headers
+        # then also apply to 401s from MCPAuthMiddleware).
+        app.add_middleware(MCPAuthMiddleware, path_prefix=s.mcp_path, api_keys=s.api_keys)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
@@ -72,6 +87,11 @@ def create_app() -> FastAPI:
         return JSONResponse(status_code=400, content={"error": "bad_request", "detail": str(exc)})
 
     app.include_router(router)
+    if s.mcp_enabled:
+        # Mounted at "/" and last, so the MCP app only sees paths no REST route
+        # matched. Mounting at s.mcp_path instead would 307-redirect POST /mcp
+        # to /mcp/, which some MCP clients refuse to follow.
+        app.mount("/", MCPMount())
     return app
 
 
