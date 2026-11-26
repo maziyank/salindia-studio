@@ -79,6 +79,7 @@ async def health() -> dict:
         "providers": list_provider_catalog(),
         "allowed_routes": s.allowed_routes,
         "max_concurrent_jobs": s.max_concurrent_jobs,
+        "mcp": {"enabled": s.mcp_enabled, "path": s.mcp_path},
     }
 
 

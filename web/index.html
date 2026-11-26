@@ -498,6 +498,95 @@
   .recent li .rtime { font-family: "JetBrains Mono", monospace; font-size: .68rem; color: var(--muted); flex: none; }
   .recent .empty { color: var(--muted); font-size: .82rem; font-style: italic; }
 
+  /* ---------- MCP ---------- */
+  .header-actions { display: flex; align-items: center; gap: 12px; }
+  .mcp-trigger {
+    font-family: "JetBrains Mono", monospace;
+    font-size: .68rem; font-weight: 500;
+    letter-spacing: .14em; text-transform: uppercase;
+    padding: 6px 13px; border-radius: 999px;
+  }
+  .mcp-trigger::before {
+    content: ""; display: inline-block;
+    width: 6px; height: 6px; margin-right: 7px;
+    border-radius: 50%; background: var(--cobalt); vertical-align: middle;
+  }
+  .mcp-dialog {
+    width: min(760px, calc(100vw - 32px));
+    max-height: calc(100vh - 64px);
+    margin: auto; padding: 26px;
+    background: var(--card); color: var(--ink);
+    border: 2px solid var(--rule); border-radius: 4px;
+    box-shadow: var(--shadow); overflow-y: auto;
+  }
+  .mcp-dialog::backdrop { background: rgba(20,17,13,.45); backdrop-filter: blur(2px); }
+  .mcp-dialog[open] { animation: pop .22s ease-out; }
+  .dialog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .dialog-head .panel-title { margin-bottom: 18px; }
+  .dialog-close {
+    flex: none; width: 30px; height: 30px;
+    display: grid; place-items: center;
+    background: var(--paper); border: 1.5px solid var(--rule);
+    border-radius: 3px; color: var(--ink); cursor: pointer;
+    font-size: .85rem; line-height: 1;
+    transition: background .15s, color .15s;
+  }
+  .dialog-close:hover { background: var(--ink); color: var(--paper); }
+  .mcp-lede { max-width: 76ch; color: #4a4235; font-size: .95rem; margin-bottom: 20px; }
+  code.inline {
+    font-family: "JetBrains Mono", monospace; font-size: .82em;
+    background: var(--paper-2); border: 1px solid #cdbfa3;
+    border-radius: 3px; padding: 1px 5px;
+  }
+  .mcp-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 20px; }
+  @media (max-width: 900px) { .mcp-grid { grid-template-columns: 1fr; } }
+  .mcp-facts { display: flex; flex-direction: column; gap: 12px; }
+  .fact { display: grid; grid-template-columns: 84px 1fr; gap: 12px; align-items: baseline; font-size: .85rem; }
+  .fact .k {
+    font-size: .66rem; font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .fact .v { word-break: break-word; }
+  .mono { font-family: "JetBrains Mono", monospace; font-size: .8rem; }
+  .mcp-tools {
+    border: 1.5px solid var(--rule); border-radius: 4px;
+    background: var(--paper); padding: 14px 16px;
+  }
+  .tools-title {
+    font-size: .66rem; font-weight: 700; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+  }
+  .mcp-tools ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .mcp-tools li { display: flex; flex-direction: column; gap: 1px; font-size: .82rem; }
+  .mcp-tools li code { font-family: "JetBrains Mono", monospace; font-size: .78rem; font-weight: 500; color: var(--clay-deep); }
+  .mcp-tools li span { color: var(--muted); }
+  .tools-note {
+    margin-top: 12px; padding-top: 10px; border-top: 1px dashed #cdbfa3;
+    font-size: .78rem; color: var(--muted);
+  }
+  .mcp-config {
+    margin-top: 20px; background: #1a1712;
+    border: 2px solid var(--rule); border-radius: 4px; overflow: hidden;
+  }
+  .config-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 14px; border-bottom: 1.5px solid #3a332a;
+    font-family: "JetBrains Mono", monospace; font-size: .68rem;
+    letter-spacing: .1em; text-transform: uppercase; color: #9d9382;
+  }
+  .config-head .copy {
+    background: none; border: 1.5px solid #4a4133; border-radius: 3px;
+    color: #d8cdb8; font-family: "JetBrains Mono", monospace;
+    font-size: .66rem; padding: 3px 9px; cursor: pointer;
+    transition: border-color .15s, color .15s;
+  }
+  .config-head .copy:hover { border-color: var(--clay); color: #fff; }
+  .mcp-config pre {
+    margin: 0; padding: 14px; overflow-x: auto;
+    font-family: "JetBrains Mono", monospace; font-size: .76rem;
+    line-height: 1.6; color: #d8cdb8;
+  }
+
   /* Toast */
   .toast {
     position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(120%);
@@ -529,9 +618,12 @@
     <span class="mark">Salindia</span>
     <span class="sub">Studio</span>
   </div>
-  <div class="status-pill" id="svc">
-    <span class="dot" id="svcDot"></span>
-    <span id="svcText">Checking service…</span>
+  <div class="header-actions">
+    <button type="button" class="btn-ghost mcp-trigger" id="mcpOpen" hidden>MCP</button>
+    <div class="status-pill" id="svc">
+      <span class="dot" id="svcDot"></span>
+      <span id="svcText">Checking service…</span>
+    </div>
   </div>
 </header>
 
@@ -848,6 +940,66 @@
 
 </div>
 
+<!-- ============ MCP dialog ============ -->
+<dialog class="mcp-dialog" id="mcpDialog" aria-labelledby="mcpTitle">
+  <div class="dialog-head">
+    <div class="panel-title">
+      <span class="num">03</span>
+      <h2 id="mcpTitle">Connect via MCP</h2>
+    </div>
+    <button type="button" class="dialog-close" id="mcpClose" aria-label="Close">✕</button>
+  </div>
+
+  <p class="mcp-lede">
+    Prefer an agent to drive this? The same jobs are exposed over the
+    Model Context Protocol — point [CC], Cursor, or any MCP client at the
+    endpoint below, and ask it to build the deck for you.
+  </p>
+
+  <div class="mcp-grid">
+    <div class="mcp-facts">
+      <div class="fact">
+        <span class="k">Endpoint</span>
+        <span class="v mono" id="mcpUrl">—</span>
+      </div>
+      <div class="fact">
+        <span class="k">Transport</span>
+        <span class="v">Streamable HTTP (stateless)</span>
+      </div>
+      <div class="fact">
+        <span class="k">Auth</span>
+        <span class="v">Same key as above, sent as <code class="inline">X-API-Key</code> or <code class="inline">Authorization: Bearer</code>.</span>
+      </div>
+      <div class="fact">
+        <span class="k">Flow</span>
+        <span class="v"><code class="inline">create_deck_job</code> → poll <code class="inline">get_job</code> → read the deck resource.</span>
+      </div>
+    </div>
+
+    <div class="mcp-tools">
+      <div class="tools-title">Tools</div>
+      <ul>
+        <li><code>create_deck_job</code><span>prompt + optional base64 files → job_id</span></li>
+        <li><code>get_job</code><span>status, usage, and recent events</span></li>
+        <li><code>list_jobs</code><span>most recent jobs</span></li>
+        <li><code>cancel_job</code><span>stop a running job</span></li>
+      </ul>
+      <div class="tools-note">
+        Resource <code class="inline">salindia://jobs/{job_id}/deck</code> returns the finished
+        <code class="inline">.pptx</code> once the job is <code class="inline">completed</code>.
+      </div>
+    </div>
+  </div>
+
+  <div class="mcp-config">
+    <div class="config-head">
+      <span>mcp.json</span>
+      <button type="button" class="copy" id="mcpCopy">copy</button>
+    </div>
+    <pre id="mcpSnippet"></pre>
+  </div>
+</dialog>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -880,6 +1032,22 @@
   // -------- api key ----------
   function apiKey() { return $("apiKey").value.trim(); }
 
+  // -------- MCP ----------
+  function renderMcpSnippet() {
+    const el = $("mcpSnippet"), urlEl = $("mcpUrl");
+    if (!el || !urlEl || !urlEl.dataset.url) return;
+    const cfg = {
+      mcpServers: {
+        salindia: {
+          type: "http",
+          url: urlEl.dataset.url,
+          headers: { "X-API-Key": apiKey() || "<your key>" },
+        },
+      },
+    };
+    el.textContent = JSON.stringify(cfg, null, 2);
+  }
+
   // -------- health ----------
   async function loadHealth() {
     try {
@@ -909,6 +1077,16 @@
         sel.appendChild(o);
       });
       state.providersLoaded = true;
+
+      // MCP panel — only shown when the server exposes it
+      if (d.mcp && d.mcp.enabled) {
+        const url = location.origin + d.mcp.path;
+        const urlEl = $("mcpUrl");
+        urlEl.textContent = url;
+        urlEl.dataset.url = url;
+        $("mcpOpen").hidden = false;
+        renderMcpSnippet();
+      }
     } catch (e) {
       $("svcDot").className = "dot off";
       $("svcText").textContent = "Service unreachable";
@@ -1621,6 +1799,33 @@
   } catch (_) {}
   $("apiKey").addEventListener("input", () => {
     try { sessionStorage.setItem("pptm_key", apiKey()); } catch (_) {}
+    renderMcpSnippet();
+  });
+
+  $("mcpOpen").addEventListener("click", () => {
+    renderMcpSnippet();
+    $("mcpDialog").showModal();
+  });
+  $("mcpClose").addEventListener("click", () => $("mcpDialog").close());
+  $("mcpDialog").addEventListener("click", (e) => {
+    // close only when the click lands outside the dialog box (backdrop)
+    if (e.target !== e.currentTarget) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    const outside =
+      e.clientX < r.left || e.clientX > r.right ||
+      e.clientY < r.top || e.clientY > r.bottom;
+    if (outside) e.currentTarget.close();
+  });
+
+  $("mcpCopy").addEventListener("click", async () => {
+    const text = $("mcpSnippet").textContent;
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      toast("MCP config copied.");
+    } catch (_) {
+      toast("Copy failed — select the text manually.", true);
+    }
   });
 
   // init
