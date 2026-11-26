@@ -53,7 +53,7 @@ async def lifespan(app: FastAPI):
 def create_app() -> FastAPI:
     s = get_settings()
     app = FastAPI(
-        title="PPT Master Service",
+        title="Salindia Studio",
         description="Backend service that drives hugohe3/ppt-master via a mini LLM agent loop.",
         version="0.1.0",
         lifespan=lifespan,

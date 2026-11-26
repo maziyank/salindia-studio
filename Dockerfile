@@ -1,4 +1,4 @@
-# PPT Master Service
+# Salindia Studio
 # Python 3.11 slim + git + system deps for lxml / cairosvg / pandoc
 FROM python:3.11-slim AS base
 

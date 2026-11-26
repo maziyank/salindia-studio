@@ -1,4 +1,4 @@
-# PPT Master Service
+# Salindia Studio
 
 A self-hostable backend service that drives [hugohe3/ppt-master](https://github.com/hugohe3/ppt-master) via a **mini LLM agent loop** — no Claude Code / Cursor / Codex IDE required. You talk to it over HTTP; it runs the agent for you and streams progress back.
 
