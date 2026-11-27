@@ -850,6 +850,7 @@
     <span class="sub">Studio</span>
   </div>
   <div class="header-actions">
+    <button type="button" class="btn-ghost mcp-trigger" id="studioOpen">Studio</button>
     <button type="button" class="btn-ghost mcp-trigger" id="historyOpen">History</button>
     <button type="button" class="btn-ghost mcp-trigger" id="mcpOpen" hidden>MCP</button>
     <div class="status-pill" id="svc">
@@ -2639,6 +2640,12 @@
     const d = new Date(iso);
     return isNaN(d) ? iso : d.toLocaleString([], { hour12: false });
   }
+  async function openStudio(page, fromRoute) {
+    state.page = page || 1;
+    showView("studio");
+    if (!fromRoute) writeURL({ view: "studio", page: state.page });
+    await loadStudio();
+  }
   async function openHistory(page, fromRoute) {
     state.page = page || 1;
     showView("history");
@@ -2955,6 +2962,7 @@
 
   // -------- history / detail handlers --------
   $("historyOpen").addEventListener("click", () => openHistory(1));
+  $("studioOpen").addEventListener("click", () => openStudio(1));
   $("historyRefresh").addEventListener("click", loadHistory);
   $("historyBack").addEventListener("click", () => {
     writeURL({}, true);
