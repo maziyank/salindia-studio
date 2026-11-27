@@ -502,6 +502,43 @@
   .btn-download:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--rule); }
   .btn-download:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--rule); }
 
+  /* Live preview (embedded ppt-master editor, reverse-proxied) */
+  .preview {
+    margin-top: 16px;
+    border: 2px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    animation: pop .4s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .preview[hidden] { display: none; }
+  .preview-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; background: var(--ink); color: var(--paper);
+    font-size: .78rem;
+  }
+  .preview-head .pv-title {
+    display: flex; align-items: center; gap: 8px;
+    font-family: "Fraunces", serif; font-weight: 700; font-size: .92rem;
+    margin-right: auto;
+  }
+  .preview-head .pv-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--okc); box-shadow: 0 0 0 3px rgba(63,107,44,.28);
+  }
+  .preview-head .pv-btn {
+    font: inherit; font-weight: 700; color: var(--paper);
+    background: transparent; border: 1.5px solid rgba(239,231,214,.45);
+    border-radius: 3px; padding: 4px 10px; cursor: pointer; text-decoration: none;
+    transition: border-color .1s;
+  }
+  .preview-head .pv-btn:hover { border-color: var(--paper); }
+  .preview-body { background: #fff; }
+  .preview-body.collapsed { display: none; }
+  .preview-body iframe { width: 100%; height: 640px; border: 0; display: block; }
+  .preview-hint { color: var(--muted); font-size: .84rem; margin: 0 0 14px; }
+  .preview-hint[hidden] { display: none; }
+  @media (max-width: 720px) { .preview-body iframe { height: 460px; } }
+
   /* Recent jobs */
   .recent { margin-top: 22px; }
   .recent h3 {
@@ -870,7 +907,7 @@
   <nav class="stepper" id="stepper" aria-label="Steps">
     <button type="button" class="step-pill active" data-step="1">
       <span class="sp-num">1</span>
-      <span class="sp-body"><span class="sp-title">Describe</span><span class="sp-sub">Prompt &amp; sources</span></span>
+      <span class="sp-body"><span class="sp-title">Describe</span><span class="sp-sub">Context</span></span>
     </button>
     <span class="sp-arrow" aria-hidden="true">→</span>
     <button type="button" class="step-pill" data-step="2">
@@ -880,12 +917,17 @@
     <span class="sp-arrow" aria-hidden="true">→</span>
     <button type="button" class="step-pill" data-step="3" disabled>
       <span class="sp-num">3</span>
-      <span class="sp-body"><span class="sp-title">Review outline</span><span class="sp-sub">Edit &amp; approve</span></span>
+      <span class="sp-body"><span class="sp-title">Blueprint</span><span class="sp-sub">Edit &amp; approve</span></span>
     </button>
     <span class="sp-arrow" aria-hidden="true">→</span>
     <button type="button" class="step-pill" data-step="4" disabled>
       <span class="sp-num">4</span>
-      <span class="sp-body"><span class="sp-title">Build</span><span class="sp-sub">Render &amp; download</span></span>
+      <span class="sp-body"><span class="sp-title">Build</span><span class="sp-sub">Render the deck</span></span>
+    </button>
+    <span class="sp-arrow" aria-hidden="true">→</span>
+    <button type="button" class="step-pill" data-step="5" disabled>
+      <span class="sp-num">5</span>
+      <span class="sp-body"><span class="sp-title">Review</span><span class="sp-sub">Refine Output</span></span>
     </button>
   </nav>
 
@@ -1171,7 +1213,7 @@
   </form>
 
   <!-- ============ Step 3: outline ============ -->
-  <section class="panel step-panel" id="step3" aria-label="Review outline" hidden>
+  <section class="panel step-panel" id="step3" aria-label="Blueprint" hidden>
     <div class="panel-title">
       <span class="num">03</span>
       <h2>Review the outline</h2>
@@ -1213,7 +1255,7 @@
   <section class="panel step-panel" id="step4" aria-label="Build" hidden>
     <div class="panel-title">
       <span class="num">04</span>
-      <h2>Build &amp; download</h2>
+      <h2>Build</h2>
     </div>
 
     <div class="progress-head">
@@ -1234,17 +1276,10 @@
       <div class="empty">Events will stream here once a job starts.</div>
     </div>
 
-    <div class="result" id="result">
-      <div class="rtxt">
-        Your deck is ready.
-        <small id="resultName"></small>
-      </div>
-      <a class="btn-download" id="dlBtn" href="#" download>↓ Download .pptx</a>
-    </div>
-
     <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
       <button type="button" class="btn-ghost danger" id="cancelBtn" disabled>Cancel job</button>
       <button type="button" class="btn-ghost" id="clearBtn">Clear log</button>
+      <button type="button" class="btn-ghost" id="toPreview">Live preview →</button>
     </div>
 
     <div class="recent">
@@ -1254,6 +1289,42 @@
 
     <div class="wizard-actions">
       <button type="button" class="btn-ghost" id="backToOutline">← Back to outline</button>
+    </div>
+  </section>
+
+  <!-- ============ Step 5: Review (live preview) ============ -->
+  <section class="panel step-panel" id="step5" aria-label="Review" hidden>
+    <div class="panel-title">
+      <span class="num">05</span>
+      <h2>Review</h2>
+    </div>
+
+    <p class="preview-hint" id="previewHint">
+      Slides appear here as the agent writes them. The live editor is also where
+      you can review and adjust each slide before exporting.
+    </p>
+
+    <div class="preview" id="preview" hidden>
+      <div class="preview-head">
+        <span class="pv-title"><span class="pv-dot"></span>Live preview</span>
+        <button type="button" class="pv-btn" id="pvToggle">Hide</button>
+        <a class="pv-btn" id="pvOpen" href="#" target="_blank" rel="noopener">Open in new tab ↗</a>
+      </div>
+      <div class="preview-body" id="previewBody">
+        <iframe id="previewFrame" title="Live preview" loading="lazy"></iframe>
+      </div>
+    </div>
+
+    <div class="result" id="result">
+      <div class="rtxt">
+        Your deck is ready.
+        <small id="resultName"></small>
+      </div>
+      <a class="btn-download" id="dlBtn" href="#" download>↓ Download .pptx</a>
+    </div>
+
+    <div class="wizard-actions">
+      <button type="button" class="btn-ghost" id="backToBuild">← Back to build</button>
     </div>
   </section>
 
@@ -1386,6 +1457,7 @@
     route: "create",
     provider: "",
     page: 1,                // history pagination (1-based)
+    previewPath: null,      // live-preview proxy path for the active job
   };
   const PAGE_SIZE = 10;
 
@@ -1593,7 +1665,27 @@
   }
   function stopTimer() { if (state.tickTimer) { clearInterval(state.tickTimer); state.tickTimer = null; } }
 
-  // -------- event handling ----------
+  // -------- live preview ----------
+  // Show ppt-master's native editor (proxied) for the current job. `path` is
+  // the proxy prefix, e.g. "/jobs/<id>/preview/".
+  function showPreview(path) {
+    if (!path) return;
+    const src = path.endsWith("/") ? path : path + "/";
+    const frame = $("previewFrame");
+    if (frame.getAttribute("src") !== src) frame.setAttribute("src", src);
+    $("pvOpen").href = src;
+    $("previewBody").classList.remove("collapsed");
+    $("pvToggle").textContent = "Hide";
+    $("preview").hidden = false;
+    $("previewHint").hidden = true;
+  }
+  function hidePreview() {
+    $("preview").hidden = true;
+    $("previewFrame").removeAttribute("src");
+    $("pvOpen").href = "#";
+    $("previewHint").hidden = false;
+  }
+
   function handleEvent(ev) {
     if (!ev || !ev.type) return;
     if (ev.type === "ping") return;
@@ -1606,6 +1698,16 @@
         setState("running"); logLine("meta", "Job started.");
         if (outlining) outlineStatus("running", "Reading your prompt and sources…");
         else setStage("Running agent…");
+        break;
+      case "job.preview":
+        if (d.path) {
+          state.previewPath = d.path;
+          if (!outlining) {
+            showPreview(d.path);
+            syncStepper();
+            logLine("meta", "Live preview ready — open the Review step to watch slides appear.");
+          }
+        }
         break;
       case "job.outline":
         if (d.outline) { state.outline = d.outline; renderOutline(d.outline); }
@@ -1665,17 +1767,21 @@
     if (n === 2) return true;
     if (n === 3) return !!state.outline || state.phase === "outline";
     if (n === 4) return state.phase === "build" && !!state.jobId;
+    if (n === 5) return state.phase === "build" && !!state.jobId;
     return false;
+  }
+  function syncStepper() {
+    document.querySelectorAll("#stepper .step-pill").forEach((p) => {
+      const s = Number(p.dataset.step);
+      p.classList.toggle("active", s === state.step);
+      p.classList.toggle("done", s < state.step);
+      p.disabled = !stepAllowed(s) && s !== state.step;
+    });
   }
   function showStep(n) {
     state.step = n;
-    ["step1", "step2", "step3", "step4"].forEach((id, i) => { $(id).hidden = (i + 1) !== n; });
-    document.querySelectorAll("#stepper .step-pill").forEach((p) => {
-      const s = Number(p.dataset.step);
-      p.classList.toggle("active", s === n);
-      p.classList.toggle("done", s < n);
-      p.disabled = !stepAllowed(s) && s !== n;
-    });
+    ["step1", "step2", "step3", "step4", "step5"].forEach((id, i) => { $(id).hidden = (i + 1) !== n; });
+    syncStepper();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -1893,6 +1999,8 @@
     dl.setAttribute("download", "");
     $("resultName").textContent = d.export_path ? String(d.export_path).split("/").pop() : (state.jobId + ".pptx");
     $("result").classList.add("show");
+    syncStepper();
+    showStep(5);
     closeStreams();
     setBusy(false);
     addRecent(state.jobId, "completed");
@@ -2023,6 +2131,8 @@
   async function reopen(jobId) {
     // Reset view, then attach to an existing job.
     $("result").classList.remove("show");
+    hidePreview();
+    state.previewPath = null;
     clearLog();
     state.done = false;
     state.phase = "build";
@@ -2041,6 +2151,7 @@
       const r = await fetch("/jobs/" + jobId, { headers: authHeaders() });
       if (r.ok) {
         const rec = await r.json();
+        if (rec.preview_path) { state.previewPath = rec.preview_path; showPreview(rec.preview_path); }
         if (rec.status === "completed") onComplete({ export_path: rec.export_path });
         else if (rec.status === "failed") onFailed(rec.error || "failed");
         else if (rec.status === "cancelled") onCancelled();
@@ -2473,6 +2584,8 @@
     state.phase = "build";
     state.done = false;
     state.jobId = null;
+    state.previewPath = null;
+    hidePreview();
     $("result").classList.remove("show");
     clearLog();
     setPercent(null);
@@ -2498,6 +2611,7 @@
       const d = await r.json();
       state.jobId = d.job_id;
       $("jobId").textContent = d.job_id.slice(0, 16) + "…";
+      syncStepper();
       logLine("meta", "Build job " + d.job_id.slice(0, 12) + "… created.");
       openStream(d.job_id);
     } catch (err) {
@@ -2540,6 +2654,8 @@
   $("addSlide").addEventListener("click", addSlide);
   $("refineAll").addEventListener("click", refineAll);
   $("backToOutline").addEventListener("click", () => showStep(state.skippedOutline ? 2 : 3));
+  $("toPreview").addEventListener("click", () => showStep(5));
+  $("backToBuild").addEventListener("click", () => showStep(4));
   $("stepper").addEventListener("click", (e) => {
     const pill = e.target.closest(".step-pill");
     if (!pill || pill.disabled) return;
@@ -2556,6 +2672,13 @@
     } catch (e) { toast("Cancel failed", true); }
   });
   $("clearBtn").addEventListener("click", clearLog);
+
+  // -------- live preview controls --------
+  $("pvToggle").addEventListener("click", () => {
+    const body = $("previewBody");
+    const collapsed = body.classList.toggle("collapsed");
+    $("pvToggle").textContent = collapsed ? "Show" : "Hide";
+  });
 
   // remember api key for the tab
   try {

@@ -25,6 +25,7 @@ from app.agent.loop import AgentLoop
 from app.agent.outline import get_outline_tools
 from app.config import get_settings
 from app.events import Event, EventType, JobStatus, bus
+from app.preview.manager import get_preview_manager
 from app.storage.factory import get_storage
 from app.storage.base import StorageBackend
 from app.webhooks import dispatch_event
@@ -65,6 +66,7 @@ class JobRecord:
     duration_seconds: Optional[float] = None
     source_files: List[str] = field(default_factory=list)
     outline: Optional[Dict[str, Any]] = None   # set by outline_only jobs
+    preview_path: Optional[str] = None         # live-preview proxy path (build jobs)
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -164,8 +166,10 @@ class JobManager:
                         outline_only=True,
                     )
                 else:
-                    # Build phase: stage sources into the engine's workdir
-                    # (projects/<job_id>/sources/) and drive the renderer.
+                    # Build phase: bring up the live preview first so slides
+                    # appear to the client as the agent writes them, then stage
+                    # sources into the engine's workdir and drive the renderer.
+                    await self._start_preview(job_id)
                     await self._stage_sources(job_id, spec.sources)
                     loop = AgentLoop(
                         job_id=job_id,
@@ -202,6 +206,29 @@ class JobManager:
                 self._loops.pop(job_id, None)
                 self._tasks.pop(job_id, None)
                 await self._persist()
+
+    async def _start_preview(self, job_id: str) -> None:
+        """Launch the live-preview editor for this job and announce its proxy
+        path. Best-effort: a preview failure never blocks the build."""
+        try:
+            path = await self._start_preview_or_none(job_id)
+        except Exception as e:  # noqa: BLE001
+            log.warning("live preview unavailable for %s: %r", job_id, e)
+            return
+        if not path:
+            return
+        rec = self._records.get(job_id)
+        if rec:
+            rec.preview_path = path
+            await self._persist()
+        await bus.publish(Event(job_id=job_id, type=EventType.JOB_PREVIEW, data={"path": path}))
+
+    async def _start_preview_or_none(self, job_id: str) -> Optional[str]:
+        mgr = get_preview_manager()
+        port = await mgr.start(job_id)
+        if not port:
+            return None
+        return mgr.proxy_prefix(job_id) + "/"
 
     async def _stage_sources(self, job_id: str, sources: List[str]) -> None:
         """Copy uploaded source files from storage into the agent's workdir

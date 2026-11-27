@@ -63,6 +63,11 @@ class PPTMasterRuntime:
         return self.repo_dir / "svg_final"
 
     @property
+    def preview_server_script(self) -> Path:
+        # ppt-master's live-preview editor (Flask) for a project's svg_output/.
+        return self.scripts_dir / "svg_editor" / "server.py"
+
+    @property
     def is_ready(self) -> bool:
         return self._ready and self.skill_file.exists()
 

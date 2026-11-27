@@ -28,6 +28,7 @@ from fastapi import (
     Form,
     HTTPException,
     Request,
+    Response,
     UploadFile,
     WebSocket,
     WebSocketDisconnect,
@@ -36,12 +37,15 @@ from fastapi import (
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
+import httpx
+
 from app.api.auth import require_api_key, require_api_key_sse, require_api_key_ws
 from app.config import get_settings
 from app.events import EventBus, EventType, bus
 from app.jobs.manager import JobManager, JobSpec, get_job_manager
 from app.llm.factory import get_llm, list_available_providers, list_provider_catalog
 from app.pptmaster.runtime import get_runtime
+from app.preview.manager import get_preview_manager
 from app.storage.factory import get_storage
 
 router = APIRouter()
@@ -345,6 +349,102 @@ async def download_export(job_id: str) -> FileResponse:
         raise HTTPException(404, "export not ready")
     return FileResponse(target, media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
                         filename=target.name)
+
+
+# ---------------------------------------------------------------------------
+# Live preview (reverse proxy to ppt-master's svg_editor)
+# ---------------------------------------------------------------------------
+#
+# ppt-master's SVG editor only listens on 127.0.0.1 and rejects non-loopback
+# Host/Origin headers, so a remote browser cannot reach it directly. We launch
+# it per build job and reverse-proxy it here. The editor is served from the
+# origin root (`/static/...`, `/api/...`), so those URLs are rewritten to the
+# per-job prefix. Like /jobs/{id}/export these routes are unauthenticated so
+# the browser can load them inside an iframe.
+
+def _rewrite_preview_paths(content: bytes, content_type: str, prefix: str) -> bytes:
+    """Prefix the editor's root-absolute asset/API URLs for proxied serving."""
+    if "text/html" in content_type:
+        text = content.decode("utf-8", "replace")
+        for q in ('"', "'"):
+            text = text.replace(f"{q}/static/", f"{q}{prefix}/static/")
+        return text.encode("utf-8")
+    if "javascript" in content_type:
+        text = content.decode("utf-8", "replace")
+        for q in ('"', "'"):
+            text = text.replace(f"{q}/api/", f"{q}{prefix}/api/")
+        return text.encode("utf-8")
+    return content
+
+
+async def _proxy_preview(job_id: str, path: str, request: Request) -> Response:
+    mgr = get_preview_manager()
+    port = mgr.port(job_id)
+    if not port:
+        port = await mgr.start(job_id)
+    if not port:
+        raise HTTPException(503, "live preview not available")
+
+    prefix = mgr.proxy_prefix(job_id)
+    target = f"http://127.0.0.1:{port}/{path}" if path else f"http://127.0.0.1:{port}/"
+    if request.url.query:
+        target += "?" + request.url.query
+
+    body = await request.body()
+    headers = {}
+    content_type = request.headers.get("content-type")
+    if content_type:
+        headers["content-type"] = content_type
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            upstream = await client.request(request.method, target, content=body or None, headers=headers)
+    except httpx.HTTPError as e:  # noqa: BLE001
+        raise HTTPException(502, f"preview upstream error: {e}")
+
+    upstream_type = upstream.headers.get("content-type", "")
+    content = _rewrite_preview_paths(upstream.content, upstream_type, prefix)
+    out_headers = {"content-type": upstream_type} if upstream_type else None
+    return Response(content=content, status_code=upstream.status_code, headers=out_headers)
+
+
+@router.post("/jobs/{job_id}/preview/start", tags=["preview"])
+async def start_preview(job_id: str) -> dict:
+    """Ensure the live-preview editor is running for this job, and return the
+    proxy path the client should embed."""
+    if not get_job_manager().get(job_id):
+        raise HTTPException(404, "job not found")
+    pm = get_preview_manager()
+    port = await pm.start(job_id)
+    if not port:
+        raise HTTPException(503, "live preview not available")
+    return {"ok": True, "path": pm.proxy_prefix(job_id) + "/"}
+
+
+@router.post("/jobs/{job_id}/preview/stop", tags=["preview"])
+async def stop_preview(job_id: str) -> dict:
+    return {"ok": await get_preview_manager().stop(job_id)}
+
+
+@router.get("/jobs/{job_id}/preview", tags=["preview"])
+@router.get("/jobs/{job_id}/preview/", tags=["preview"])
+async def preview_index(job_id: str, request: Request) -> Response:
+    return await _proxy_preview(job_id, "", request)
+
+
+@router.api_route(
+    "/jobs/{job_id}/preview/{path:path}",
+    methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
+    tags=["preview"],
+)
+async def preview_proxy(job_id: str, path: str, request: Request) -> Response:
+    return await _proxy_preview(job_id, path, request)
+
+
+@router.get("/jobs/{job_id}/images/{path:path}", tags=["preview"])
+async def preview_image(job_id: str, path: str, request: Request) -> Response:
+    """SVGs reference images as `../images/<file>`; when the editor is embedded
+    at /jobs/<id>/preview/ those resolve to this sibling path."""
+    return await _proxy_preview(job_id, f"images/{path}", request)
 
 
 # ---------------------------------------------------------------------------
