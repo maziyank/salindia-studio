@@ -1,0 +1,17 @@
+{
+  "name": "Salindia Studio",
+  "short_name": "Salindia",
+  "description": "AI presentation studio: describe your deck, review the outline, and build a ready-to-download .pptx.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#efe7d6",
+  "theme_color": "#14110d",
+  "icons": [
+    {
+      "src": "/static/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

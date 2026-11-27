@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Salindia Studio">
+  <defs>
+    <radialGradient id="glow" cx="18%" cy="14%" r="60%">
+      <stop offset="0%" stop-color="#c4572e" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#c4572e" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="#14110d"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+
+  <!-- decorative slide stack -->
+  <g opacity="0.9">
+    <rect x="820" y="150" width="300" height="200" rx="12" fill="#efe7d6" opacity="0.10"/>
+    <rect x="850" y="185" width="300" height="200" rx="12" fill="#efe7d6" opacity="0.18"/>
+    <rect x="880" y="220" width="300" height="200" rx="12" fill="#efe7d6"/>
+    <rect x="880" y="220" width="300" height="42" rx="12" fill="#c4572e"/>
+    <rect x="904" y="292" width="140" height="12" rx="6" fill="#14110d" opacity="0.75"/>
+    <rect x="904" y="318" width="220" height="12" rx="6" fill="#14110d" opacity="0.45"/>
+    <rect x="904" y="344" width="180" height="12" rx="6" fill="#14110d" opacity="0.30"/>
+  </g>
+
+  <!-- brand mark -->
+  <g transform="translate(96, 150)">
+    <rect x="0" y="0" width="88" height="88" rx="20" fill="#efe7d6"/>
+    <rect x="16" y="20" width="56" height="9" rx="4" fill="#c4572e"/>
+    <rect x="16" y="40" width="26" height="6" rx="3" fill="#14110d" opacity="0.75"/>
+    <rect x="16" y="54" width="40" height="6" rx="3" fill="#14110d" opacity="0.45"/>
+    <rect x="30" y="70" width="20" height="6" rx="3" fill="#c4572e"/>
+  </g>
+
+  <text x="96" y="340" fill="#efe7d6" font-family="Georgia, 'Times New Roman', serif" font-size="96" font-weight="700">Salindia</text>
+  <text x="100" y="410" fill="#c4572e" font-family="Georgia, 'Times New Roman', serif" font-size="34" letter-spacing="8" font-weight="700">STUDIO</text>
+  <text x="100" y="462" fill="#efe7d6" opacity="0.65" font-family="Helvetica, Arial, sans-serif" font-size="30">AI presentation studio</text>
+  <rect x="100" y="500" width="120" height="6" rx="3" fill="#c4572e"/>
+</svg>

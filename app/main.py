@@ -12,10 +12,12 @@ from __future__ import annotations
 import asyncio
 import logging
 from contextlib import AsyncExitStack, asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.api.auth import MCPAuthMiddleware
 from app.api.routes import router
@@ -87,6 +89,10 @@ def create_app() -> FastAPI:
         return JSONResponse(status_code=400, content={"error": "bad_request", "detail": str(exc)})
 
     app.include_router(router)
+    # Static UI assets (favicon, Open Graph image, web manifest).
+    web_dir = Path(__file__).resolve().parents[1] / "web"
+    if web_dir.is_dir():
+        app.mount("/static", StaticFiles(directory=web_dir), name="static")
     if s.mcp_enabled:
         # Mounted at "/" and last, so the MCP app only sees paths no REST route
         # matched. Mounting at s.mcp_path instead would 307-redirect POST /mcp
