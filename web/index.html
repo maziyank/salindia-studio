@@ -1226,7 +1226,7 @@
 
     <div class="stage-line">
       <span class="stage-name" id="stageName">Waiting to start…</span>
-      <span class="elapsed" id="elapsed">0s · 0 tokens</span>
+      <span class="elapsed" id="elapsed">0s · 0 tokens (0 in / 0 out)</span>
     </div>
 
     <div class="log" id="log">
@@ -1559,13 +1559,17 @@
     const tick = () => {
       const s = Math.floor((Date.now() - state.startedAt) / 1000);
       const elapsed = s < 60 ? s + "s" : Math.floor(s / 60) + "m " + (s % 60) + "s";
-      const total = state.tokens.input + state.tokens.output;
-      $("elapsed").textContent = elapsed + " · " + fmtTokens(total) + " tokens";
+      $("elapsed").textContent = elapsed + " · " + fmtTokenBreakdown(state.tokens);
     };
     tick();
     state.tickTimer = setInterval(tick, 1000);
   }
   function fmtTokens(n) { return Number(n || 0).toLocaleString(); }
+  function fmtTokenBreakdown(t) {
+    const input = Number((t && t.input) || 0);
+    const output = Number((t && t.output) || 0);
+    return fmtTokens(input + output) + " tokens (" + fmtTokens(input) + " in / " + fmtTokens(output) + " out)";
+  }
   function usageSuffix(d) {
     const u = d && d.usage;
     if (!u) return ".";
@@ -1581,10 +1585,9 @@
       input: Number(usage.input_tokens || 0),
       output: Number(usage.output_tokens || 0),
     };
-    const total = state.tokens.input + state.tokens.output;
     $("elapsed").textContent = $("elapsed").textContent.replace(
-      /·\s*[\d,]*\s*tokens$/,
-      "· " + fmtTokens(total) + " tokens"
+      /·\s*[\d,]+ tokens(?:\s*\([^)]*\))?$/,
+      "· " + fmtTokenBreakdown(state.tokens)
     );
   }
   function stopTimer() { if (state.tickTimer) { clearInterval(state.tickTimer); state.tickTimer = null; } }
