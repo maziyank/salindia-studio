@@ -264,12 +264,20 @@ class JobManager:
         return self._records.get(job_id)
 
     def list_jobs(self, limit: int = 100, offset: int = 0) -> List[JobRecord]:
-        """Return job records newest-first, with optional pagination."""
-        recs = list(self._records.values())[::-1]
+        """Return job records newest-first, with optional pagination.
+
+        Outline-only jobs are internal planning steps of a build, not
+        standalone history entries, so they are excluded from the listing.
+        """
+        recs = [r for r in self._records.values() if not self._is_outline_job(r)][::-1]
         return recs[offset:offset + limit]
 
     def count_jobs(self) -> int:
-        return len(self._records)
+        return sum(1 for r in self._records.values() if not self._is_outline_job(r))
+
+    @staticmethod
+    def _is_outline_job(rec: JobRecord) -> bool:
+        return bool(rec.spec.get("outline_only"))
 
     async def _webhook_dispatcher(self, job_id: str, url: str, secret: Optional[str]) -> None:
         """Subscribe to the bus for this job and POST each event to the webhook."""
