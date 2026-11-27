@@ -68,6 +68,23 @@ class Settings(BaseSettings):
     llm_max_tokens: int = 8192
     llm_max_iterations: int = 40
 
+    # Image generation
+    # Active backend for the agent's `generate_image` tool.
+    image_backend: str = "openai"
+    # Default output size passed to the backend (e.g. 1024x1024, 1792x1024).
+    image_size: str = "1024x1024"
+    image_concurrency: int = 3
+    # Per-backend model / deployment names.
+    image_model_openai: str = "gpt-image-1"
+    image_model_azure: str = ""  # Azure deployment name for the image model
+    image_model_gemini: str = "imagen-3.0-generate-002"
+    image_model_qwen: str = "qwen-image"
+    # Qwen / DashScope image endpoint (OpenAI-compatible).
+    qwen_api_key: str = ""
+    qwen_base_url: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+    # Optional stock-photo search key (Pixabay).
+    pixabay_api_key: str = ""
+
     # Webhooks
     webhook_default_url: str = ""
     webhook_secret: str = ""
@@ -108,6 +125,14 @@ class Settings(BaseSettings):
             raise ValueError(
                 "LLM_PROVIDER must be one of openai|anthropic|gemini|kimi|azure|custom"
             )
+        return v
+
+    @field_validator("image_backend")
+    @classmethod
+    def _validate_image_backend(cls, v: str) -> str:
+        v = v.lower()
+        if v not in {"openai", "azure", "gemini", "qwen"}:
+            raise ValueError("IMAGE_BACKEND must be one of openai|azure|gemini|qwen")
         return v
 
 

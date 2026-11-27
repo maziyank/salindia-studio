@@ -47,8 +47,9 @@ Operating principles:
 - Each job has a private workdir under projects/<job_id>/; sources the user
   uploaded are in sources/. You write intermediate files (SVG, notes, manifest)
   anywhere under the workdir.
-- When you need an image, call `run_pptmaster_script` with image_search.py or
-  image_gen.py, or `http_get` to fetch a URL.
+- When you need an image, call `generate_image` with a detailed prompt (it uses
+  the configured backend and saves to `images/<slug>.png`), or `run_pptmaster_script`
+  with image_search.py, or `http_get` to fetch a URL.
 - Emit progress regularly via the `progress` tool so the client can see status.
 - Uploaded sources live at `sources/<filename>` inside your workdir. Read them
   with `read_file`; do not assume they are anywhere else.

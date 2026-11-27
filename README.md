@@ -229,6 +229,7 @@ The agent loop exposes these tools to the LLM:
 | `write_file` | Write SVG / notes / manifest into the workdir. |
 | `list_dir` | Inspect the workdir. |
 | `run_pptmaster_script` | Run `image_gen.py` / `image_search.py` / `update_repo.py` in a subprocess. |
+| `generate_image` | Generate an image from a prompt via the configured backend (`IMAGE_BACKEND`). |
 | `http_get` | Fetch an image URL (≤10MB) into the workdir. |
 | `progress` | Emit a client-visible progress message (stage, percent, message). |
 | `finalize_deck` | Stage the produced `.pptx` to `exports/` and end the job. |
@@ -246,6 +247,17 @@ The system prompt is `SKILL.md + a short operating preamble` that constrains the
 - Switch at runtime via `LLM_PROVIDER` env var, or per-job via `provider_override` in the JSON request body.
 
 The provider abstraction (`app/llm/base.py`) normalizes every provider's response into the same shape (`LLMContent[]` with `text` and `tool_use` blocks), so the agent loop is provider-agnostic.
+
+## Image generation backends
+
+The agent's `generate_image` tool uses `IMAGE_BACKEND` to pick a backend (`app/images/`):
+
+- **openai** — `OPENAI_API_KEY` + `IMAGE_MODEL_OPENAI` (default `gpt-image-1`).
+- **azure** — `AZURE_API_KEY` + `AZURE_ENDPOINT` + `AZURE_API_VERSION`, `IMAGE_MODEL_AZURE` = image deployment name.
+- **gemini** — `GEMINI_API_KEY` + `IMAGE_MODEL_GEMINI` (Imagen, e.g. `imagen-3.0-generate-002`).
+- **qwen** — `QWEN_API_KEY` + `IMAGE_MODEL_QWEN` + `QWEN_BASE_URL` (DashScope compatible-mode).
+
+`IMAGE_SIZE` sets the default output size. Generated files are saved under the job workdir (default `images/<slug>.png`).
 
 ## Storage backends
 

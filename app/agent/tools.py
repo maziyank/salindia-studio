@@ -226,6 +226,43 @@ async def _progress(args: Dict[str, Any], job_id: str) -> Dict[str, Any]:
     return {"ok": True}
 
 
+async def _generate_image(args: Dict[str, Any], job_id: str) -> Dict[str, Any]:
+    """Generate an image from a text prompt using the configured backend
+    (IMAGE_BACKEND: openai | azure | gemini | qwen) and save it into the job
+    workdir. The default destination is images/<slug>.png so SVG slides can
+    reference it as `../images/<slug>.png`.
+    """
+    prompt = str(args.get("prompt") or "").strip()
+    if not prompt:
+        return {"ok": False, "error": "prompt is required"}
+    dest = args.get("path") or ""
+    if not dest:
+        import re
+        slug = re.sub(r"[^a-z0-9]+", "-", prompt.lower())[:40].strip("-") or "image"
+        dest = f"images/{slug}.png"
+    elif not dest.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
+        dest += ".png"
+
+    from app.images.factory import get_image_provider
+    from app.config import get_settings
+    settings = get_settings()
+    size = args.get("size") or settings.image_size
+    provider = get_image_provider()
+    if not provider.available():
+        return {"ok": False, "error": f"image backend '{provider.name}' is not configured"}
+
+    try:
+        data = await provider.generate(prompt, size=size)
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "error": f"image generation failed: {e!r}"}
+
+    wd = _job_workdir(job_id)
+    full = _safe_join(wd, dest)
+    full.parent.mkdir(parents=True, exist_ok=True)
+    full.write_bytes(data)
+    return {"ok": True, "path": dest, "size": len(data), "backend": provider.name}
+
+
 async def _http_get(args: Dict[str, Any], job_id: str) -> Dict[str, Any]:
     """Restricted HTTP GET for downloading image URLs the LLM found via
     image_search. Limited to ~10MB and stores result in workdir.
@@ -297,6 +334,20 @@ def get_default_tools() -> ToolRegistry:
          },
          "required": ["script"]},
         _run_pptmaster_script,
+    )
+    reg.register(
+        "generate_image",
+        "Generate an image from a text prompt with the configured image backend "
+        "and save it into the workdir (default images/<slug>.png). Reference it "
+        "from SVG slides as `../images/<file>`.",
+        {"type": "object",
+         "properties": {
+             "prompt": {"type": "string", "description": "Detailed visual description of the image to generate"},
+             "path": {"type": "string", "description": "Optional relative output path inside the workdir (default images/<slug>.png)"},
+             "size": {"type": "string", "description": "Output size, e.g. 1024x1024 or 1792x1024 (defaults to IMAGE_SIZE)"},
+         },
+         "required": ["prompt"]},
+        _generate_image,
     )
     reg.register(
         "http_get",
