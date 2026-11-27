@@ -224,7 +224,7 @@
     background: var(--paper);
     border: 1.5px solid var(--rule);
     border-radius: 3px;
-    padding: 11px 13px;
+    padding: 15px 13px;
     transition: box-shadow .15s, border-color .15s, background .15s;
   }
   textarea { min-height: 128px; resize: vertical; line-height: 1.55; }
@@ -282,6 +282,68 @@
   }
   .canvas-opt .cname { font-size: .7rem; font-weight: 700; letter-spacing: .02em; }
   .canvas-opt .cdim { font-family: "JetBrains Mono", monospace; font-size: .6rem; color: var(--muted); }
+
+  /* Template picker */
+  .tpl-trigger {
+    width: 100%; display: flex; align-items: center; gap: 11px;
+    font-family: inherit; text-align: left; color: var(--ink);
+    background: var(--paper); border: 1.5px solid var(--rule);
+    border-radius: 3px; padding: 8px 11px; cursor: pointer;
+    transition: box-shadow .15s, border-color .15s, background .15s;
+  }
+  .tpl-trigger:hover { background: #fffaf0; }
+  .tpl-trigger:focus-visible { outline: none; border-color: var(--clay); box-shadow: 0 0 0 3px rgba(196,87,46,.14); }
+  .tpl-swatch { flex: none; width: 46px; height: 26px; }
+  .tpl-swatch .tpl-thumb { width: 100%; height: 100%; aspect-ratio: auto; }
+  .tpl-trigger-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+  .tpl-trigger-name { font-size: .9rem; font-weight: 600; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tpl-trigger-sub { font-family: "JetBrains Mono", monospace; font-size: .62rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tpl-caret { flex: none; font-size: .7rem; color: var(--muted); }
+
+  .tpl-dialog {
+    width: min(1080px, calc(100vw - 32px));
+    max-height: calc(100vh - 64px);
+    margin: auto; padding: 26px;
+    background: var(--card); color: var(--ink);
+    border: 2px solid var(--rule); border-radius: 4px;
+    box-shadow: var(--shadow); overflow-y: auto;
+  }
+  .tpl-dialog::backdrop { background: rgba(20,17,13,.45); backdrop-filter: blur(2px); }
+  .tpl-dialog[open] { animation: pop .22s ease-out; }
+  .tpl-lede { max-width: 82ch; color: #4a4235; font-size: .9rem; margin: -4px 0 20px; }
+  .tpl-group { margin-bottom: 22px; }
+  .tpl-group:last-child { margin-bottom: 0; }
+  .tpl-group-title {
+    font-size: .66rem; font-weight: 700; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--muted);
+    padding-bottom: 8px; margin-bottom: 12px;
+    border-bottom: 1.5px solid var(--rule);
+  }
+  .tpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(186px, 1fr)); gap: 14px; }
+  .tpl-card {
+    display: flex; flex-direction: column; gap: 8px;
+    padding: 9px; text-align: left; cursor: pointer;
+    background: var(--paper); color: var(--ink);
+    border: 1.5px solid #cdbfa3; border-radius: 4px; font-family: inherit;
+    transition: border-color .15s, background .15s, transform .1s, box-shadow .1s;
+  }
+  .tpl-card:hover { border-color: var(--rule); transform: translate(-1px,-1px); box-shadow: var(--shadow-sm); }
+  .tpl-card:focus-visible { outline: none; border-color: var(--clay); box-shadow: 0 0 0 3px rgba(196,87,46,.18); }
+  .tpl-card[aria-pressed="true"] { background: #fffaf0; border-color: var(--clay); box-shadow: var(--shadow-sm); }
+  .tpl-card-name { font-size: .82rem; font-weight: 600; line-height: 1.25; }
+  .tpl-card-desc { font-family: "JetBrains Mono", monospace; font-size: .62rem; color: var(--muted); line-height: 1.4; }
+
+  .tpl-thumb {
+    position: relative; display: block; width: 100%; aspect-ratio: 16 / 9;
+    border: 1.5px solid var(--rule); border-radius: 2px; overflow: hidden;
+  }
+  .tpl-thumb.plain { display: grid; place-items: center; }
+  .tpl-thumb .tt-mark { font-size: .9rem; color: var(--muted); }
+  .tpl-thumb .tt-title { position: absolute; left: 9%; top: 18%; width: 48%; height: 12%; border-radius: 1px; }
+  .tpl-thumb .tt-line { position: absolute; left: 9%; height: 5.5%; border-radius: 1px; opacity: .42; }
+  .tpl-thumb .tt-line.a { top: 44%; width: 62%; }
+  .tpl-thumb .tt-line.b { top: 57%; width: 44%; }
+  .tpl-thumb .tt-accent { position: absolute; right: 9%; bottom: 16%; width: 15%; height: 15%; border-radius: 1px; }
 
   /* Slide count presets */
   .presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
@@ -912,7 +974,7 @@
     <span class="sp-arrow" aria-hidden="true">→</span>
     <button type="button" class="step-pill" data-step="2">
       <span class="sp-num">2</span>
-      <span class="sp-body"><span class="sp-title">Design spec</span><span class="sp-sub">Style, size &amp; tone</span></span>
+      <span class="sp-body"><span class="sp-title">Design</span><span class="sp-sub">Style, size &amp; tone</span></span>
     </button>
     <span class="sp-arrow" aria-hidden="true">→</span>
     <button type="button" class="step-pill" data-step="3" disabled>
@@ -1073,8 +1135,16 @@
             </div>
           </div>
           <div>
-            <label class="lbl" for="template">Template</label>
-            <select id="template">
+            <label class="lbl" id="templateLabel">Template</label>
+            <button type="button" class="tpl-trigger" id="templateTrigger" aria-haspopup="dialog" aria-labelledby="templateLabel">
+              <span class="tpl-swatch" id="templateTriggerSwatch" aria-hidden="true"></span>
+              <span class="tpl-trigger-body">
+                <span class="tpl-trigger-name" id="templateTriggerName">Free design</span>
+                <span class="tpl-trigger-sub" id="templateTriggerSub">no template</span>
+              </span>
+              <span class="tpl-caret" aria-hidden="true">▾</span>
+            </button>
+            <select id="template" hidden>
               <option value="">Free design (no template)</option>
               <optgroup label="Brand identities">
                 <option value="accenture">Accenture — violet on black</option>
@@ -1428,6 +1498,23 @@
     </div>
     <pre id="mcpSnippet"></pre>
   </div>
+</dialog>
+
+<!-- ============ Template picker dialog ============ -->
+<dialog class="tpl-dialog" id="templateDialog" aria-labelledby="templateDialogTitle">
+  <div class="dialog-head">
+    <div class="panel-title">
+      <span class="num">02</span>
+      <h2 id="templateDialogTitle">Choose a template</h2>
+    </div>
+    <button type="button" class="dialog-close" id="templateClose" aria-label="Close">✕</button>
+  </div>
+  <p class="tpl-lede">
+    Each thumbnail previews the template's palette and layout. Design styles carry a complete
+    visual system distilled from a real deck; brand identities lock the deck to a familiar
+    corporate look. Choose free design to let the designer decide.
+  </p>
+  <div class="tpl-body" id="templateBody"></div>
 </dialog>
 
 <div class="toast" id="toast"></div>
@@ -2409,17 +2496,183 @@
     document.querySelectorAll("#slideCountPresets .chip").forEach((c) => c.classList.toggle("active", c.dataset.n === v));
   });
 
-  // template selection implies the template route
-  $("template").addEventListener("change", () => {
-    if ($("template").value) $("route").value = "template";
+  // -------- template picker ----------
+  // Thumbnails are painted from each template's real palette: design styles
+  // carry an explicit Palette block in their brief, brand identities are read
+  // off their descriptor ("orange on deep navy").
+  const BRAND_COLORS = {
+    "near-black": "#141210", black: "#141210", charcoal: "#26241f",
+    "deep navy": "#12233d", navy: "#12233d", "deep-blue": "#12233d",
+    "electric blue": "#2b6cb0", "corporate blue": "#1f4e79", blue: "#2b6cb0",
+    gray: "#8a857e", grey: "#8a857e", "forest green": "#254d32", green: "#2f6b3f",
+    "signature green": "#76b900", scarlet: "#c0392b", crimson: "#c0392b", red: "#c0392b",
+    "warm coral": "#d97757", coral: "#e2731f", orange: "#e2731f", amber: "#e0a02e",
+    gold: "#c9a227", violet: "#6d28d9", purple: "#6d28d9", magenta: "#c026a3",
+    rose: "#e0559a", teal: "#2e8b8b", cyan: "#22a6c4", lime: "#8fbf3f",
+    spectrum: "#3b82f6", white: "#ffffff",
+  };
+  const DARK_KEYS = ["near-black", "black", "charcoal", "deep navy", "navy", "dark"];
+
+  function paletteFromBrief(brief) {
+    if (!brief) return null;
+    const scope = (brief.match(/Palette:\s*([^.]+)/) || [, brief])[1];
+    const pick = (key) => {
+      const m = scope.match(new RegExp(key + "[^#]*?(#[0-9A-Fa-f]{3,8})"));
+      return m ? m[1] : null;
+    };
+    return {
+      bg: pick("Background") || "#ffffff",
+      primary: pick("Primary") || "#1f2933",
+      accent: pick("Accent") || "#c0392b",
+    };
+  }
+
+  function paletteFromBrand(label) {
+    const desc = (label.includes("—") ? label.split("—").pop() : label).toLowerCase();
+    const keys = Object.keys(BRAND_COLORS).sort((a, b) => b.length - a.length);
+    const on = desc.match(/\bon\s+([a-z\- ]+)/);
+    const bgKey = on ? keys.find((k) => on[1].startsWith(k)) : null;
+    const isDark = bgKey ? DARK_KEYS.includes(bgKey) : DARK_KEYS.some((d) => desc.includes(d));
+    const bg = bgKey ? BRAND_COLORS[bgKey] : (isDark ? "#141210" : "#ffffff");
+    const accentKey = keys.find((k) => k !== bgKey && desc.includes(k) && BRAND_COLORS[k] !== bg);
+    return { bg, primary: isDark ? "#f1ece1" : "#1c1a17", accent: BRAND_COLORS[accentKey] || "#c4572e" };
+  }
+
+  function templatePalette(value, label) {
+    if (!value) return null;
+    const style = DESIGN_TEMPLATES[value];
+    return style ? paletteFromBrief(style.brief) : paletteFromBrand(label);
+  }
+
+  function templateThumb(palette) {
+    const t = document.createElement("span");
+    t.className = "tpl-thumb";
+    if (!palette) {
+      t.classList.add("plain");
+      t.style.background = "var(--paper-2)";
+      const mark = document.createElement("span");
+      mark.className = "tt-mark";
+      mark.textContent = "✦";
+      t.appendChild(mark);
+      return t;
+    }
+    t.style.background = palette.bg;
+    t.innerHTML =
+      '<span class="tt-title" style="background:' + palette.primary + '"></span>'
+      + '<span class="tt-line a" style="background:' + palette.primary + '"></span>'
+      + '<span class="tt-line b" style="background:' + palette.primary + '"></span>'
+      + '<span class="tt-accent" style="background:' + palette.accent + '"></span>';
+    return t;
+  }
+
+  function templateGroup(title, cards) {
+    const g = document.createElement("div");
+    g.className = "tpl-group";
+    if (title) {
+      const h = document.createElement("div");
+      h.className = "tpl-group-title";
+      h.textContent = title;
+      g.appendChild(h);
+    }
+    const grid = document.createElement("div");
+    grid.className = "tpl-grid";
+    cards.forEach((c) => grid.appendChild(c));
+    g.appendChild(grid);
+    return g;
+  }
+
+  function templateCard(option) {
+    const value = option.value;
+    const label = option.textContent.trim();
+    const parts = label.split("—");
+    const name = value ? parts[0].trim() : "Free design";
+    const desc = value ? parts.slice(1).join("—").trim() : "no template";
+
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "tpl-card";
+    card.dataset.value = value;
+    card.setAttribute("aria-pressed", value === $("template").value ? "true" : "false");
+    card.title = value ? name + (desc ? " — " + desc : "") : name;
+    card.appendChild(templateThumb(templatePalette(value, label)));
+    const n = document.createElement("span");
+    n.className = "tpl-card-name";
+    n.textContent = name;
+    const d = document.createElement("span");
+    d.className = "tpl-card-desc";
+    d.textContent = desc;
+    card.append(n, d);
+    card.addEventListener("click", () => {
+      setTemplate(value);
+      $("templateDialog").close();
+    });
+    return card;
+  }
+
+  function buildTemplateDialog() {
+    const body = $("templateBody");
+    if (body.childElementCount) return;
+    [...$("template").children].forEach((node) => {
+      if (node.tagName === "OPTGROUP") {
+        body.appendChild(templateGroup(node.label, [...node.children].map(templateCard)));
+      } else if (node.tagName === "OPTION") {
+        body.appendChild(templateGroup("", [templateCard(node)]));
+      }
+    });
+  }
+
+  function syncTemplateTrigger() {
+    const value = $("template").value;
+    const swatch = $("templateTriggerSwatch");
+    swatch.innerHTML = "";
+    let name = "Free design";
+    let sub = "no template";
+    let palette = null;
+    if (value) {
+      const opt = [...$("template").options].find((o) => o.value === value);
+      const label = opt ? opt.textContent.trim() : value;
+      const parts = label.split("—");
+      name = parts[0].trim();
+      sub = parts.slice(1).join("—").trim();
+      palette = templatePalette(value, label);
+    }
+    swatch.appendChild(templateThumb(palette));
+    $("templateTriggerName").textContent = name;
+    $("templateTriggerSub").textContent = sub;
+  }
+
+  // Selecting a template implies the template route.
+  function setTemplate(value) {
+    $("template").value = value;
+    syncTemplateTrigger();
+    if (value) $("route").value = "template";
+    $("templateBody").querySelectorAll(".tpl-card").forEach((c) => {
+      c.setAttribute("aria-pressed", c.dataset.value === value ? "true" : "false");
+    });
+  }
+
+  $("templateTrigger").addEventListener("click", () => {
+    buildTemplateDialog();
+    $("templateDialog").showModal();
   });
+  $("templateClose").addEventListener("click", () => $("templateDialog").close());
+  $("templateDialog").addEventListener("click", (e) => {
+    // close only when the click lands outside the dialog box (backdrop)
+    if (e.target !== e.currentTarget) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    const outside =
+      e.clientX < r.left || e.clientX > r.right ||
+      e.clientY < r.top || e.clientY > r.bottom;
+    if (outside) e.currentTarget.close();
+  });
+  syncTemplateTrigger();
 
   $("specReset").addEventListener("click", () => {
     document.querySelector('input[name="canvas"][value="ppt169"]').checked = true;
     $("autoCanvas").checked = false; syncCanvasEnabled();
     $("slideCount").value = "10";
     document.querySelectorAll("#slideCountPresets .chip").forEach((c) => c.classList.toggle("active", c.dataset.n === "10"));
-    $("template").value = "";
+    setTemplate("");
     $("tone").value = "";
     $("language").value = "en-US";
     $("notes").value = "";
