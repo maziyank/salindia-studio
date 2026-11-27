@@ -36,9 +36,25 @@ Hard rules:
 - Inspect the material the user attached before outlining: call `list_sources`
   to see the available files, then `read_source` on the relevant ones.
 - Base the structure on the user's request and the "Design spec requirements"
-  embedded in it (slide count, tone, language, template). Honour the requested
-  number of slides (default ~10) and the requested output language for every
-  string.
+  embedded in it (slide count, tone, language, template, story framework).
+  Honour the requested number of slides (default ~10) and the requested output
+  language for every string.
+- If a story framework is specified, make the slide order follow its sections:
+    * SCQA - Situation, Complication, Question, Answer: establish the shared
+      context, expose the tension or gap, pose the key question, then answer it.
+    * Pyramid Principle - main message/recommendation first, then 3-5
+      supporting arguments, each backed by data and evidence (top-down).
+    * PAS (Problem - Agitate - Solve) - name the audience's problem, show the
+      cost of leaving it unsolved, then present the solution and action plan.
+    * What - So What - Now What - the facts/findings, their implications, then
+      the next steps or decisions.
+    * Past - Present - Future - the journey so far, the current state and
+      challenges, then the vision, targets, and roadmap.
+    * HCCC (Hook - Context - Core Message - Call to Action) - grab attention,
+      give brief context, land the core idea, then close with a concrete ask.
+  If the user left the framework to the planner, choose the one that best fits
+  the topic and audience, follow it, and state your choice in the first
+  slide's `context`.
 
 When ready, call `submit_outline` EXACTLY ONCE with:
   - title: a concise, specific deck title

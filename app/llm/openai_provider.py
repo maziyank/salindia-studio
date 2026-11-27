@@ -119,11 +119,14 @@ class OpenAIProvider(LLMProvider):
         # Some models (gpt-5/o-series) reject `max_tokens` (want `max_completion_tokens`)
         # and/or a custom `temperature` (only the default is supported). Adapt as we
         # learn about the model, then retry (up to 3 corrections per call).
+        resp = None
+        last_error: Optional[BadRequestError] = None
         for _ in range(4):
             try:
                 resp = await client.chat.completions.create(**kwargs)
                 break
             except BadRequestError as e:
+                last_error = e
                 param = getattr(e, "param", None)
                 message = str(e)
                 if (
@@ -142,6 +145,12 @@ class OpenAIProvider(LLMProvider):
                     kwargs["reasoning_effort"] = "none"
                 else:
                     raise
+        if resp is None:
+            # Every attempt was rejected and needed an adaptation; surface the
+            # last API error instead of an UnboundLocalError on `resp`.
+            raise last_error or RuntimeError(
+                "LLM request failed after exhausting parameter retries"
+            )
         choice = resp.choices[0]
         msg = choice.message
         content: List[LLMContent] = []

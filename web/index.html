@@ -283,6 +283,30 @@
   .canvas-opt .cname { font-size: .7rem; font-weight: 700; letter-spacing: .02em; }
   .canvas-opt .cdim { font-family: "JetBrains Mono", monospace; font-size: .6rem; color: var(--muted); }
 
+  /* Story framework picker (card radios) */
+  .fwk-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
+  @media (max-width: 700px) { .fwk-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 420px) { .fwk-grid { grid-template-columns: 1fr; } }
+  .fwk-opt { position: relative; display: block; cursor: pointer; }
+  .fwk-opt input { position: absolute; opacity: 0; pointer-events: none; }
+  .fwk-opt .card {
+    display: flex; flex-direction: column; gap: 3px; height: 100%;
+    padding: 9px 10px;
+    background: var(--paper); border: 1.5px solid #cdbfa3; border-radius: 3px;
+    transition: border-color .15s, background .15s, transform .1s, box-shadow .1s;
+  }
+  .fwk-opt:hover .card { border-color: var(--rule); }
+  .fwk-opt input:focus-visible + .card { box-shadow: 0 0 0 3px rgba(196,87,46,.18); }
+  .fwk-opt input:checked + .card {
+    background: #fffaf0; border-color: var(--clay);
+    box-shadow: var(--shadow-sm); transform: translate(-1px,-1px);
+  }
+  .fwk-opt .fwk-name { font-size: .76rem; font-weight: 700; line-height: 1.25; }
+  .fwk-opt .fwk-flow {
+    font-family: "JetBrains Mono", monospace; font-size: .59rem;
+    color: var(--muted); line-height: 1.4;
+  }
+
   /* Template picker */
   .tpl-trigger {
     width: 100%; display: flex; align-items: center; gap: 11px;
@@ -1237,6 +1261,62 @@
               </optgroup>
             </select>
           </div>
+        </div>
+
+        <div class="field">
+          <label class="lbl" id="frameworkLabel">Story framework</label>
+          <div class="fwk-grid" id="frameworkGrid" role="radiogroup" aria-labelledby="frameworkLabel">
+            <label class="fwk-opt">
+              <input type="radio" name="framework" value="auto" checked />
+              <span class="card">
+                <span class="fwk-name">AI chooses</span>
+                <span class="fwk-flow">Best fit for the content</span>
+              </span>
+            </label>
+            <label class="fwk-opt">
+              <input type="radio" name="framework" value="scqa" />
+              <span class="card">
+                <span class="fwk-name">SCQA</span>
+                <span class="fwk-flow">Situation → Complication → Question → Answer</span>
+              </span>
+            </label>
+            <label class="fwk-opt">
+              <input type="radio" name="framework" value="pyramid" />
+              <span class="card">
+                <span class="fwk-name">Pyramid Principle</span>
+                <span class="fwk-flow">Conclusion → Arguments → Evidence</span>
+              </span>
+            </label>
+            <label class="fwk-opt">
+              <input type="radio" name="framework" value="pas" />
+              <span class="card">
+                <span class="fwk-name">Problem – Agitate – Solve</span>
+                <span class="fwk-flow">Problem → Agitate → Solve</span>
+              </span>
+            </label>
+            <label class="fwk-opt">
+              <input type="radio" name="framework" value="wsn" />
+              <span class="card">
+                <span class="fwk-name">What – So What – Now What</span>
+                <span class="fwk-flow">Facts → Implications → Actions</span>
+              </span>
+            </label>
+            <label class="fwk-opt">
+              <input type="radio" name="framework" value="ppf" />
+              <span class="card">
+                <span class="fwk-name">Past – Present – Future</span>
+                <span class="fwk-flow">Journey → Today → Roadmap</span>
+              </span>
+            </label>
+            <label class="fwk-opt">
+              <input type="radio" name="framework" value="hccc" />
+              <span class="card">
+                <span class="fwk-name">Hook – Context – Core – CTA</span>
+                <span class="fwk-flow">Hook → Context → Core message → CTA</span>
+              </span>
+            </label>
+          </div>
+          <div class="hint" id="frameworkHint"></div>
         </div>
 
         <div class="field row2">
@@ -2256,6 +2336,67 @@
     banner: "Banner 16:9 (1920×1080)",
   };
 
+  // Story frameworks that shape the deck's structure and slide order.
+  const FRAMEWORKS = {
+    auto: {
+      label: "AI chooses",
+      flow: "Best fit for the content",
+      desc: "The planner picks the framework that best fits your content and audience, then names its choice in the outline.",
+      best: "",
+    },
+    scqa: {
+      label: "SCQA",
+      flow: "Situation → Complication → Question → Answer",
+      desc: "Consulting classic: establish the shared context, expose the tension or gap, pose the key question, then answer it.",
+      best: "Analytical reports, evaluations, problem-solving",
+    },
+    pyramid: {
+      label: "Pyramid Principle",
+      flow: "Conclusion → Arguments → Evidence",
+      desc: "Barbara Minto's top-down structure: lead with the main message, then 3–5 supporting arguments, each backed by data and evidence.",
+      best: "Busy decision-makers who need the point first",
+    },
+    pas: {
+      label: "Problem – Agitate – Solve",
+      flow: "Problem → Agitate → Solve",
+      desc: "Persuasive arc: name the audience's pain, show the cost of leaving it unsolved, then present the concrete solution.",
+      best: "Pitches, proposals, change initiatives",
+    },
+    wsn: {
+      label: "What – So What – Now What",
+      flow: "Facts → Implications → Actions",
+      desc: "Practical review loop: present the facts, explain why they matter, then agree the next steps.",
+      best: "Performance reviews, project evaluations, analysis readouts",
+    },
+    ppf: {
+      label: "Past – Present – Future",
+      flow: "Journey → Today → Roadmap",
+      desc: "Chronological transformation story: the journey so far, the current state and challenges, then the vision and roadmap ahead.",
+      best: "Transformation journeys, program updates, strategy direction",
+    },
+    hccc: {
+      label: "Hook – Context – Core – CTA",
+      flow: "Hook → Context → Core message → CTA",
+      desc: "Versatile general-purpose arc: grab attention, give brief context, land the core idea, then close with a concrete call to action.",
+      best: "Seminars, idea pitches, general presentations",
+    },
+  };
+
+  function selectedFramework() {
+    const el = document.querySelector('input[name="framework"]:checked');
+    return el ? el.value : "auto";
+  }
+
+  function syncFrameworkHint() {
+    const fw = FRAMEWORKS[selectedFramework()] || FRAMEWORKS.auto;
+    $("frameworkHint").textContent = fw.desc + (fw.best ? " Best for: " + fw.best + "." : "");
+  }
+
+  function frameworkLabel(key) {
+    if (!key || key === "auto") return "AI-chosen framework";
+    return (FRAMEWORKS[key] || FRAMEWORKS.auto).label;
+  }
+
   // Design styles distilled from the design_spec.md files in
   // hugohe3/ppt-master-examples. These are not brand presets, so the visual
   // system (palette, type, composition, signature elements) is handed to the
@@ -2496,6 +2637,11 @@
     document.querySelectorAll("#slideCountPresets .chip").forEach((c) => c.classList.toggle("active", c.dataset.n === v));
   });
 
+  // story-framework picker
+  document.querySelectorAll('input[name="framework"]').forEach((r) =>
+    r.addEventListener("change", syncFrameworkHint));
+  syncFrameworkHint();
+
   // -------- template picker ----------
   // Thumbnails are painted from each template's real palette: design styles
   // carry an explicit Palette block in their brief, brand identities are read
@@ -2672,6 +2818,8 @@
     $("autoCanvas").checked = false; syncCanvasEnabled();
     $("slideCount").value = "10";
     document.querySelectorAll("#slideCountPresets .chip").forEach((c) => c.classList.toggle("active", c.dataset.n === "10"));
+    document.querySelector('input[name="framework"][value="auto"]').checked = true;
+    syncFrameworkHint();
     setTemplate("");
     $("tone").value = "";
     $("language").value = "en-US";
@@ -2688,6 +2836,7 @@
       canvas_label: autoCanvas ? "" : CANVAS_LABELS[selectedCanvas()],
       page_count: $("slideCount").value.trim(),
       template: $("template").value,
+      framework: selectedFramework(),
       tone: $("tone").value,
       language: $("language").value,
       notes: $("notes").value.trim(),
@@ -2705,6 +2854,12 @@
     else if (spec.canvas_format === "auto") reqs.push("- Slide size: choose the most appropriate canvas for the content");
     else reqs.push("- Slide size: " + spec.canvas_label + " (canvas format `" + spec.canvas_format + "`)");
     if (spec.page_count) reqs.push("- Number of slides: " + spec.page_count);
+    const fw = FRAMEWORKS[spec.framework] || FRAMEWORKS.auto;
+    if (spec.framework && spec.framework !== "auto") {
+      reqs.push("- Story framework: " + fw.label + " (" + fw.flow + "). Shape the outline and the slide order around these sections. " + fw.desc);
+    } else {
+      reqs.push("- Story framework: let the planner choose the most fitting framework (SCQA, Pyramid Principle, Problem–Agitate–Solve, What–So What–Now What, Past–Present–Future, or Hook–Context–Core Message–CTA) and follow it.");
+    }
     if (spec.template) {
       if (style) {
         reqs.push("- Template: " + style.label + " design style (distilled from the ppt-master-examples design spec)");
@@ -2756,6 +2911,7 @@
     logLine("meta", "Design spec: " + (state.spec.canvas_format === "auto" ? "auto size" : state.spec.canvas_label)
       + " · " + (state.spec.page_count || "auto") + " slides"
       + " · " + (state.spec.template || "free design")
+      + " · " + frameworkLabel(state.spec.framework)
       + (state.spec.tone ? " · " + state.spec.tone : ""));
     logLine("meta", "Requesting an outline" + (state.files.length ? " with " + state.files.length + " file(s)" : "") + "…");
 

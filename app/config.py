@@ -55,6 +55,9 @@ class Settings(BaseSettings):
     azure_api_key: str = ""
     azure_endpoint: str = ""
     azure_api_version: str = "2024-02-15-preview"
+    # API version used for the Responses endpoint. Must be a version that
+    # supports /openai/responses (2025-03-01-preview or newer).
+    azure_responses_api_version: str = "2025-04-01-preview"
     openai_base_url: str = ""
     kimi_base_url: str = "https://api.moonshot.cn/v1"
     # Generic OpenAI-compatible provider (any endpoint speaking the OpenAI

@@ -28,6 +28,7 @@ lxml==5.3.0
 requests==2.32.3
 httpx==0.28.1
 pypdf==5.1.0
+python-docx==1.1.2          # DOCX source extraction (app/agent)
 pandoc==2.4               # legacy doc formats (optional at runtime)
 svglib==1.5.1
 reportlab==4.2.5
