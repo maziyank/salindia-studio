@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from app.agent.loop import AgentLoop
+from app.agent.outline import get_outline_tools
 from app.config import get_settings
 from app.events import Event, EventType, JobStatus, bus
 from app.storage.factory import get_storage
@@ -45,6 +46,7 @@ class JobSpec:
     webhook_url: Optional[str] = None
     webhook_secret: Optional[str] = None
     no_confirm: bool = True          # service mode: never asks for confirmation
+    outline_only: bool = False       # stop after producing a content outline
     options: Dict[str, Any] = field(default_factory=dict)
 
 
@@ -62,6 +64,7 @@ class JobRecord:
     usage: Dict[str, int] = field(default_factory=dict)
     duration_seconds: Optional[float] = None
     source_files: List[str] = field(default_factory=list)
+    outline: Optional[Dict[str, Any]] = None   # set by outline_only jobs
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -149,13 +152,26 @@ class JobManager:
             rec.started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
             await self._persist()
             try:
-                # Stage source files into the agent's workdir (projects/<job_id>/sources/)
-                await self._stage_sources(job_id, spec.sources)
-                loop = AgentLoop(
-                    job_id=job_id,
-                    user_prompt=spec.prompt,
-                    provider_override=spec.provider_override,
-                )
+                if spec.outline_only:
+                    # Standalone planning phase: engine-agnostic. The outline is
+                    # produced straight from the uploaded sources in storage, so
+                    # we do NOT stage into (or touch) the PPT Master repo here.
+                    loop = AgentLoop(
+                        job_id=job_id,
+                        user_prompt=spec.prompt,
+                        provider_override=spec.provider_override,
+                        tools=get_outline_tools(self.storage, spec.sources),
+                        outline_only=True,
+                    )
+                else:
+                    # Build phase: stage sources into the engine's workdir
+                    # (projects/<job_id>/sources/) and drive the renderer.
+                    await self._stage_sources(job_id, spec.sources)
+                    loop = AgentLoop(
+                        job_id=job_id,
+                        user_prompt=spec.prompt,
+                        provider_override=spec.provider_override,
+                    )
                 self._loops[job_id] = loop
                 result = await asyncio.wait_for(loop.run(), timeout=self.settings.max_job_timeout_seconds)
                 rec.usage = loop.usage
@@ -164,6 +180,8 @@ class JobManager:
                     rec.export_path = result.get("export_path")
                     rec.export_name = Path(rec.export_path).name if rec.export_path else None
                     rec.duration_seconds = result.get("duration_seconds")
+                    if result.get("outline"):
+                        rec.outline = result.get("outline")
                 elif result.get("status") == "cancelled":
                     rec.status = JobStatus.CANCELLED.value
                     rec.error = "cancelled"

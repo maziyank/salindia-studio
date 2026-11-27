@@ -25,6 +25,7 @@ import time
 import uuid
 from typing import Any, Dict, List, Optional
 
+from app.agent.outline import OUTLINE_SYSTEM_PROMPT
 from app.agent.tools import ToolRegistry, get_default_tools
 from app.config import get_settings
 from app.events import Event, EventType, bus
@@ -121,9 +122,11 @@ class AgentLoop:
         tools: Optional[ToolRegistry] = None,
         max_iterations: Optional[int] = None,
         provider_override: Optional[str] = None,
+        outline_only: bool = False,
     ) -> None:
         self.job_id = job_id
         self.user_prompt = user_prompt
+        self.outline_only = outline_only
         self.settings = get_settings()
         self.llm: LLMProvider = provider or get_llm(override=provider_override)
         self.tools: ToolRegistry = tools or get_default_tools()
@@ -134,6 +137,7 @@ class AgentLoop:
         self._total_output_tokens = 0
         self._tool_call_count = 0
         self._final_export: Optional[str] = None
+        self._outline: Optional[Dict[str, Any]] = None
         self._nudged = False
 
     def request_stop(self) -> None:
@@ -151,6 +155,10 @@ class AgentLoop:
     @property
     def final_export(self) -> Optional[str]:
         return self._final_export
+
+    @property
+    def outline(self) -> Optional[Dict[str, Any]]:
+        return self._outline
 
     async def _emit(self, etype: EventType, data: Dict[str, Any]) -> None:
         await bus.publish(Event(job_id=self.job_id, type=etype, data=data))
@@ -172,6 +180,11 @@ class AgentLoop:
                     "stage": "finalize", "message": "Deck finalized",
                     "export_name": result.get("export_name"),
                 })
+            # Capture the structured outline produced during the outline phase.
+            # The tool itself publishes the JOB_OUTLINE event; here we just keep
+            # a copy so run() can end the phase cleanly.
+            if name == "submit_outline" and isinstance(result, dict) and result.get("outline"):
+                self._outline = result.get("outline")
             payload = json.dumps(result, default=str, ensure_ascii=False)
             # Truncate huge tool outputs to keep context manageable
             if len(payload) > 8000:
@@ -188,6 +201,30 @@ class AgentLoop:
             await self._emit(EventType.JOB_WARNING, {"tool": name, "error": str(e)})
             return json.dumps({"ok": False, "error": err})
 
+    def _nudge_text(self) -> str:
+        if self.outline_only:
+            return (
+                "You ended your turn without calling `submit_outline`. The outline "
+                "is not ready yet. Call `submit_outline` now with the deck title and "
+                "the ordered list of slides, then stop. Do not reply with text only."
+            )
+        return (
+            "You ended your turn without calling any tool, but the deck has "
+            "not been finalized. Continue working now: use tools to produce "
+            "the .pptx and call `finalize_deck` with its relative path. "
+            "Do not reply with text only."
+        )
+
+    async def _finish_outline(self, started: float, iteration: int) -> Dict[str, Any]:
+        """Emit completion for the outline phase and return the run summary."""
+        await self._emit(EventType.JOB_COMPLETED, {
+            "outline": self._outline,
+            "duration_seconds": round(time.time() - started, 2),
+            "usage": self.usage,
+        })
+        return {"status": "completed", "outline": self._outline,
+                "iteration": iteration, "usage": self.usage}
+
     async def run(self) -> Dict[str, Any]:
         """Main loop. Returns a summary dict. Throws on unrecoverable errors."""
         started = time.time()
@@ -196,18 +233,24 @@ class AgentLoop:
         # Seed the conversation
         self._messages.append(LLMMessage(role="user", content=self.user_prompt))
 
-        system = SYSTEM_PREAMBLE
-        # Append SKILL.md content as part of the system prompt IF the runtime
-        # is ready. If not, the LLM can still call read_skill_md (it will get
-        # a helpful error). Loading here saves one round-trip when ready.
-        rt = get_runtime()
-        if rt.is_ready:
-            try:
-                system = SYSTEM_PREAMBLE + "\n\n--- SKILL.md ---\n\n" + rt.load_skill_md()
-            except Exception as e:  # noqa: BLE001
-                log.warning("could not inline SKILL.md: %r", e)
-
-        tool_schemas = self.tools.schemas()
+        if self.outline_only:
+            # Standalone planning phase: no rendering engine involved. The
+            # toolset was supplied by the caller (app.agent.outline) and already
+            # contains only source-inspection + submit_outline tools.
+            system = OUTLINE_SYSTEM_PROMPT
+            tool_schemas = self.tools.schemas()
+        else:
+            # Build phase: drive the rendering engine (PPT Master). Append
+            # SKILL.md to the system prompt when the runtime is ready; loading
+            # here saves one round-trip (the LLM can still call read_skill_md).
+            system = SYSTEM_PREAMBLE
+            rt = get_runtime()
+            if rt.is_ready:
+                try:
+                    system = SYSTEM_PREAMBLE + "\n\n--- SKILL.md ---\n\n" + rt.load_skill_md()
+                except Exception as e:  # noqa: BLE001
+                    log.warning("could not inline SKILL.md: %r", e)
+            tool_schemas = self.tools.schemas()
 
         for iteration in range(1, self.max_iter + 1):
             if self._should_stop:
@@ -243,6 +286,9 @@ class AgentLoop:
             # If there are no tool calls, the LLM is done talking. If the deck
             # was finalized, great; otherwise consider it a soft failure.
             if not resp.tool_calls:
+                # Outline phase: a submitted outline is the success condition.
+                if self.outline_only and self._outline is not None:
+                    return await self._finish_outline(started, iteration)
                 if self._final_export:
                     await self._emit(EventType.JOB_COMPLETED, {
                         "export_path": self._final_export,
@@ -260,12 +306,7 @@ class AgentLoop:
                         "text": "Deck is not finalized yet; reminding the model to continue.",
                         "iteration": iteration,
                     })
-                    self._messages.append(LLMMessage(role="user", content=(
-                        "You ended your turn without calling any tool, but the deck has "
-                        "not been finalized. Continue working now: use tools to produce "
-                        "the .pptx and call `finalize_deck` with its relative path. "
-                        "Do not reply with text only."
-                    )))
+                    self._messages.append(LLMMessage(role="user", content=self._nudge_text()))
                     continue
                 await self._emit(EventType.JOB_FAILED, {
                     "error": "agent ended without calling finalize_deck",
@@ -285,6 +326,10 @@ class AgentLoop:
                     tool_call_id=call.tool_call_id,
                     name=call.tool_name,
                 ))
+                # Outline phase ends as soon as the outline has been submitted;
+                # no need to spend another LLM round-trip.
+                if self.outline_only and self._outline is not None:
+                    return await self._finish_outline(started, iteration)
 
         # Hit iteration cap
         await self._emit(EventType.JOB_FAILED, {

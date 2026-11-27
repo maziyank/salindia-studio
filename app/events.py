@@ -26,6 +26,7 @@ class EventType(str, Enum):
     JOB_TOOL_CALL = "job.tool_call"
     JOB_TOOL_RESULT = "job.tool_result"
     JOB_THOUGHT = "job.thought"          # free-form LLM assistant text chunk
+    JOB_OUTLINE = "job.outline"          # structured content outline awaiting confirmation
     JOB_WARNING = "job.warning"
     JOB_COMPLETED = "job.completed"
     JOB_FAILED = "job.failed"

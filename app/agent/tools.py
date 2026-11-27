@@ -19,7 +19,7 @@ import os
 import shlex
 import subprocess
 from pathlib import Path
-from typing import Any, Awaitable, Callable, Dict, List, Optional
+from typing import Any, Awaitable, Callable, Dict, List
 
 from app.events import Event, EventType, bus
 from app.pptmaster.runtime import get_runtime
@@ -43,6 +43,7 @@ class ToolRegistry:
         self._tools[name] = {"description": description, "parameters": parameters, "fn": fn}
 
     def schemas(self) -> List[Dict[str, Any]]:
+        """Return the tool schemas offered to the LLM (every registered tool)."""
         return [
             {"name": n, "description": t["description"], "parameters": t["parameters"]}
             for n, t in self._tools.items()

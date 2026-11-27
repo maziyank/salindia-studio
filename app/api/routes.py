@@ -40,7 +40,7 @@ from app.api.auth import require_api_key, require_api_key_sse, require_api_key_w
 from app.config import get_settings
 from app.events import EventBus, EventType, bus
 from app.jobs.manager import JobManager, JobSpec, get_job_manager
-from app.llm.factory import list_available_providers, list_provider_catalog
+from app.llm.factory import get_llm, list_available_providers, list_provider_catalog
 from app.pptmaster.runtime import get_runtime
 from app.storage.factory import get_storage
 
@@ -96,7 +96,17 @@ class JobCreateRequest(BaseModel):
     webhook_url: Optional[str] = None
     webhook_secret: Optional[str] = None
     no_confirm: bool = True
+    outline_only: bool = False
     options: dict = Field(default_factory=dict)
+
+
+class OutlineRefineRequest(BaseModel):
+    """Body for AI-assisted outline refinement (no job is created)."""
+    action: str = Field("slide", description="'slide' to refine one item, 'all' for the whole outline")
+    outline: dict = Field(default_factory=dict, description="The current outline {title, slides:[...]}")
+    index: Optional[int] = Field(None, description="0-based slide index (required when action='slide')")
+    instruction: Optional[str] = Field(None, description="Optional extra guidance for the model")
+    provider_override: Optional[str] = None
 
 
 async def _save_uploads(job_id_prefix: str, files: List[UploadFile]) -> List[str]:
@@ -124,6 +134,7 @@ async def create_job(
     webhook_url: Optional[str] = Form(None),
     webhook_secret: Optional[str] = Form(None),
     no_confirm: bool = Form(True),
+    outline_only: bool = Form(False),
     options: Optional[str] = Form(None),
     files: List[UploadFile] = File(default=[]),
 ) -> dict:
@@ -156,6 +167,7 @@ async def create_job(
         webhook_url=webhook_url,
         webhook_secret=webhook_secret,
         no_confirm=no_confirm,
+        outline_only=outline_only,
         options=parsed_options if isinstance(parsed_options, dict) else {},
     )
     # The manager will mint its own job_id; to keep uploads aligned we pass
@@ -172,9 +184,36 @@ async def create_job_json(req: JobCreateRequest) -> dict:
     rec = await mgr.create_job(JobSpec(
         prompt=req.prompt, route=req.route, sources=req.sources,
         provider_override=req.provider_override, webhook_url=req.webhook_url,
-        webhook_secret=req.webhook_secret, no_confirm=req.no_confirm, options=req.options,
+        webhook_secret=req.webhook_secret, no_confirm=req.no_confirm,
+        outline_only=req.outline_only, options=req.options,
     ))
     return {"job_id": rec.job_id, "status": rec.status, "sources": rec.source_files}
+
+
+# ---------------------------------------------------------------------------
+# Outline refinement (AI-assisted; no job is created)
+# ---------------------------------------------------------------------------
+
+@router.post("/outline/refine", tags=["outline"], dependencies=[Depends(require_api_key)])
+async def refine_outline_endpoint(req: OutlineRefineRequest) -> dict:
+    """Refine an outline - a single slide (action='slide') or the whole deck
+    (action='all') - using the LLM. Returns the improved item(s) as JSON."""
+    from app.agent.outline import refine_outline, refine_slide
+    try:
+        llm = get_llm(req.provider_override)
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(400, f"LLM unavailable: {e}")
+    try:
+        if req.action == "all":
+            return {"outline": await refine_outline(llm, req.outline, req.instruction)}
+        if req.index is None:
+            raise HTTPException(400, "index is required when action='slide'")
+        slide = await refine_slide(llm, req.outline, req.index, req.instruction)
+        return {"index": req.index, "slide": slide}
+    except HTTPException:
+        raise
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(500, f"refine failed: {e}")
 
 
 # ---------------------------------------------------------------------------

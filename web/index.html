@@ -221,12 +221,8 @@
     margin-bottom: 18px;
   }
   .spec-head {
-    display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+    display: flex; align-items: baseline; justify-content: flex-end; gap: 10px;
     margin-bottom: 14px;
-  }
-  .spec-head h3 {
-    font-family: "Fraunces", serif; font-weight: 600; font-size: 1rem;
-    letter-spacing: -.01em;
   }
   .spec-head .reset {
     background: none; border: none; padding: 0; cursor: pointer;
@@ -609,6 +605,126 @@
     animation: spin .7s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---------- Wizard ---------- */
+  .wrap.wizard { grid-template-columns: minmax(0, 1fr); max-width: 980px; }
+
+  .stepper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    animation: rise .6s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .step-pill {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 11px 15px;
+    border: 2px solid var(--rule);
+    border-radius: 4px;
+    background: var(--card);
+    color: var(--ink);
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+    box-shadow: var(--shadow-sm);
+    transition: transform .12s ease, background .15s ease, box-shadow .12s ease;
+  }
+  .step-pill:hover:not(:disabled) { transform: translate(-1px,-1px); }
+  .step-pill .sp-num {
+    font-family: "JetBrains Mono", monospace;
+    font-size: .82rem;
+    width: 27px; height: 27px;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    border: 1.5px solid var(--rule);
+    background: var(--paper);
+    flex: none;
+  }
+  .step-pill .sp-body { display: flex; flex-direction: column; line-height: 1.18; }
+  .step-pill .sp-title { font-weight: 700; font-size: .9rem; }
+  .step-pill .sp-sub { font-size: .68rem; color: var(--muted); letter-spacing: .02em; }
+  .step-pill.active { background: var(--ink); color: var(--paper); box-shadow: var(--shadow); }
+  .step-pill.active .sp-sub { color: rgba(239,231,214,.72); }
+  .step-pill.active .sp-num { background: var(--clay); border-color: var(--clay); color: #fff; }
+  .step-pill.done .sp-num { background: var(--okc); border-color: var(--okc); color: #fff; }
+  .step-pill:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; }
+  .sp-arrow { color: var(--muted); flex: none; }
+  @media (max-width: 680px) {
+    .sp-arrow { display: none; }
+    .step-pill { flex: 1 1 100%; }
+  }
+
+  .step-panel[hidden] { display: none; }
+
+  .wizard-note { margin-top: 12px; font-size: .78rem; color: var(--muted); }
+
+  .wizard-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1.5px dashed var(--rule);
+  }
+  .wizard-actions .spacer { flex: 1; }
+  .wizard-actions .btn-generate { width: auto; }
+
+  /* ---------- Outline editor ---------- */
+  .outline-status {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px;
+    border: 1.5px solid var(--rule);
+    border-radius: 3px;
+    background: var(--paper);
+    font-size: .86rem;
+    margin-bottom: 18px;
+  }
+  .outline-status .spin {
+    width: 13px; height: 13px; border-radius: 50%; flex: none;
+    border: 2px solid rgba(20,17,13,.22); border-top-color: var(--ink);
+    animation: spin .7s linear infinite;
+  }
+  .outline-status.err { border-color: var(--errc); color: var(--errc); }
+  .outline-status.ok { border-color: var(--okc); }
+
+  #outlineTitle { font-family: "Fraunces", serif; font-size: 1.15rem; font-weight: 600; }
+
+  .outline-slides { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+  .oslide {
+    border: 1.5px solid var(--rule);
+    border-radius: 3px;
+    background: var(--paper);
+    padding: 13px 14px 14px;
+  }
+  .oslide-head { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
+  .oslide-num {
+    font-family: "JetBrains Mono", monospace; font-size: .7rem; font-weight: 500;
+    color: var(--paper); background: var(--cobalt);
+    padding: 3px 8px; border-radius: 3px; flex: none;
+  }
+  .oslide-title { flex: 1; min-width: 0; font-weight: 600; font-size: .95rem; padding: 8px 10px; background: var(--card); }
+  .oslide-tools { display: flex; gap: 5px; flex: none; }
+  .oslide-tools button {
+    width: 29px; height: 29px; border: 1.5px solid var(--rule);
+    background: var(--card); border-radius: 3px; cursor: pointer; font-size: .82rem; line-height: 1;
+  }
+  .oslide-tools button:hover:not(:disabled) { background: var(--paper-2); }
+  .oslide-tools button:disabled { opacity: .3; cursor: not-allowed; }
+  .oslide .mini {
+    display: block; font-size: .64rem; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 5px;
+  }
+  .oslide textarea { font-family: inherit; font-size: .88rem; line-height: 1.55; resize: vertical; min-height: 66px; background: var(--card); }
+  .oslide .subhead {
+    display: block; font-size: .64rem; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--muted); margin: 11px 0 5px;
+  }
+  .oslide.is-busy { opacity: .55; pointer-events: none; }
+  .oslide-tools button.refine { color: var(--cobalt); }
+  .oslide-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
 </style>
 </head>
 <body>
@@ -627,24 +743,48 @@
   </div>
 </header>
 
-<div class="wrap">
+<div class="wrap wizard">
 
   <section class="hero">
-    <h1>Turn a prompt into a <em>deck</em>, and watch it happen.</h1>
-    <p>Describe the presentation you want — optionally drop in source documents. The agent plans, designs, and exports a <strong>.pptx</strong>, streaming every step back to you here.</p>
+    <h1>Turn a prompt into a editable <em>deck</em> — one step at a time.</h1>
+    <p>Describe the presentation, review and edit the generated outline, then build. The agent plans, designs, and exports a <strong>.pptx</strong>, streaming every step back to you.</p>
   </section>
 
-  <!-- ============ Generate ============ -->
-  <section class="panel" aria-label="Generate slides">
+  <nav class="stepper" id="stepper" aria-label="Steps">
+    <button type="button" class="step-pill active" data-step="1">
+      <span class="sp-num">1</span>
+      <span class="sp-body"><span class="sp-title">Describe</span><span class="sp-sub">Prompt &amp; sources</span></span>
+    </button>
+    <span class="sp-arrow" aria-hidden="true">→</span>
+    <button type="button" class="step-pill" data-step="2">
+      <span class="sp-num">2</span>
+      <span class="sp-body"><span class="sp-title">Design spec</span><span class="sp-sub">Style, size &amp; tone</span></span>
+    </button>
+    <span class="sp-arrow" aria-hidden="true">→</span>
+    <button type="button" class="step-pill" data-step="3" disabled>
+      <span class="sp-num">3</span>
+      <span class="sp-body"><span class="sp-title">Review outline</span><span class="sp-sub">Edit &amp; approve</span></span>
+    </button>
+    <span class="sp-arrow" aria-hidden="true">→</span>
+    <button type="button" class="step-pill" data-step="4" disabled>
+      <span class="sp-num">4</span>
+      <span class="sp-body"><span class="sp-title">Build</span><span class="sp-sub">Render &amp; download</span></span>
+    </button>
+  </nav>
+
+  <!-- ============ Steps 1–2: describe + design spec (single form) ============ -->
+  <form id="form">
+
+  <!-- Step 1: describe -->
+  <section class="panel step-panel" id="step1" aria-label="Describe the deck">
     <div class="panel-title">
       <span class="num">01</span>
-      <h2>Generate slides</h2>
+      <h2>Describe your deck</h2>
     </div>
 
-    <form id="form">
       <div class="field">
         <label class="lbl" for="prompt">Prompt</label>
-        <textarea id="prompt" placeholder="e.g. Create a 10-slide investor pitch deck for a climate-tech startup building solar microgrids in Southeast Asia. Use a confident, editorial tone." required></textarea>
+        <textarea id="prompt" placeholder="e.g. Create a 10-slide investor pitch deck for a climate-tech startup building solar microgrids in Southeast Asia. Use a confident, editorial tone."></textarea>
         <div class="hint">Be specific about topic, audience, slide count, and tone.</div>
       </div>
 
@@ -658,9 +798,49 @@
         <ul class="files" id="fileList"></ul>
       </div>
 
+      <div class="field row2">
+        <div>
+          <label class="lbl" for="route">Route</label>
+          <select id="route">
+            <option value="create">create — new deck</option>
+            <option value="edit">edit — modify a deck</option>
+            <option value="template">template — from a template</option>
+            <option value="postprocess">postprocess</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl" for="provider">LLM provider</label>
+          <select id="provider">
+            <option value="">default</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <details class="keybox" id="keyBox">
+          <summary>API key</summary>
+          <div class="inner">
+            <input type="password" id="apiKey" placeholder="X-API-Key (e.g. changeme-dev-key)" autocomplete="off" />
+            <div class="hint">Sent as the <code>X-API-Key</code> header. Remembered only in this browser tab.</div>
+          </div>
+        </details>
+      </div>
+
+      <div class="wizard-actions">
+        <span class="spacer"></span>
+        <button type="button" class="btn-generate" id="toSpec"><span>Next: design spec →</span></button>
+      </div>
+    </section>
+
+    <!-- Step 2: design spec -->
+    <section class="panel step-panel" id="step2" aria-label="Design spec" hidden>
+      <div class="panel-title">
+        <span class="num">02</span>
+        <h2>Design spec</h2>
+      </div>
+
       <fieldset class="spec" aria-label="Design spec">
         <div class="spec-head">
-          <h3>Design spec</h3>
           <button type="button" class="reset" id="specReset">reset to defaults</button>
         </div>
 
@@ -860,45 +1040,62 @@
         </div>
       </fieldset>
 
-      <div class="field row2">
-        <div>
-          <label class="lbl" for="route">Route</label>
-          <select id="route">
-            <option value="create">create — new deck</option>
-            <option value="edit">edit — modify a deck</option>
-            <option value="template">template — from a template</option>
-            <option value="postprocess">postprocess</option>
-          </select>
-        </div>
-        <div>
-          <label class="lbl" for="provider">LLM provider</label>
-          <select id="provider">
-            <option value="">default</option>
-          </select>
-        </div>
+      <div class="wizard-actions">
+        <button type="button" class="btn-ghost" id="backTo1">← Back</button>
+        <span class="spacer"></span>
+        <button type="submit" class="btn-generate" id="genBtn">
+          <span id="genLabel">Generate outline</span>
+        </button>
+      </div>
+      <p class="wizard-note">Next you'll review and edit the outline before any slide is built.</p>
+    </section>
+
+  </form>
+
+  <!-- ============ Step 3: outline ============ -->
+  <section class="panel step-panel" id="step3" aria-label="Review outline" hidden>
+    <div class="panel-title">
+      <span class="num">03</span>
+      <h2>Review the outline</h2>
+    </div>
+
+    <div class="outline-status" id="outlineStatus">
+      <span class="spin"></span>
+      <span id="outlineStatusText">Generating an outline…</span>
+    </div>
+
+    <div id="outlineWrap" hidden>
+      <div class="field">
+        <label class="lbl" for="outlineTitle">Deck title</label>
+        <input type="text" id="outlineTitle" />
       </div>
 
       <div class="field">
-        <details class="keybox" id="keyBox">
-          <summary>API key</summary>
-          <div class="inner">
-            <input type="password" id="apiKey" placeholder="X-API-Key (e.g. changeme-dev-key)" autocomplete="off" />
-            <div class="hint">Sent as the <code>X-API-Key</code> header. Remembered only in this browser tab.</div>
-          </div>
-        </details>
+        <label class="lbl">Slides <span id="outlineCount" style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted)"></span></label>
+        <div class="outline-slides" id="outlineSlides"></div>
+        <div class="oslide-actions">
+          <button type="button" class="btn-ghost" id="addSlide">+ Add slide</button>
+          <button type="button" class="btn-ghost" id="refineAll">✨ Refine all with AI</button>
+        </div>
       </div>
+      <div class="hint">Edit any title, bullets, data, or context. Move slides with ↑/↓, remove with ✕, or ✨ refine an item with AI. The build follows this outline exactly.</div>
+    </div>
 
-      <button type="submit" class="btn-generate" id="genBtn">
-        <span id="genLabel">Generate deck</span>
+    <div class="wizard-actions">
+      <button type="button" class="btn-ghost" id="backToSpec">← Back</button>
+      <button type="button" class="btn-ghost" id="regenOutline">↻ Regenerate</button>
+      <span class="spacer"></span>
+      <button type="button" class="btn-generate" id="approveBtn" disabled>
+        <span id="approveLabel">Approve &amp; build →</span>
       </button>
-    </form>
+    </div>
   </section>
 
-  <!-- ============ Progress ============ -->
-  <section class="panel" aria-label="Progress">
+  <!-- ============ Step 4: build ============ -->
+  <section class="panel step-panel" id="step4" aria-label="Build" hidden>
     <div class="panel-title">
-      <span class="num">02</span>
-      <h2>Progress</h2>
+      <span class="num">04</span>
+      <h2>Build &amp; download</h2>
     </div>
 
     <div class="progress-head">
@@ -935,6 +1132,10 @@
     <div class="recent">
       <h3>Recent jobs</h3>
       <ul id="recent"><li class="empty" style="cursor:default;border:none;background:none;padding:0">No jobs yet this session.</li></ul>
+    </div>
+
+    <div class="wizard-actions">
+      <button type="button" class="btn-ghost" id="backToOutline">← Back to outline</button>
     </div>
   </section>
 
@@ -1017,6 +1218,14 @@
     tokens: { input: 0, output: 0 },
     done: false,
     providersLoaded: false,
+    step: 1,
+    phase: "idle",          // "idle" | "outline" | "build"
+    outline: null,          // { title, slides: [{ title, bullets: [], data, context }] }
+    outlineReady: false,
+    prompt: "",             // composed prompt used to generate the outline
+    spec: null,             // design spec reused for the build phase
+    route: "create",
+    provider: "",
   };
 
   // -------- toast --------
@@ -1225,33 +1434,44 @@
     if (!ev || !ev.type) return;
     if (ev.type === "ping") return;
     const d = ev.data || {};
+    const outlining = state.phase === "outline";
     switch (ev.type) {
       case "job.created":
         setState("queued"); logLine("meta", "Job created, queued."); break;
       case "job.started":
-        setState("running"); logLine("meta", "Job started."); setStage("Running agent…"); break;
+        setState("running"); logLine("meta", "Job started.");
+        if (outlining) outlineStatus("running", "Reading your prompt and sources…");
+        else setStage("Running agent…");
+        break;
+      case "job.outline":
+        if (d.outline) { state.outline = d.outline; renderOutline(d.outline); }
+        logLine("progress", "▸ Outline received.");
+        break;
       case "job.progress": {
         if (d.usage) setTokens(d.usage);
         // Usage-only updates carry no stage; don't spam the log for them.
         if (!d.stage && !d.message) break;
         const stage = d.stage || d.message || "Working…";
+        logLine("progress", "▸ " + (d.message || stage));
+        if (outlining) { outlineStatus("running", stage); break; }
         setStage(stage);
         if (d.percent !== null && d.percent !== undefined) setPercent(Number(d.percent));
         else if (d.stage === "analyze") setPercent(8);
         else if (d.stage === "design") setPercent(35);
         else if (d.stage === "render") setPercent(65);
         else if (d.stage === "export") setPercent(90);
-        logLine("progress", "▸ " + (d.message || stage));
         break;
       }
       case "job.thought":
         logLine("thought", d.text || "");
+        if (outlining && d.text) outlineStatus("running", String(d.text).slice(0, 140));
         break;
       case "job.tool_call": {
         const name = d.name || d.tool || "tool";
         const args = d.args ? JSON.stringify(d.args) : "";
         logLine("tool_call", "→ " + name + (args ? " " + args.slice(0, 300) : ""));
-        if (/finalize/i.test(name)) setPercent(97);
+        if (outlining) outlineStatus("running", "Working: " + name + "…");
+        else if (/finalize/i.test(name)) setPercent(97);
         break;
       }
       case "job.tool_result": {
@@ -1263,12 +1483,236 @@
       case "job.warning":
         logLine("warn", "! " + (d.message || d.error || "warning")); break;
       case "job.completed":
-        onComplete(d); break;
+        if (outlining) onOutlineComplete(d); else onComplete(d);
+        break;
       case "job.failed":
-        onFailed(d.error || d.reason || "agent failed"); break;
+        if (outlining) onOutlineFailed(d.error || d.reason || "outline failed");
+        else onFailed(d.error || d.reason || "agent failed");
+        break;
       case "job.cancelled":
-        onCancelled(); break;
+        if (outlining) onOutlineFailed("cancelled"); else onCancelled();
+        break;
     }
+  }
+
+  // -------- wizard navigation ----------
+  function stepAllowed(n) {
+    if (n === 1) return true;
+    if (n === 2) return true;
+    if (n === 3) return !!state.outline || state.phase === "outline";
+    if (n === 4) return state.phase === "build" && !!state.jobId;
+    return false;
+  }
+  function showStep(n) {
+    state.step = n;
+    ["step1", "step2", "step3", "step4"].forEach((id, i) => { $(id).hidden = (i + 1) !== n; });
+    document.querySelectorAll("#stepper .step-pill").forEach((p) => {
+      const s = Number(p.dataset.step);
+      p.classList.toggle("active", s === n);
+      p.classList.toggle("done", s < n);
+      p.disabled = !stepAllowed(s) && s !== n;
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // -------- outline review ----------
+  function outlineStatus(kind, text) {
+    const el = $("outlineStatus");
+    el.classList.remove("err", "ok");
+    if (kind === "err") el.classList.add("err");
+    if (kind === "ok") el.classList.add("ok");
+    const spin = el.querySelector(".spin");
+    if (spin) spin.style.display = kind === "running" ? "" : "none";
+    $("outlineStatusText").textContent = text;
+  }
+  function renderOutline(outline) {
+    state.outline = {
+      title: (outline && outline.title) || "",
+      slides: ((outline && outline.slides) || []).map((s) => ({
+        title: s.title || "",
+        bullets: Array.isArray(s.bullets) ? s.bullets.slice() : [],
+        data: s.data || "",
+        context: s.context || "",
+      })),
+    };
+    $("outlineTitle").value = state.outline.title;
+    renderOutlineSlides();
+    $("outlineWrap").hidden = false;
+    $("approveBtn").disabled = false;
+  }
+  // One labelled textarea bound to a slide field. `bullets` is a list (one per
+  // line); `data` and `context` are free text.
+  function slideField(label, placeholder, slide, key) {
+    const box = document.createElement("div");
+    const lbl = document.createElement("span");
+    lbl.className = "subhead"; lbl.textContent = label;
+    const ta = document.createElement("textarea");
+    ta.placeholder = placeholder;
+    if (key === "bullets") {
+      ta.className = "mini";
+      ta.value = (slide.bullets || []).join("\n");
+      ta.addEventListener("input", () => { slide.bullets = ta.value.split("\n"); });
+    } else {
+      ta.value = slide[key] || "";
+      ta.addEventListener("input", () => { slide[key] = ta.value; });
+    }
+    box.append(lbl, ta);
+    return box;
+  }
+  function renderOutlineSlides() {
+    const wrap = $("outlineSlides");
+    wrap.innerHTML = "";
+    const slides = (state.outline && state.outline.slides) || [];
+    slides.forEach((s, i) => {
+      const card = document.createElement("div");
+      card.className = "oslide";
+
+      const head = document.createElement("div");
+      head.className = "oslide-head";
+      const num = document.createElement("span");
+      num.className = "oslide-num"; num.textContent = i + 1;
+      const title = document.createElement("input");
+      title.type = "text"; title.className = "oslide-title";
+      title.value = s.title; title.placeholder = "Slide title";
+      title.addEventListener("input", () => { s.title = title.value; });
+      const tools = document.createElement("div");
+      tools.className = "oslide-tools";
+      const refine = document.createElement("button");
+      refine.type = "button"; refine.className = "refine"; refine.textContent = "✨";
+      refine.title = "Refine this slide with AI";
+      refine.onclick = () => refineSlide(i);
+      const up = document.createElement("button");
+      up.type = "button"; up.textContent = "↑"; up.title = "Move up"; up.disabled = i === 0;
+      up.onclick = () => moveSlide(i, -1);
+      const down = document.createElement("button");
+      down.type = "button"; down.textContent = "↓"; down.title = "Move down"; down.disabled = i === slides.length - 1;
+      down.onclick = () => moveSlide(i, 1);
+      const del = document.createElement("button");
+      del.type = "button"; del.textContent = "✕"; del.title = "Remove slide";
+      del.onclick = () => removeSlide(i);
+      tools.append(refine, up, down, del);
+      head.append(num, title, tools);
+
+      card.append(
+        head,
+        slideField("Content / bullets", "One bullet per line", s, "bullets"),
+        slideField("Data / evidence", "Key facts, figures, or quotations — one per line", s, "data"),
+        slideField("Context / rationale", "Why this slide exists and how it connects", s, "context"),
+      );
+      wrap.appendChild(card);
+    });
+    $("outlineCount").textContent = "· " + slides.length + (slides.length === 1 ? " slide" : " slides");
+  }
+  function moveSlide(i, dir) {
+    const slides = state.outline.slides, j = i + dir;
+    if (j < 0 || j >= slides.length) return;
+    [slides[i], slides[j]] = [slides[j], slides[i]];
+    renderOutlineSlides();
+  }
+  function removeSlide(i) {
+    state.outline.slides.splice(i, 1);
+    renderOutlineSlides();
+  }
+  function addSlide() {
+    if (!state.outline) state.outline = { title: $("outlineTitle").value, slides: [] };
+    state.outline.slides.push({ title: "", bullets: [], data: "", context: "" });
+    renderOutlineSlides();
+  }
+  function collectOutline() {
+    if (!state.outline) return null;
+    const slides = state.outline.slides
+      .map((s) => ({
+        title: (s.title || "").trim(),
+        bullets: (s.bullets || []).map((b) => String(b).trim()).filter(Boolean),
+        data: (s.data || "").trim(),
+        context: (s.context || "").trim(),
+      }))
+      .filter((s) => s.title || s.bullets.length);
+    return { title: ($("outlineTitle").value || "").trim(), slides };
+  }
+
+  // -------- AI refinement --------
+  async function refineRequest(body) {
+    const r = await fetch("/outline/refine", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...authHeaders() },
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) {
+      let detail = r.status + " " + r.statusText;
+      try { const j = await r.json(); detail = j.detail || j.error || detail; } catch (_) {}
+      throw new Error(detail);
+    }
+    return r.json();
+  }
+  async function refineSlide(i) {
+    const slides = state.outline && state.outline.slides;
+    if (!slides || i < 0 || i >= slides.length) return;
+    const card = $("outlineSlides").children[i];
+    if (card) card.classList.add("is-busy");
+    outlineStatus("running", "Refining slide " + (i + 1) + " with AI…");
+    try {
+      const d = await refineRequest({
+        action: "slide", outline: collectOutline(), index: i,
+        provider_override: state.provider || null,
+      });
+      const s = d.slide || {};
+      slides[i] = {
+        title: s.title || slides[i].title,
+        bullets: Array.isArray(s.bullets) ? s.bullets : slides[i].bullets,
+        data: s.data || "",
+        context: s.context || "",
+      };
+      renderOutlineSlides();
+      outlineStatus("ok", "Slide " + (i + 1) + " refined — review and edit as needed.");
+    } catch (err) {
+      if (card) card.classList.remove("is-busy");
+      outlineStatus("err", "Refine failed: " + (err.message || err));
+      toast("Refine failed: " + (err.message || err), true);
+    }
+  }
+  async function refineAll() {
+    if (!state.outline || !state.outline.slides.length) { toast("Nothing to refine yet.", true); return; }
+    const btn = $("refineAll");
+    if (btn) btn.disabled = true;
+    outlineStatus("running", "Refining the whole outline with AI…");
+    try {
+      const d = await refineRequest({
+        action: "all", outline: collectOutline(),
+        provider_override: state.provider || null,
+      });
+      renderOutline(d.outline || state.outline);
+      outlineStatus("ok", "Outline refined — review and edit as needed.");
+      toast("Outline refined.");
+    } catch (err) {
+      outlineStatus("err", "Refine failed: " + (err.message || err));
+      toast("Refine failed: " + (err.message || err), true);
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  }
+  function onOutlineComplete(d) {
+    stopTimer();
+    state.outlineReady = true;
+    state.done = true;
+    closeStreams();
+    setBusy(false);
+    const outline = (d && d.outline) || state.outline;
+    if (!outline) { outlineStatus("err", "The agent finished without returning an outline."); return; }
+    renderOutline(outline);
+    outlineStatus("ok", "Outline ready — edit any slide below, then approve to build.");
+    showStep(3);
+    toast("Outline ready — review and approve it.");
+  }
+  function onOutlineFailed(err) {
+    stopTimer();
+    state.done = true;
+    closeStreams();
+    setBusy(false);
+    outlineStatus("err", "Could not generate an outline: " + err);
+    if (!stepAllowed(2)) { state.phase = "outline"; }
+    showStep(3);
+    toast("Outline failed: " + err, true);
   }
 
   function onComplete(d) {
@@ -1344,9 +1788,17 @@
         const r = await fetch("/jobs/" + jobId, { headers: authHeaders() });
         if (!r.ok) return;
         const rec = await r.json();
-        if (rec.status === "completed") { onComplete({ export_path: rec.export_path }); }
-        else if (rec.status === "failed") { onFailed(rec.error || "failed"); }
-        else if (rec.status === "cancelled") { onCancelled(); }
+        const outlining = state.phase === "outline";
+        if (rec.status === "completed") {
+          if (outlining) onOutlineComplete({ outline: rec.outline });
+          else onComplete({ export_path: rec.export_path, export_name: rec.export_name, usage: rec.usage, duration_seconds: rec.duration_seconds });
+        } else if (rec.status === "failed") {
+          if (outlining) onOutlineFailed(rec.error || "failed");
+          else onFailed(rec.error || "failed");
+        } else if (rec.status === "cancelled") {
+          if (outlining) onOutlineFailed("cancelled");
+          else onCancelled();
+        }
       } catch (e) { /* keep polling */ }
     }, 2500);
   }
@@ -1361,9 +1813,16 @@
     btn.disabled = busy;
     $("cancelBtn").disabled = !busy;
     if (busy) {
-      btn.innerHTML = '<span class="spinner"></span><span>Generating…</span>';
+      const lbl = state.phase === "build" ? "Building…" : "Generating…";
+      btn.innerHTML = '<span class="spinner"></span><span>' + lbl + "</span>";
     } else {
-      btn.innerHTML = '<span id="genLabel">Generate deck</span>';
+      btn.innerHTML = '<span id="genLabel">Generate outline</span>';
+    }
+    // Keep the approve button consistent with the current phase.
+    const ap = $("approveBtn");
+    if (ap) {
+      ap.disabled = busy || !state.outlineReady;
+      if ($("approveLabel")) $("approveLabel").textContent = (busy && state.phase === "build") ? "Building…" : "Approve & build →";
     }
   }
 
@@ -1399,7 +1858,9 @@
     $("result").classList.remove("show");
     clearLog();
     state.done = false;
+    state.phase = "build";
     state.jobId = jobId;
+    showStep(4);
     $("jobId").textContent = jobId.slice(0, 16) + "…";
     setState("running");
     setPercent(null);
@@ -1729,39 +2190,107 @@
     return lines.join("\n");
   }
 
-  // -------- submit ----------
+  // -------- phase 1: generate outline ----------
+  function jobFormData(prompt, extra) {
+    const fd = new FormData();
+    fd.append("prompt", prompt);
+    fd.append("route", state.route);
+    if (state.provider) fd.append("provider_override", state.provider);
+    fd.append("no_confirm", "true");
+    fd.append("options", JSON.stringify(state.spec || {}));
+    Object.keys(extra || {}).forEach((k) => fd.append(k, extra[k]));
+    state.files.forEach((f) => fd.append("files", f, f.name));
+    return fd;
+  }
+
+  async function submitOutline() {
+    state.phase = "outline";
+    state.outline = null;
+    state.outlineReady = false;
+    state.done = false;
+    $("outlineWrap").hidden = true;
+    $("approveBtn").disabled = true;
+    outlineStatus("running", "Generating an outline…");
+    state.jobId = null;
+    setState("queued");
+    setStage("Submitting…");
+    setBusy(true);
+    startTimer();
+    showStep(3);
+
+    const fd = jobFormData(state.prompt, { outline_only: "true" });
+    logLine("meta", "Design spec: " + (state.spec.canvas_format === "auto" ? "auto size" : state.spec.canvas_label)
+      + " · " + (state.spec.page_count || "auto") + " slides"
+      + " · " + (state.spec.template || "free design")
+      + (state.spec.tone ? " · " + state.spec.tone : ""));
+    logLine("meta", "Requesting an outline" + (state.files.length ? " with " + state.files.length + " file(s)" : "") + "…");
+
+    try {
+      const r = await fetch("/jobs", { method: "POST", headers: authHeaders(), body: fd });
+      if (!r.ok) {
+        let detail = r.status + " " + r.statusText;
+        try { const j = await r.json(); detail = j.detail || j.error || detail; } catch (_) {}
+        throw new Error(detail);
+      }
+      const d = await r.json();
+      state.jobId = d.job_id;
+      logLine("meta", "Outline job " + d.job_id.slice(0, 12) + "… created.");
+      openStream(d.job_id);
+    } catch (err) {
+      onOutlineFailed(err.message || String(err));
+    }
+  }
+
   $("form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const basePrompt = $("prompt").value.trim();
-    if (!basePrompt) { toast("Please enter a prompt.", true); return; }
-    if (!apiKey()) { $("keyBox").open = true; toast("Enter your API key first.", true); return; }
-    const spec = readSpec();
-    const prompt = composePrompt(basePrompt, spec);
+    if (!basePrompt) { showStep(1); toast("Please enter a prompt.", true); $("prompt").focus(); return; }
+    if (!apiKey()) { showStep(1); $("keyBox").open = true; toast("Enter your API key first.", true); return; }
+    state.spec = readSpec();
+    state.prompt = composePrompt(basePrompt, state.spec);
+    state.route = $("route").value;
+    state.provider = $("provider").value;
+    await submitOutline();
+  });
 
-    // reset view
+  // -------- phase 2: approve & build ----------
+  function promptWithOutline(base, outline) {
+    const lines = [base.trim(), "", "Approved outline (follow this structure exactly):"];
+    lines.push("Deck title: " + (outline.title || "(untitled)"));
+    outline.slides.forEach((s, i) => {
+      lines.push((i + 1) + ". " + (s.title || "(untitled slide)"));
+      (s.bullets || []).forEach((b) => lines.push("   - " + b));
+      if (s.data) {
+        lines.push("   data:");
+        String(s.data).split("\n").forEach((d) => { if (d.trim()) lines.push("     * " + d.trim()); });
+      }
+      if (s.context) lines.push("   context: " + String(s.context).replace(/\s+/g, " ").trim());
+    });
+    lines.push("", "Build every slide from this outline in order. You may refine wording and visual design, but do not add, remove, or reorder slides.");
+    return lines.join("\n");
+  }
+
+  async function approveAndBuild() {
+    const outline = collectOutline();
+    if (!outline || !outline.slides.length) { toast("Add at least one slide before building.", true); return; }
+    state.outline = outline;
+    state.outlineReady = true;
+    state.phase = "build";
+    state.done = false;
+    state.jobId = null;
     $("result").classList.remove("show");
     clearLog();
-    state.done = false;
     setPercent(null);
-    setStage("Submitting…");
     setState("queued");
+    setStage("Submitting…");
     setBusy(true);
     startTimer();
+    showStep(4);
 
-    const fd = new FormData();
-    fd.append("prompt", prompt);
-    fd.append("route", $("route").value);
-    const prov = $("provider").value;
-    if (prov) fd.append("provider_override", prov);
-    fd.append("no_confirm", "true");
-    fd.append("options", JSON.stringify(spec));
-    state.files.forEach((f) => fd.append("files", f, f.name));
-
-    logLine("meta", "Design spec: " + (spec.canvas_format === "auto" ? "auto size" : spec.canvas_label)
-      + " · " + (spec.page_count || "auto") + " slides"
-      + " · " + (spec.template || "free design")
-      + (spec.tone ? " · " + spec.tone : ""));
-    logLine("meta", "Submitting job" + (state.files.length ? " with " + state.files.length + " file(s)" : "") + "…");
+    const prompt = promptWithOutline(state.prompt, outline);
+    const fd = jobFormData(prompt, {});
+    logLine("meta", "Approved outline · " + outline.slides.length + " slides.");
+    logLine("meta", "Building the deck" + (state.files.length ? " with " + state.files.length + " file(s)" : "") + "…");
 
     try {
       const r = await fetch("/jobs", { method: "POST", headers: authHeaders(), body: fd });
@@ -1773,12 +2302,51 @@
       const d = await r.json();
       state.jobId = d.job_id;
       $("jobId").textContent = d.job_id.slice(0, 16) + "…";
-      logLine("meta", "Job " + d.job_id.slice(0, 12) + "… created.");
-      setStage("Queued");
+      logLine("meta", "Build job " + d.job_id.slice(0, 12) + "… created.");
       openStream(d.job_id);
     } catch (err) {
       onFailed(err.message || String(err));
     }
+  }
+
+  // -------- wizard button handlers ----------
+  function cancelRunningOutline() {
+    if (state.phase === "outline" && state.jobId && !state.done && !state.outlineReady) {
+      fetch("/jobs/" + state.jobId + "/cancel", { method: "POST", headers: authHeaders() }).catch(() => {});
+    }
+  }
+  // Step 1 → Step 2: require a prompt, then show the design spec.
+  $("toSpec").addEventListener("click", () => {
+    if (!$("prompt").value.trim()) { toast("Please enter a prompt.", true); $("prompt").focus(); return; }
+    showStep(2);
+  });
+  // Step 2 → Step 1.
+  $("backTo1").addEventListener("click", () => showStep(1));
+  // Outline → design spec (cancel a still-running outline job).
+  $("backToSpec").addEventListener("click", () => {
+    cancelRunningOutline();
+    closeStreams();
+    state.phase = "idle";
+    setBusy(false);
+    showStep(2);
+  });
+  $("regenOutline").addEventListener("click", async () => {
+    state.spec = readSpec();
+    state.prompt = composePrompt($("prompt").value.trim(), state.spec);
+    state.route = $("route").value;
+    state.provider = $("provider").value;
+    cancelRunningOutline();
+    closeStreams();
+    await submitOutline();
+  });
+  $("approveBtn").addEventListener("click", approveAndBuild);
+  $("addSlide").addEventListener("click", addSlide);
+  $("refineAll").addEventListener("click", refineAll);
+  $("backToOutline").addEventListener("click", () => showStep(3));
+  $("stepper").addEventListener("click", (e) => {
+    const pill = e.target.closest(".step-pill");
+    if (!pill || pill.disabled) return;
+    showStep(Number(pill.dataset.step));
   });
 
   // -------- cancel / clear --------
