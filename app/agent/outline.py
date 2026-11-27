@@ -25,8 +25,8 @@ from app.storage.base import StorageBackend
 
 
 OUTLINE_SYSTEM_PROMPT = """You are the planning assistant of Salindia Studio. In
-THIS phase your only job is to produce a CONTENT OUTLINE for a slide deck, then
-stop.
+THIS phase your only job is to produce a DETAILED, PER-SLIDE CONTENT OUTLINE for
+a slide deck, then stop.
 
 Hard rules:
 - Produce an outline only. Do NOT write or render slides, do NOT run any export
@@ -36,9 +36,9 @@ Hard rules:
 - Inspect the material the user attached before outlining: call `list_sources`
   to see the available files, then `read_source` on the relevant ones.
 - Base the structure on the user's request and the "Design spec requirements"
-  embedded in it (slide count, tone, language, template, story framework).
-  Honour the requested number of slides (default ~10) and the requested output
-  language for every string.
+  embedded in it (slide count, tone, language, template, story framework,
+  audience, core message). Honour the requested number of slides (default ~10)
+  and the requested output language for every string.
 - If a story framework is specified, make the slide order follow its sections:
     * SCQA - Situation, Complication, Question, Answer: establish the shared
       context, expose the tension or gap, pose the key question, then answer it.
@@ -55,23 +55,62 @@ Hard rules:
   If the user left the framework to the planner, choose the one that best fits
   the topic and audience, follow it, and state your choice in the first
   slide's `context`.
+- Plan the deck as an ARGUMENT, not a list of topics. Every slide must move the
+  audience from one belief to the next; if a slide does not change what the
+  audience thinks, knows, or does, cut it or merge it. Group slides into 2-4
+  named parts that mirror the framework sections.
 
-When ready, call `submit_outline` EXACTLY ONCE with:
-  - title: a concise, specific deck title
-  - slides: an ordered array; each item is
-      {"title": "...", "bullets": [...], "data": "...", "context": "..."}
-Give every slide:
-  - an assertion-style title (a claim, not a label);
-  - 2-5 short bullets (<= 12 words each) as the slide's content;
-  - `data`: the concrete supporting evidence - key facts, figures, dates,
-    names, or quotations drawn from the attached material (one per line). Never
-    invent a figure you cannot support; if the data is missing, state what
-    should be gathered instead;
-  - `context`: 1-3 sentences of background/rationale - why this slide exists,
+For EACH slide, think like a presentation designer and fill EVERY field below.
+A reader must be able to hand this outline to a designer and get the intended
+deck without asking follow-up questions. Vague slides ("Overview", "Key
+points", "Thank you") are not acceptable.
+
+  - title: an assertion-style claim (a full sentence that states the point),
+    never a label. It should be the takeaway a viewer reads first.
+  - audience_move: "From <what they currently believe or feel> -> to <what they
+    should believe or feel after this slide>". One sentence. This is the job
+    of the slide.
+  - relationships: how this slide's parts relate logically, naming both the
+    relation and the units, e.g. "link: claim -> three proofs", "order: step 1
+    -> 2 -> 3", "contrast: before <-> after", "membership: four costs of one
+    decision", "parent: category -> sub-items". Rigorous structure lives here.
+  - layout: the composition / layout pattern in plain language, including
+    where the eye lands first, e.g. "full-bleed photo; title and three figures
+    over the darkest lower third", "two columns: diagram left, four bullets
+    right", "hero number centred, one support line, source line at the foot".
+  - core_message: the single sentence a viewer must remember from this slide.
+    Specific and defensible, not a restatement of the title.
+  - bullets: 3-6 on-slide content lines (<= 14 words each). These are the words
+    that actually appear on the slide, not speaker notes. Use the source's
+    concrete facts; no filler.
+  - data: the concrete evidence behind the slide - key figures, dates, names,
+    quotations, units and years, one per line. Cite the source or fact id when
+    the material provides one. Never invent a figure; if the evidence is
+    missing, state what must be gathered instead.
+  - visualization: the visual form that carries the message - e.g. "horizontal
+    bar chart, 5 categories, one highlighted", "timeline with 4 milestones",
+    "2x2 matrix", "annotated diagram", "comparison table", "big-number
+    callout", "none (text-led)". Name the axes, categories or annotations.
+  - images: the imagery the slide needs - subject, framing and role
+    (hero / background / support / icon), or "none". Respect the design spec's
+    image strategy.
+  - motion: an optional transition or build that reinforces the logic, e.g.
+    "reveal the three proofs one at a time", "morph the chapter rail from the
+    previous slide", or "none".
+  - context: 1-3 sentences of background/rationale - why this slide exists,
     what it assumes, and how it connects to the neighbouring slides.
-Cover the full arc: an opening, the body, and a closing slide. After
-`submit_outline` returns, reply with a single short line and stop - do not
-call any other tool.
+
+Also give the deck:
+  - title: a concise, specific deck title.
+  - narrative: one paragraph (3-5 sentences) describing the through-line - the
+    argument arc, the turning points, and the closing ask.
+  - parts: 2-4 short part names that group the slides (e.g. "Part 1: The old
+    world").
+
+Cover the full arc: an opening, the body, and a closing slide. When ready, call
+`submit_outline` EXACTLY ONCE with `title`, `narrative`, `parts` and `slides`
+(each slide carrying all the fields above). After `submit_outline` returns,
+reply with a single short line and stop - do not call any other tool.
 """
 
 
@@ -111,15 +150,25 @@ def _as_str(value: Any) -> str:
 
 
 def _normalize_slide(item: Dict[str, Any]) -> Dict[str, Any]:
-    """Normalize one outline slide. `bullets` is the content; `data` and
-    `context` carry the supporting evidence and rationale."""
+    """Normalize one outline slide into the detailed per-slide contract.
+
+    `bullets` are the words that appear on the slide; `data` is the evidence;
+    `audience_move`, `relationships`, `layout`, `core_message`, `visualization`,
+    `images`, `motion` and `context` describe the design intent behind it."""
     bullets = item.get("bullets") or []
     if isinstance(bullets, str):
         bullets = bullets.split("\n")
     return {
         "title": str(item.get("title", "")).strip(),
+        "audience_move": _as_str(item.get("audience_move")),
+        "relationships": _as_str(item.get("relationships")),
+        "layout": _as_str(item.get("layout")),
+        "core_message": _as_str(item.get("core_message")),
         "bullets": [str(b).strip() for b in bullets if str(b).strip()],
         "data": _as_str(item.get("data")),
+        "visualization": _as_str(item.get("visualization")),
+        "images": _as_str(item.get("images")),
+        "motion": _as_str(item.get("motion")),
         "context": _as_str(item.get("context")),
     }
 
@@ -128,8 +177,13 @@ def _normalize_outline(obj: Dict[str, Any]) -> Dict[str, Any]:
     obj = obj if isinstance(obj, dict) else {}
     raw = obj.get("slides")
     raw = raw if isinstance(raw, list) else []
+    parts = obj.get("parts") or []
+    if isinstance(parts, str):
+        parts = [parts]
     return {
         "title": str(obj.get("title", "")).strip(),
+        "narrative": _as_str(obj.get("narrative")),
+        "parts": [str(p).strip() for p in parts if str(p).strip()],
         "slides": [_normalize_slide(s) for s in raw if isinstance(s, dict)],
     }
 
@@ -215,26 +269,46 @@ def get_outline_tools(storage: StorageBackend, sources: List[str]) -> ToolRegist
     )
     reg.register(
         "submit_outline",
-        "Submit the deck's content outline. Call once with a title and an ordered "
-        "list of slides; the phase then ends for user review.",
+        "Submit the deck's detailed content outline. Call once with a deck title, "
+        "a narrative, 2-4 part names, and an ordered list of slides; the phase then "
+        "ends for user review.",
         {"type": "object",
          "properties": {
-             "title": {"type": "string", "description": "Deck title"},
+             "title": {"type": "string", "description": "Concise, specific deck title"},
+             "narrative": {"type": "string",
+                           "description": "One paragraph (3-5 sentences) on the deck's through-line: the argument arc, turning points, and closing ask"},
+             "parts": {"type": "array", "items": {"type": "string"},
+                       "description": "2-4 short part names that group the slides"},
              "slides": {
                  "type": "array",
-                 "description": "Ordered slides; each has a title, short bullets, supporting data, and context.",
+                 "description": "Ordered slides; each is a fully specified beat of the argument.",
                  "items": {
                      "type": "object",
                      "properties": {
-                         "title": {"type": "string", "description": "Assertion-style slide title"},
+                         "title": {"type": "string",
+                                   "description": "Assertion-style claim (a full sentence stating the point), never a label"},
+                         "audience_move": {"type": "string",
+                                           "description": "From <current belief/feeling> -> to <intended belief/feeling>; the job of this slide"},
+                         "relationships": {"type": "string",
+                                           "description": "Logical relation between the slide's parts, naming the relation and the units, e.g. 'link: claim -> three proofs', 'order: step 1 -> 2 -> 3', 'contrast: before <-> after', 'membership: four costs of one decision'"},
+                         "layout": {"type": "string",
+                                    "description": "Composition / layout pattern in plain language, including where the eye lands first"},
+                         "core_message": {"type": "string",
+                                          "description": "The single sentence a viewer must remember from this slide"},
                          "bullets": {"type": "array", "items": {"type": "string"},
-                                     "description": "2-5 short content bullets (<= 12 words each)"},
+                                     "description": "3-6 on-slide content lines (<= 14 words each); the words that actually appear on the slide"},
                          "data": {"type": "string",
-                                  "description": "Supporting facts, figures, or evidence (one per line)"},
+                                  "description": "Concrete evidence behind the slide - figures, dates, names, quotations, units, years - one per line; cite the source or fact id, never invent a figure"},
+                         "visualization": {"type": "string",
+                                           "description": "Visual form that carries the message (chart, timeline, matrix, diagram, table, big-number callout, or 'none (text-led)'), naming axes/categories/annotations"},
+                         "images": {"type": "string",
+                                    "description": "Imagery needed: subject, framing and role (hero / background / support / icon), or 'none'; respect the design spec's image strategy"},
+                         "motion": {"type": "string",
+                                    "description": "Optional transition or build that reinforces the logic, or 'none'"},
                          "context": {"type": "string",
-                                     "description": "1-3 sentences of background/rationale for this slide"},
+                                     "description": "1-3 sentences of background/rationale: why this slide exists, what it assumes, how it connects to its neighbours"},
                      },
-                     "required": ["title"],
+                     "required": ["title", "core_message", "bullets"],
                  },
              },
          },
@@ -256,13 +330,36 @@ def get_outline_tools(storage: StorageBackend, sources: List[str]) -> ToolRegist
 # AI refinement of an already-generated outline
 # ---------------------------------------------------------------------------
 
+_SLIDE_JSON_HINT = (
+    '{"title": ..., "audience_move": ..., "relationships": ..., "layout": ..., '
+    '"core_message": ..., "bullets": [...], "data": ..., "visualization": ..., '
+    '"images": ..., "motion": ..., "context": ...}'
+)
+
 _REFINE_RULES = """Refinement rules:
-- Turn each title into an assertion (a claim), not a label.
-- Keep 2-5 bullets per slide, each <= 12 words.
-- `data`: concrete supporting facts/figures/quotations. Never invent specific
-  numbers, dates, or citations you cannot support; if the evidence is missing,
-  say what should be gathered instead.
-- `context`: 1-3 sentences of background/rationale for the slide.
+- Keep every slide fully specified. Each slide must carry ALL of these fields, and
+  none may be left as a vague placeholder:
+    * title - an assertion (a full sentence stating the point), never a label.
+    * audience_move - "From <current belief/feeling> -> to <intended belief/feeling>".
+    * relationships - the logical relation between the slide's parts, naming the
+      relation and the units (link / order / contrast / membership / parent / ...).
+    * layout - the composition in plain language, including where the eye lands first.
+    * core_message - the one sentence a viewer must remember from this slide.
+    * bullets - 3-6 on-slide content lines (<= 14 words each), the words that
+      actually appear on the slide.
+    * data - concrete evidence (figures, dates, names, quotations, units, years),
+      one per line. Never invent specific numbers, dates, or citations you cannot
+      support; if the evidence is missing, say what should be gathered instead.
+    * visualization - the visual form that carries the message (chart, timeline,
+      matrix, diagram, table, big-number callout, or "none (text-led)"), naming
+      axes/categories/annotations.
+    * images - subject, framing and role (hero / background / support / icon), or
+      "none".
+    * motion - an optional transition/build that reinforces the logic, or "none".
+    * context - 1-3 sentences of background/rationale and how the slide connects
+      to its neighbours.
+- Make the deck read as an argument: sharpen the audience_move and relationships
+  so each slide earns its place and hands off to the next.
 - Preserve the deck's language and slide count; do not add, drop, or reorder
   slides (unless the user's extra instruction explicitly asks for it).
 Return ONLY a JSON object - no prose, no markdown code fences."""
@@ -301,7 +398,7 @@ async def refine_slide(llm: LLMProvider, outline: Dict[str, Any], index: int,
     user = (
         _refine_context(norm, instruction)
         + f"\n\nRefine ONLY slide index {index} (slide {index + 1} of {len(norm['slides'])})."
-        + '\nReply with a JSON object: {"title": ..., "bullets": [...], "data": ..., "context": ...}'
+        + "\nReply with a JSON object holding every slide field: " + _SLIDE_JSON_HINT
     )
     resp = await llm.chat([LLMMessage(role="user", content=user)],
                           system=REFINE_SLIDE_SYSTEM_PROMPT)
@@ -315,8 +412,8 @@ async def refine_outline(llm: LLMProvider, outline: Dict[str, Any],
     user = (
         _refine_context(norm, instruction)
         + "\n\nRefine the WHOLE outline."
-        + '\nReply with a JSON object: {"title": ..., "slides": [{"title": ..., '
-        + '"bullets": [...], "data": ..., "context": ...}]}'
+        + '\nReply with a JSON object: {"title": ..., "narrative": ..., "parts": [...], '
+        + '"slides": [' + _SLIDE_JSON_HINT + ', ...]}'
     )
     resp = await llm.chat([LLMMessage(role="user", content=user)],
                           system=REFINE_OUTLINE_SYSTEM_PROMPT)

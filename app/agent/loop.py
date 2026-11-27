@@ -55,8 +55,55 @@ Operating principles:
   with `read_file`; do not assume they are anywhere else.
 - Your workdir is already a PPT Master project directory. Every script runs with
   your workdir as the working directory, so always pass "." as the project:
-    1. design_spec.md — write it with `write_file`; it must include the section
-       `## IX. Content Outline`.
+    1. design_spec.md — write it with `write_file`. This is the deck's full design
+       contract and must be as detailed as the reference specs in
+       ppt-master-examples. Open with `<!-- ppt-master-schema: design-spec/v1 -->`
+       and a `# <project> - Design Spec` title, then include ALL of these
+       sections, filled in for THIS deck (no placeholders):
+         ## I. Project Information — a table of: project name, canvas format,
+           page count, primary language, target audience (prose: who they are,
+           what they already believe, what they need), communication intent,
+           desired audience outcome, core message / ask / action, delivery
+           context, artifact afterlife, reading mode, content strategy, design
+           style, AI image acquisition path, generation mode, spec refinement,
+           speaker notes (yes/no), custom animations, narration audio, created
+           date. Add a Template Application paragraph: which layout prototypes
+           this deck borrows, what may change, and why.
+         ## II. Canvas Specification — format, dimensions, viewBox, margins,
+           content area.
+         ## III. Visual Theme — Theme Style (mode, mode references, mode
+           behaviour, visual style, visual-style references, visual-style
+           behaviour, theme, tone), a Color Scheme table with 10-12 roles
+           (Role | HEX | Purpose: background, secondary background, primary,
+           accent, secondary accent, body text, secondary text, divider, scrim,
+           surface, ...), and an AI Image Strategy (image rendering, references,
+           behaviour, visual, mood).
+         ## IV. Typography System — a Font Plan table
+           (Role | Character (Reference) | Primary | English if non-English |
+           Fallback tail) covering title, body, display, chapter title, chapter
+           number, quote and hero number; the per-role font stacks; a Role
+           rationale; and a Font Size Hierarchy table (Purpose | Anchor Size px).
+         ## V. Layout Principles — deck-wide direction: hierarchy direction,
+           composition tendency, cross-page continuity, spacing posture, and
+           spacing anchors (page margin, block gap, column gutter, corner radius,
+           body leading). State the grid and how pages vary around it.
+         ## VI. Icon Usage Specification — primary bundled library, stroke
+           width, and a table of Icon Path | Suitable Scenarios (or an explicit
+           "none" rationale).
+         ## VII. Visualization Reference List — the chart/diagram families this
+           deck uses and when.
+         ## VIII. Image Resource List — a table with columns Filename |
+           Dimensions | Ratio | Purpose | Type | Image pattern | Crop Policy |
+           Acquire Via | Status | Reference | text_policy | page_role (or an
+           explicit "no image resource is planned" rationale).
+         ## IX. Content Outline — the approved per-slide outline, grouped into
+           parts, with each slide's audience move, relationships, composition,
+           title, core message, content, images, motion and fact ids.
+         ## X. Speaker Notes Requirements — generation, filename, content, total
+           duration, notes style, presentation purpose.
+         ## XI. Technical Constraints Reminder — the hard rules that must hold
+           when the slides are rendered.
+       Keep it consistent with spec_lock.md below (same palette, fonts, canvas).
     2. spec_lock.md — write it with `write_file` in EXACTLY this Markdown lock
        dialect (## section, then "- key: value" lines). Do not use YAML/nesting:
          <!-- ppt-master-schema: spec-lock/v1 -->

@@ -260,6 +260,28 @@
   .spec .field { margin-bottom: 14px; }
   .spec .field:last-of-type { margin-bottom: 0; }
 
+  /* Advanced design-spec disclosure */
+  details.adv {
+    border: 1.5px dashed var(--rule);
+    border-radius: 4px;
+    background: var(--paper);
+    padding: 11px 13px;
+    margin: 4px 0 14px;
+  }
+  details.adv summary {
+    cursor: pointer; list-style: none;
+    font-family: "JetBrains Mono", monospace; font-size: .7rem; font-weight: 600;
+    color: var(--cobalt); display: flex; align-items: center; gap: 8px;
+  }
+  details.adv summary::-webkit-details-marker { display: none; }
+  details.adv summary::before {
+    content: "▸"; display: inline-block; transition: transform .15s;
+  }
+  details.adv[open] summary::before { transform: rotate(90deg); }
+  details.adv .inner { margin-top: 12px; }
+  details.adv .inner .field:last-of-type { margin-bottom: 0; }
+  details.adv .inner .hint { margin-top: 0; margin-bottom: 12px; }
+
   /* Canvas picker (card radios) */
   .canvas-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
   @media (max-width: 520px) { .canvas-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -960,6 +982,20 @@
     display: block; font-size: .64rem; font-weight: 700; letter-spacing: .1em;
     text-transform: uppercase; color: var(--muted); margin: 11px 0 5px;
   }
+  .oslide-intent {
+    margin-top: 10px; border-top: 1px dashed var(--rule); padding-top: 8px;
+  }
+  .oslide-intent > summary {
+    cursor: pointer; list-style: none; user-select: none;
+    font-size: .64rem; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--cobalt);
+  }
+  .oslide-intent > summary::-webkit-details-marker { display: none; }
+  .oslide-intent > summary::before {
+    content: "▸"; display: inline-block; width: 12px; transition: transform .15s ease;
+  }
+  .oslide-intent[open] > summary::before { transform: rotate(90deg); }
+  .oslide-intent[open] > summary { margin-bottom: 8px; }
   .oslide.is-busy { opacity: .55; pointer-events: none; }
   .oslide-tools button.refine { color: var(--cobalt); }
   .oslide-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
@@ -1343,6 +1379,95 @@
           </div>
         </div>
 
+        <details class="adv" id="advSpec">
+          <summary>Advanced design spec — audience, message &amp; visual system</summary>
+          <div class="inner">
+            <p class="hint">Fill these in to make the design spec as detailed as the ppt-master-examples references. Leave any field blank to let the designer decide.</p>
+
+            <div class="field row2">
+              <div>
+                <label class="lbl" for="audience">Target audience</label>
+                <input type="text" id="audience" placeholder="e.g. Series A investors who already know the climate market" />
+              </div>
+              <div>
+                <label class="lbl" for="delivery">Delivery context</label>
+                <select id="delivery">
+                  <option value="">Designer's judgment</option>
+                  <option value="live presentation, presented from a screen">Live presentation (on screen)</option>
+                  <option value="read alone, no presenter">Read alone (sent as a file)</option>
+                  <option value="printed handout, read on paper">Printed handout</option>
+                  <option value="async video walkthrough">Async video walkthrough</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="lbl" for="intent">Communication intent &amp; desired outcome</label>
+              <input type="text" id="intent" placeholder="e.g. move a sceptical reader to convinced that microgrids are investable; outcome: book a diligence call" />
+            </div>
+
+            <div class="field">
+              <label class="lbl" for="coreMessage">Core message / ask</label>
+              <input type="text" id="coreMessage" placeholder="The single sentence the audience must remember, and the action you want them to take" />
+            </div>
+
+            <div class="field row2">
+              <div>
+                <label class="lbl" for="readingMode">Reading mode</label>
+                <select id="readingMode">
+                  <option value="">Designer's judgment</option>
+                  <option value="skimmed in 60 seconds">Skim in 60 seconds</option>
+                  <option value="read in full, 5-10 minutes">Read in full</option>
+                  <option value="presented live with speaker notes">Presented live</option>
+                </select>
+              </div>
+              <div>
+                <label class="lbl" for="iconLib">Icon library</label>
+                <select id="iconLib">
+                  <option value="">Designer's judgment</option>
+                  <option value="tabler-outline">Tabler outline (stroke icons)</option>
+                  <option value="chunk-filled">Chunk filled (solid icons)</option>
+                  <option value="none">No icons</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="lbl" for="styleRefs">Visual style references</label>
+              <input type="text" id="styleRefs" placeholder="e.g. Swiss editorial grid, generous whitespace, full-bleed photography, thin rules" />
+            </div>
+
+            <div class="field row2">
+              <div>
+                <label class="lbl" for="colorRoles">Colour roles</label>
+                <input type="text" id="colorRoles" placeholder="e.g. Background #0B1220; Primary #4A86B4; Accent #E2761C" />
+              </div>
+              <div>
+                <label class="lbl" for="typeRoles">Typography roles</label>
+                <input type="text" id="typeRoles" placeholder="e.g. Fraunces titles / Inter body; body 22px, title 40px" />
+              </div>
+            </div>
+
+            <div class="field row2">
+              <div>
+                <label class="lbl" for="layoutSpec">Layout &amp; spacing anchors</label>
+                <input type="text" id="layoutSpec" placeholder="e.g. 12-column grid, 80px margins, 24px gutters, 8px spacing scale" />
+              </div>
+              <div>
+                <label class="lbl" for="imageStrategy">Image strategy</label>
+                <select id="imageStrategy">
+                  <option value="">Designer's judgment</option>
+                  <option value="full-bleed photography as evidence">Full-bleed photography</option>
+                  <option value="restrained supporting imagery">Restrained supporting imagery</option>
+                  <option value="diagrams and data, no photos">Diagrams and data only</option>
+                  <option value="generated illustrations">Generated illustrations</option>
+                  <option value="no images">No images</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </details>
+
         <div class="field">
           <label class="lbl" for="notes">Additional constraints <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted)">(optional)</span></label>
           <input type="text" id="notes" placeholder="e.g. include a pricing table, avoid stock photos, use brand color #1F3A6E" />
@@ -1388,7 +1513,7 @@
           <button type="button" class="btn-ghost" id="refineAll">✨ Refine all with AI</button>
         </div>
       </div>
-      <div class="hint">Edit any title, bullets, data, or context. Move slides with ↑/↓, remove with ✕, or ✨ refine an item with AI. The build follows this outline exactly.</div>
+      <div class="hint">Review each slide's title, core message, content, data and its design intent (audience move, relationships, composition, visualization, images, motion). Move slides with ↑/↓, remove with ✕, or ✨ refine an item with AI. The build follows this outline exactly.</div>
     </div>
 
     <div class="wizard-actions">
@@ -1616,7 +1741,9 @@
     providersLoaded: false,
     step: 1,
     phase: "idle",          // "idle" | "outline" | "build"
-    outline: null,          // { title, slides: [{ title, bullets: [], data, context }] }
+    outline: null,          // { title, narrative, parts: [], slides: [{ title, audience_move,
+                            //   relationships, layout, core_message, bullets: [], data,
+                            //   visualization, images, motion, context }] }
     outlineReady: false,
     skippedOutline: false,  // true when the user bypassed the outline review
     prompt: "",             // composed prompt used to generate the outline
@@ -1962,15 +2089,28 @@
     if (spin) spin.style.display = kind === "running" ? "" : "none";
     $("outlineStatusText").textContent = text;
   }
+  function normalizeSlide(s) {
+    s = s || {};
+    return {
+      title: s.title || "",
+      audience_move: s.audience_move || "",
+      relationships: s.relationships || "",
+      layout: s.layout || "",
+      core_message: s.core_message || "",
+      bullets: Array.isArray(s.bullets) ? s.bullets.slice() : [],
+      data: s.data || "",
+      visualization: s.visualization || "",
+      images: s.images || "",
+      motion: s.motion || "",
+      context: s.context || "",
+    };
+  }
   function renderOutline(outline) {
     state.outline = {
       title: (outline && outline.title) || "",
-      slides: ((outline && outline.slides) || []).map((s) => ({
-        title: s.title || "",
-        bullets: Array.isArray(s.bullets) ? s.bullets.slice() : [],
-        data: s.data || "",
-        context: s.context || "",
-      })),
+      narrative: (outline && outline.narrative) || "",
+      parts: Array.isArray(outline && outline.parts) ? outline.parts.slice() : [],
+      slides: ((outline && outline.slides) || []).map(normalizeSlide),
     };
     $("outlineTitle").value = state.outline.title;
     renderOutlineSlides();
@@ -1978,7 +2118,7 @@
     $("approveBtn").disabled = false;
   }
   // One labelled textarea bound to a slide field. `bullets` is a list (one per
-  // line); `data` and `context` are free text.
+  // line); every other field is free text.
   function slideField(label, placeholder, slide, key) {
     const box = document.createElement("div");
     const lbl = document.createElement("span");
@@ -1986,7 +2126,6 @@
     const ta = document.createElement("textarea");
     ta.placeholder = placeholder;
     if (key === "bullets") {
-      ta.className = "mini";
       ta.value = (slide.bullets || []).join("\n");
       ta.addEventListener("input", () => { slide.bullets = ta.value.split("\n"); });
     } else {
@@ -2030,11 +2169,27 @@
       tools.append(refine, up, down, del);
       head.append(num, title, tools);
 
+      const intent = document.createElement("details");
+      intent.className = "oslide-intent";
+      const isum = document.createElement("summary");
+      isum.textContent = "Design intent, composition & media";
+      intent.appendChild(isum);
+      intent.append(
+        slideField("Audience move", "From <current belief> -> to <intended belief>", s, "audience_move"),
+        slideField("Relationships", "link / order / contrast / membership / parent — name the relation and the units", s, "relationships"),
+        slideField("Layout / composition", "Where the eye lands first and how the page is composed", s, "layout"),
+        slideField("Visualization", "Chart / timeline / matrix / diagram / table / big-number, or none", s, "visualization"),
+        slideField("Images", "Subject, framing and role (hero / background / support / icon), or none", s, "images"),
+        slideField("Motion", "Transition or build that reinforces the logic, or none", s, "motion"),
+        slideField("Context / rationale", "Why this slide exists and how it connects", s, "context"),
+      );
+
       card.append(
         head,
-        slideField("Content / bullets", "One bullet per line", s, "bullets"),
-        slideField("Data / evidence", "Key facts, figures, or quotations — one per line", s, "data"),
-        slideField("Context / rationale", "Why this slide exists and how it connects", s, "context"),
+        slideField("Core message", "The one sentence a viewer must remember from this slide", s, "core_message"),
+        slideField("Content / bullets", "One bullet per line (3-6 lines, ≤14 words each)", s, "bullets"),
+        slideField("Data / evidence", "Key facts, figures, dates, units or quotations — one per line", s, "data"),
+        intent,
       );
       wrap.appendChild(card);
     });
@@ -2051,8 +2206,8 @@
     renderOutlineSlides();
   }
   function addSlide() {
-    if (!state.outline) state.outline = { title: $("outlineTitle").value, slides: [] };
-    state.outline.slides.push({ title: "", bullets: [], data: "", context: "" });
+    if (!state.outline) state.outline = { title: $("outlineTitle").value, narrative: "", parts: [], slides: [] };
+    state.outline.slides.push(normalizeSlide({}));
     renderOutlineSlides();
   }
   function collectOutline() {
@@ -2060,12 +2215,24 @@
     const slides = state.outline.slides
       .map((s) => ({
         title: (s.title || "").trim(),
+        audience_move: (s.audience_move || "").trim(),
+        relationships: (s.relationships || "").trim(),
+        layout: (s.layout || "").trim(),
+        core_message: (s.core_message || "").trim(),
         bullets: (s.bullets || []).map((b) => String(b).trim()).filter(Boolean),
         data: (s.data || "").trim(),
+        visualization: (s.visualization || "").trim(),
+        images: (s.images || "").trim(),
+        motion: (s.motion || "").trim(),
         context: (s.context || "").trim(),
       }))
-      .filter((s) => s.title || s.bullets.length);
-    return { title: ($("outlineTitle").value || "").trim(), slides };
+      .filter((s) => s.title || s.bullets.length || s.core_message);
+    return {
+      title: ($("outlineTitle").value || "").trim(),
+      narrative: (state.outline.narrative || "").trim(),
+      parts: (state.outline.parts || []).slice(),
+      slides,
+    };
   }
 
   // -------- AI refinement --------
@@ -2094,12 +2261,20 @@
         provider_override: state.provider || null,
       });
       const s = d.slide || {};
-      slides[i] = {
-        title: s.title || slides[i].title,
-        bullets: Array.isArray(s.bullets) ? s.bullets : slides[i].bullets,
-        data: s.data || "",
-        context: s.context || "",
-      };
+      const prev = slides[i] || {};
+      slides[i] = normalizeSlide({
+        title: s.title || prev.title,
+        audience_move: s.audience_move || prev.audience_move,
+        relationships: s.relationships || prev.relationships,
+        layout: s.layout || prev.layout,
+        core_message: s.core_message || prev.core_message,
+        bullets: Array.isArray(s.bullets) ? s.bullets : prev.bullets,
+        data: s.data || prev.data,
+        visualization: s.visualization || prev.visualization,
+        images: s.images || prev.images,
+        motion: s.motion || prev.motion,
+        context: s.context || prev.context,
+      });
       renderOutlineSlides();
       outlineStatus("ok", "Slide " + (i + 1) + " refined — review and edit as needed.");
     } catch (err) {
@@ -2404,211 +2579,211 @@
   const DESIGN_TEMPLATES = {
     "apollo-photo-essay": {
       label: "Apollo Photo Essay",
-      brief: "16:9 1280×720 deck, 13 pages. Style: photo-editorial × narrative：满版照片主导，文字只做指认与计数；暗色安静的文字侧，一个锈橙强调色只用在编号、细线和关键词上. Tone: 克制、具体、有重量。不抒情，不惊叹；靠确切的时刻（02:56:15 UTC）、确切的编号（AS11-40-5903）和确切的距离（400,171 公里）产生分量. Palette: Background #0B0E11; Surface #1E242B; Primary #E9E4D9; Accent #D2622B; Secondary accent #6E7B8A; Body text #DAD5CA. Type: Times New Roman titles / Arial body (body 30px, title 54px). Margins: 72 px 四边.",
+      brief: "PPT 16:9 1280 × 720 deck, 13 pages. Style: photo-editorial × narrative：满版照片主导，文字只做指认与计数；暗色安静的文字侧，一个锈橙强调色只用在编号、细线和关键词上. Mode/visual style: custom (photo-editorial) — 满版出血照片是页面脊椎，文字只做指认、计数与图注；页面装饰只有发丝细线、编号章标和小字图注，任何卡片、图标、阴影都不与照片争夺注意力。构图在四种之间轮换——L 形文字区、标题跨压照片明暗交界、破边的浮动图注卡、以及无照片时退回 editorial 的多栏文字页。留白给文字，出血给照片；文字侧永远是安静的中性暗色，锈橙只出现在编号、细线和一两个关键词上。整卷平面，唯一允许的渐变是压字用的方向性 scrim. Theme: 一本关于四年的月度画报。照片是版面的脊椎，文字只在照片让出来的暗部里说话。整卷共用一枚\"任务章标\"——一条细线加一行 1968 · APOLLO 8 这样的编号，它在每一页的同一个位置出现，并在相邻页之间移动、改写，成为把十三页缝起来的那根线. Tone: 克制、具体、有重量。不抒情，不惊叹；靠确切的时刻（02:56:15 UTC）、确切的编号（AS11-40-5903）和确切的距离（400,171 公里）产生分量. Palette: Background #0B0E11; Surface #161A20; Primary #E9E4D9; Accent #D2622B; Secondary accent #6E7B8A; Body text #DAD5CA; Secondary text #98A0A9. Type: SimSun (EN: Times New Roman) titles / Microsoft YaHei (EN: Arial) body (body 30px, title 54px). Layout: 照片先被看见，再是压在它明暗交界上的标题，再是一段不超过两句的正文，最后才是小字图注与署名。每页只有一个视觉主角 四种构图轮换——L 形文字区（沿左缘与下缘）、标题跨压照片明暗交界、破边的浮动图注卡、无照片时退回 editorial 多栏文字页；不重复相邻两页的同一种 Spacing anchors: 页边距 72 / 块间距 32 / 栏间距 40 / 圆角 4 / 正文行距 48. Icons: none. Images: 封面：土星五号在夜里离开地面; Photography.",
     },
     "apple-fy2025-review": {
       label: "Apple FY2025 经营复盘",
-      brief: "16:9 1280×720 deck, 14 pages. Style: 账页式数据复盘:中性纸白场、发丝细线栅格、等宽表格数字、状态色只编码状态. Tone: 克制、直述、不软化坏数字. Palette: Background #FFFFFF; Surface #F4F6F8; Primary #1E293B; Accent #2B6CB0; Secondary accent #2E7D5B; Secondary text #64748B. Type: Microsoft YaHei titles / Microsoft YaHei body (body 24px, title 44px). Margins: 上下左右 64px.",
+      brief: "PPT 16:9 1280 × 720 deck, 14 pages. Style: 账页式数据复盘:中性纸白场、发丝细线栅格、等宽表格数字、状态色只编码状态. Mode/visual style: custom (data-journalism, swiss-minimal) — 账页式栅格。纸白场上用发丝细线(而非卡片与阴影)划分区域,分栏与基线严格对齐,页面像一张可以逐格审计的账页;每页固定三个区域——顶部断言句、中部数字/图表主体、底部来源与口径行——位置跨页不变。装饰为零:没有渐变、发光、圆角 KPI 卡与仪表盘外壳,状态只由色 + 形/标签双重编码。数字全部走等宽字族并右对齐,列与列之间靠对齐而不是容器分组。留白用于把\"结果\"与\"解释\"分开,而不是用于稀释密度. Theme: 一份可审计的年度账页——每一个数字都能指回源表的某一行某一列. Tone: 克制、直述、不软化坏数字. Palette: Background #FFFFFF; Surface #F4F6F8; Primary #1E293B; Accent #2B6CB0; Secondary accent #2E7D5B; Body text #1E293B; Secondary text #64748B. Type: Microsoft YaHei titles / Microsoft YaHei body (body 24px, title 44px). Layout: 自上而下——顶部断言句先落地结论,中部把支撑它的那个数字放到最大,底部给口径与来源;横向上把\"变化量\"放在比\"原值\"更靠左或更大的位置 每页一个主导事实 + 一组可审计的支撑数字;图表占据中部主区并自带比较基线,说明文字沿右侧或下方成窄栏 Spacing anchors: 页边距 64px;区块间距 32px;分栏栏距 24px;圆角半径 0px;正文行高 1.55. Icons: tabler-outline.",
     },
     "brutalist-press": {
       label: "Brutalism Field Guide",
-      brief: "16:9 1280×720 deck, 16 pages. Style: Brutalist editorial newspaper carrying a narrative arc — a field guide printed on newsprint: masthead numerals, irregular column widths, heavy rules, one inverted focal cell per spread…. Tone: Reportorial, dry, unsentimental — a critic's field notes rather than an advocate…. Palette: Background #F2F0EA; Primary #14110F; Accent #C8331E; Secondary accent #6E6A62; Body text #1C1A17; Secondary text #55514A. Type: Arial Black titles / Cambria body (body 20px, title 36px). Margins: 48 px left/right, 40 px top, 44 px bottom.",
+      brief: "PPT 16:9 1280 × 720 px deck, 16 pages. Style: Brutalist editorial newspaper carrying a narrative arc — a field guide printed on newsprint: masthead numerals, irregular column widths, heavy rules, one inverted focal cell per spread, halftone documentary photography. Mode/visual style: custom (brutalist) — Newsprint field guide. Irregular two-, three-, and four-column measures on one 12-column ruleset, mixed within a page; ink hairline column dividers and 6–10 px full-bleed rule bars slicing sections. Theme: A printed field guide to raw concrete: the page is built the way the buildings were — structure exposed, grid visible. Tone: Reportorial, dry, unsentimental — a critic's field notes rather than an advocate's brochure. Palette: Background #F2F0EA; Surface #E2DFD5; Primary #14110F; Accent #C8331E; Secondary accent #6E6A62; Body text #1C1A17; Secondary text #55514A. Type: Arial Black titles / Cambria body (body 20px, title 36px). Layout: Attention enters at the masthead numeral or the top rule bar, drops to the headline set flush left, then reads down the widest column Irregular column measures over a 12-column ruleset — a page may run 5+7, 4+4+4, 3+6+3 Spacing anchors: page margin 48 px; block gap 24 px; column gutter 20 px; corner radius 0 px; body leading 30 px. Icons: chunk-filled. Images: Cover field — the raw concrete surface the whole guide is about.",
     },
     "cloudflare-outage-postmortem": {
       label: "Cloudflare Outage Postmortem",
-      brief: "16:9 1280×720 deck, 15 pages. Style: Incident Postmortem method (installed Style workspace) realized as a neutral achromatic record: white field, hairline rules, a fixed left-to-right time direction…. Tone: Factual, unhurried, and unembarrassed…. Palette: Background #FFFFFF; Primary #1F2933; Accent #B4342C; Secondary accent #B7791F; Secondary text #5A6673; Divider #D7DDE3. Type: Arial titles / Arial body (body 20px, title 36px). Margins: 64 px left/right, 56 px top, 56 px bottom.",
+      brief: "PPT 16:9 1280 × 720 deck, 15 pages. Style: Incident Postmortem method (installed Style workspace) realized as a neutral achromatic record: white field, hairline rules, a fixed left-to-right time direction, and colour reserved entirely for the four declared severity states. Mode/visual style: briefing + swiss-minimal — . Theme: A record, not a report about a record. A white field with a strict two-band grid, hairline rules instead of boxes. Tone: Factual, unhurried, and unembarrassed. The account describes what responders could see at each moment. Palette: Background #FFFFFF; Surface #F2F4F6; Primary #1F2933; Accent #B4342C; Secondary accent #B7791F; Body text #1F2933; Secondary text #5A6673. Type: Arial titles / Arial body (body 20px, title 36px). Layout: Title states what the page establishes; a single lead line carries the governing assertion One fact per page under a strict grid. A fixed 12-column field with a persistent left rule Spacing anchors: page margin 64 px, block gap 28 px, column gutter 32 px, corner radius 0 px, body leading 30 px. Icons: chunk-filled.",
     },
     "container-editorial": {
       label: "Container Shipping Editorial",
-      brief: "16:9 1280×720 deck, 12 pages. Style: 杂志式满幅照片编辑体(custom mode + custom visual style),照片承担论证、文字反白压在渐变 scrim 上. Tone: 克制、具体、可争论;像一篇有图版的长报道,不像培训材料。. Palette: Background #0B1220; Surface #16212F; Primary #4A86B4; Accent #E2761C; Secondary accent #BCD4E8; Body text #E8EFF6. Type: Cambria titles / Cambria body (body 24px, title 40px). Margins: 文字四边 80 px;图片不留边,至少触及一条画布边.",
+      brief: "PPT 16:9 1280 × 720 deck, 12 pages. Style: 杂志式满幅照片编辑体(custom mode + custom visual style),照片承担论证、文字反白压在渐变 scrim 上. Mode/visual style: custom (photo-editorial, editorial, data-journalism) — 满幅照片承担论证(photo-editorial):每页的图片至少触及一条画布边,文字反白压在黑色渐变 scrim 上,版面不出现卡片、圆角容器或阴影。层级由 editorial 的杂志规矩建立:一根 6 px 橙色短棒作为章节与分栏页的起笔,标题与正文之间留一个固定的 24 px 块间距,正文左上角起排. Theme: 港口夜色里的编辑版面——深蓝黑作为底板,历史段落走单色调、当代段落走全彩,同一张照片以\"压暗预告 → 全幅展开\"的方式跨页复现,构成全卷的连续动机. Tone: 克制、具体、可争论;像一篇有图版的长报道,不像培训材料. Palette: Background #0B1220; Surface #16212F; Primary #4A86B4; Accent #E2761C; Secondary accent #BCD4E8; Body text #E8EFF6; Secondary text #C7D3DE. Type: SimHei (EN: Cambria) titles / Microsoft YaHei (EN: Cambria) body (body 24px, title 40px). Layout: 视线先落在满幅照片的主体上,再沿渐变 scrim 由暗处进入文字;文字块内部自左上起排,数字是每页唯一允许抢走焦点的元素 每页只解决一个主张;照片要么整幅、要么按原型声明的半幅/三分幅/四分幅切分,绝不内缩成带边距的插图;文字永远在照片最暗的一侧 Spacing anchors: 页边距 80 px;块间距 24 px;分栏栏距 80 px;圆角半径 3 px(仅用于强调短棒);正文行距 38 px. Icons: tabler-outline. Images: 港口与码头的纪实照片:门机、箱堆、甲板、旧式散杂货作业、军用补给码头、黎明的超大船; 工业的、有重量的、略带历史距离感;像《国家地理》或《财富》长报道里的跨页图版.",
     },
     "dujiangyan": {
       label: "Dujiangyan",
-      brief: "16:9 1280×720 deck, 14 pages. Style: 方向 B「工程图纸」— 深色蓝图纸 × 数据出版：以工程制图的细线、引线、尺寸标注作为版面语言，数据页按新闻信息图的栅格排布. Tone: 克制、精确、可复述；不抒情、不用\"奇迹/智慧结晶\"一类赞叹句撑场. Palette: Background #0B1B2E; Surface #16314C; Primary #4A90C2; Accent #E8A33D; Secondary accent #7FD1C3; Body text #D6E4F0. Type: Consolas titles / Consolas body (body 24px, title 42px). Margins: 上下 56 px，左右 72 px.",
+      brief: "PPT 16:9 1280 × 720 deck, 14 pages. Style: 方向 B「工程图纸」— 深色蓝图纸 × 数据出版：以工程制图的细线、引线、尺寸标注作为版面语言，数据页按新闻信息图的栅格排布. Mode/visual style: custom (blueprint, data-journalism) — 版面即图纸——深色蓝图纸底，全部结构用单一线色的细线框、引线、尺寸括号与极淡的底纹网格构成，几乎不用实心色块与圆角；原理页让示意图本身充当版式骨架，文字挂在引线端点上，角落留一个图纸标题栏（页码／页名／来源）。数据页换成 data-journalism 的多栏栅格：发丝分隔线、等宽数字、超大英雄数字、页脚来源行，图表是版面的脊柱而不是被框住的插图。全卷只有一个暖色重点色，用来标\"当前正在讲的那一件\"，其余一律保持低调线条. Theme: 工程图纸上的活体系统——把两千年的水工原理当成一份仍在使用的施工图来读. Tone: 克制、精确、可复述；不抒情、不用\"奇迹/智慧结晶\"一类赞叹句撑场. Palette: Background #0B1B2E; Surface #11263D; Primary #4A90C2; Accent #E8A33D; Secondary accent #7FD1C3; Body text #D6E4F0; Secondary text #93AEC8. Type: SimHei (EN: Consolas) titles / Microsoft YaHei (EN: Consolas) body (body 24px, title 42px). Layout: 先读左上角的判断句标题，再进入画面中部的图纸主体，最后沿引线落到右侧或下方的注记与数字；来源行始终在页脚最后被读到 原理页让示意图占据整页并充当骨架，文字挂在引线端点；数据页改用多栏栅格，图表横跨主栏、注记退到侧栏；章节与结语页让大留白与一条贯通的水平基线承担全部结构 Spacing anchors: page margin 72 px；block gap 32 px；column gutter 40 px；corner radius 2 px；body leading 38 px. Icons: tabler-outline. Images: 封面的实地锚点：让读者先确认这是一处真实存在、今天仍在运转的场所; Photo.",
     },
     "every-day-counts-proposal": {
       label: "Every Day Counts",
-      brief: "16:9 1280×720 deck, 14 pages. Style: Warm-but-accountable proposal: soft-rounded containers and generous rhythm on argument pages, editorial hairlines and visible source lines on evidence pages…. Tone: Direct, respectful of the board's time, unsentimental about the evidence…. Palette: Background #FFFFFF; Surface #FAF8F5; Primary #1F4B57; Accent #E07A3F; Secondary accent #6A9AA8; Body text #23282D. Type: Trebuchet MS titles / Calibri body (body 24px, title 40px). Margins: 64 px left/right, 56 px top, 56 px bottom.",
+      brief: "PPT 16:9 1280 × 720 deck, 14 pages. Style: Warm-but-accountable proposal: soft-rounded containers and generous rhythm on argument pages, editorial hairlines and visible source lines on evidence pages; one lantern-amber accent reserved for the client's outcome and the decision points. Mode/visual style: custom (soft-rounded, editorial) — soft-rounded owns the deck's containers and rhythm — 16 px radii, low soft elevation, generous gutters, a warm paper field behind white cards — so a two-year ask reads as approachable rather than austere. editorial owns. Theme: A district's school day rebuilt as a system that notices. The recurring motif is the lantern arc — a single thin amber arc that appears at the corner of anchor. Tone: Direct, respectful of the board's time, unsentimental about the evidence, and explicit about what is not yet proven. Palette: Background #FFFFFF; Surface #F4F1EC; Primary #1F4B57; Accent #E07A3F; Secondary accent #6A9AA8; Body text #23282D; Secondary text #5A6368. Type: Trebuchet MS titles / Calibri body (body 24px, title 88px). Layout: Attention enters at the page title, which always states the takeaway, drops to one dominant object (a chart, a diagram, a table Keep one stable position for the commitment line and one stable position for supporting evidence so the deck navigates by position when it is read Spacing anchors: page margin 64, block gap 32, column gutter 32, corner radius 16, body leading 34. Icons: tabler-outline. Images: Flat vector scenes of school-day objects and thresholds — a classroom at first light, a front door and a waiting bus at the edge of a neighborhood morning; Calm, early, unresolved but not bleak — the visual register of a well-made public-service.",
     },
     "glassmorphism": {
       label: "Glassmorphism Demo",
-      brief: "16:9 1280×720 deck, 12 pages. Style: B) General Consulting + Glassmorphism SaaS. Tone: 未来感、科技、轻盈悬浮、专业. Palette: Background #0A0E27; Primary #5B8DEF; Accent #A26BFA; Secondary accent #3DDDFC; Body text #E8ECFF; Secondary text #A8B0D0. Type: \"Microsoft YaHei\", \"PingFang SC\" titles / Arial body (title 40px). Margins: 60px 左右 / 50px 上下.",
+      brief: "PPT 16:9 1280×720 deck, 12 pages. Style: B) General Consulting + Glassmorphism SaaS. Theme: Dark theme（深色玻璃 + 流光霓虹）. Tone: 未来感、科技、轻盈悬浮、专业. Palette: Background #0A0E27; Surface #1A2150; Primary #5B8DEF; Accent #A26BFA; Secondary accent #3DDDFC; Body text #E8ECFF; Secondary text #A8B0D0. Type: Microsoft YaHei titles / Microsoft YaHei (EN: Arial) body (body 20px, title 40px). Layout: Patterns: Single column centered, Symmetric split (5:5), Three/four column cards, Matrix grid (2×2). Images: glassmorphism; tech-neon.",
     },
     "global-ai-capital": {
       label: "Global AI Capital 2026",
-      brief: "16:9 1280×720 deck, 18 pages. Style: B) General Consulting + Bloomberg/Economist 新闻信息图风. Tone: 冷静、克制、出版级、数据导向；不是 keynote 冲击力，而是夜读财经长稿的深思感. Palette: Background #0E1116; Primary #E8E6E1; Accent #E63946; Secondary accent #F4A261; Secondary text #8A857E; Secondary bg #1A1F26. Type: Cambria titles / Arial body (title 32px). Margins: 左右 60px / 上下 50px.",
+      brief: "PPT 16:9 1280×720 deck, 18 pages. Style: B) General Consulting + Bloomberg/Economist 新闻信息图风. Theme: Dark theme. Tone: 冷静、克制、出版级、数据导向；不是 keynote 冲击力，而是夜读财经长稿的深思感. Palette: Background #0E1116; Surface #1A1F26; Primary #E8E6E1; Accent #E63946; Secondary accent #F4A261; Secondary text #8A857E. Type: Microsoft YaHei (EN: Cambria) titles / Microsoft YaHei (EN: Arial) body (body 16px, title 32px). Images: editorial; dark-cinematic.",
     },
     "goldberg-variations": {
       label: "Goldberg Variations",
-      brief: "16:9 1280×720 deck, 12 pages. Style: 「铜版纸上的建筑」— mode custom(instructional 为基底、narrative 收束古尔德段落)+ visual style custom(editorial + ink-notes);奶油纸底、墨色线条、暗红批注,五线谱线与拱形为贯穿母题. Tone: 安静、精确、带一点手稿温度的导赏语气. Palette: Background #F4EFE4; Primary #1F2A36; Accent #9E2A2B; Secondary accent #A88452; Body text #2B2621; Secondary text #6E655A. Type: Cambria titles / Segoe UI body (body 22px, title 38px). Margins: 左右 60 px,上 48 px,下 40 px.",
+      brief: "PPT 16:9 1280 × 720 deck, 12 pages. Style: 「铜版纸上的建筑」— mode custom(instructional 为基底、narrative 收束古尔德段落)+ visual style custom(editorial + ink-notes);奶油纸底、墨色线条、暗红批注,五线谱线与拱形为贯穿母题. Mode/visual style: custom (editorial, ink-notes) — 奶油色纸面上的墨色线条系统:editorial 负责衬线标题与无衬线正文的对位、细规则线、页边批注与出处小字;ink-notes 负责以线条而非卡片承载结构——五根平行谱线作为贯穿母题,拱形、阶梯、括号、连线用墨线勾勒,节点以小圆点/小音符头标记;暗红只用于\"卡农\"与当页唯一重点,灰蓝只用于小调;几乎不用阴影与卡片网格,留白由谱线与拱形组织. Theme: 乐谱即建筑——咏叹调是两端的柱脚,30 个变奏是拱身,每三首一根卡农\"梁柱\",低音线是地基. Tone: 安静、精确、带一点手稿温度的导赏语气. Palette: Background #F4EFE4; Surface #E9E1D0; Primary #1F2A36; Accent #9E2A2B; Secondary accent #A88452; Body text #2B2621; Secondary text #6E655A. Type: SimSun (EN: Cambria) titles / Microsoft YaHei (EN: Segoe UI) body (body 22px, title 38px). Layout: 标题(左上,衬线)→ 页面主图(结构线/谱线)→ 批注与出处;结构页让图占主导,文字作为页边批注 以一条贯穿页面的\"谱线/地平线\"或拱形组织区域,而不是卡片网格;对比页用左右对页;封面与收尾使用大留白 Spacing anchors: 页边距 60 px;块间距 28 px;栏间距 40 px;圆角 4 px;正文行距 1.55. Icons: tabler-outline. Images: 18 世纪铜版雕刻/蚀刻插画线条,细密平行排线与交叉排线塑形,墨线印在奶油纸上,极少量暗红; 安静庄重而精确,像 1741 年铜版印刷乐谱扉页旁的插画.",
     },
     "heatline-seed-pitch": {
       label: "Heatline Seed Pitch",
-      brief: "16:9 1280×720 deck, 15 pages. Style: Field Notes — warm, high-contrast editorial page architecture with a schematic annotation layer; one ember accent reserved for evidence. Tone: Confident, plain-spoken, unhurried; specific where it matters and explicitly unc…. Palette: Background #FBF7F1; Primary #16233A; Accent #D65A1E; Secondary accent #2E6F5E; Body text #1F2733; Secondary text #6B6154. Type: Arial Black titles / Calibri body (body 24px, title 42px). Margins: 64 px left/right, 56 px top, 56 px bottom.",
+      brief: "PPT 16:9 1280 × 720 deck, 15 pages. Style: Field Notes — warm, high-contrast editorial page architecture with a schematic annotation layer; one ember accent reserved for evidence. Mode/visual style: custom (editorial, blueprint) — A warm paper field organised by an editorial column grid and heavy horizontal hairline rules: a rule under the claim line at a fixed height on every page, a second rule closing the evidence block. Theme: Engineering field notes on warm paper — a hardware business argued with measurements. Tone: Confident, plain-spoken, unhurried; specific where it matters and explicitly uncertain where it is. Palette: Background #FBF7F1; Surface #EFE7DA; Primary #16233A; Accent #D65A1E; Secondary accent #2E6F5E; Body text #1F2733; Secondary text #6B6154. Type: Arial Black titles / Calibri body (body 24px, title 42px). Layout: Claim line first at a fixed height, then the single dominant evidence object, then the quiet layer — definition, source One claim and one dominant element per page on a warm field; evidence blocks recessed rather than boxed Spacing anchors: page margin 64 px, block gap 32 px, column gutter 32 px, corner radius 4 px, body leading 34 px. Icons: tabler-outline. Images: Working installers and real domestic hardware, photographed close and plainly, with one quiet region reserved for the page's claim line; Early-morning trade work — the register of a good newspaper business-section photograph.",
     },
     "how-color-works-workshop": {
       label: "How Color Works",
-      brief: "16:9 1280×720 deck, 14 pages. Style: Studio Worksheet — a quiet warm-paper worksheet on a strict grid, where the only saturated color on any page is the color being taught. Tone: Plain, unhurried, unsentimental; confident about what is measurable and honest a…. Palette: Background #FAF8F4; Primary #23201C; Accent #A8452B; Secondary accent #3E5C6B; Body text #2E2A25; Secondary text #6B6259. Type: Trebuchet MS titles / Segoe UI body (body 24px, title 42px). Margins: 64 px left/right, 56 px top, 56 px bottom.",
+      brief: "PPT 16:9 1280 × 720 deck, 14 pages. Style: Studio Worksheet — a quiet warm-paper worksheet on a strict grid, where the only saturated color on any page is the color being taught. Mode/visual style: custom (swiss-minimal, editorial, sketch-notes) — swiss-minimal owns the skeleton — a strict modular grid, flush-left alignment, exact square-cornered geometry, one large organizing plane per page and vast deliberate whitespace. Theme: A studio worksheet — paper, a ruler-straight grid, ink, and the colors under examination pinned to it. Tone: Plain, unhurried, unsentimental; confident about what is measurable and honest about what is only convention. Palette: Background #FAF8F4; Surface #EDE7DC; Primary #23201C; Accent #A8452B; Secondary accent #3E5C6B; Body text #2E2A25; Secondary text #6B6259. Type: Trebuchet MS titles / Segoe UI body (body 24px, title 42px). Layout: A kicker line and a hairline rule at the top left establish where the page sits in the 90 minutes; the title states what happens here One large organizing plane or one dominant specimen region per page against wide margins; asymmetric splits rather than even columns Spacing anchors: page margin 64 px · block gap 32 px · column gutter 40 px · corner radius 4 px · body leading 36 px. Icons: tabler-outline. Images: Ink line drawings of physical apparatus and anatomy — a prism on a bench, an eye in section; The margin of a good textbook: unhurried, exact.",
     },
     "indie-bookstore-zine-guide": {
       label: "Indie Bookstore Zine Guide",
-      brief: "16:9 1280×720 deck, 18 pages. Style: A) General Versatile + Risograph zine 印刷工艺 / DIY 海报美学. Tone: 印刷工艺感、海报感、DIY 张力、复古独立出版气质. Palette: Background #F5EFE0; Primary #1E4DBC; Accent #FF5C8A; Secondary accent #E8A02E; Body text #1A1A1A; Secondary text #5A5A5A. Type: Impact, \"Arial Black\" titles / Arial body (title 40px). Margins: 左右 60px / 上下 50px.",
+      brief: "PPT 16:9 1280×720 deck, 18 pages. Style: A) General Versatile + Risograph zine 印刷工艺 / DIY 海报美学. Theme: Light theme (暖米色纸底). Tone: 印刷工艺感、海报感、DIY 张力、复古独立出版气质. Palette: Background #F5EFE0; Surface #EAE2CC; Primary #1E4DBC; Accent #FF5C8A; Secondary accent #E8A02E; Body text #1A1A1A; Secondary text #5A5A5A. Type: Microsoft YaHei (EN: Impact) titles / Microsoft YaHei (EN: Arial) body (body 20px, title 100px). Layout: Patterns: Single column centered, Asymmetric split (3:7 / 2:8), Top-bottom split, Three/four column cards. Icons: templates/icons/chunk-filled/. Images: screen-print; duotone.",
     },
     "infosec-training": {
       label: "Infosec Training",
-      brief: "16:9 1280×720 deck, 28 pages. Style: 合规卷宗（Compliance Dossier）——米白纸面上的编辑式法规卷宗，左侧贯穿的纵向卷宗轨承接章节编号，章节页整版反转为深墨底，印章红只用于红线与警示. Tone: 克制、可核验、带分量；像一份被人反复批注过的法规汇编，而不是一场安全产品发布会. Palette: Background #F7F4EE; Surface #FFFFFF; Primary #1F2A37; Accent #C0392B; Secondary accent #1D6A73; Body text #232A31. Type: Cambria titles / Arial body (body 24px, title 44px). Margins: 上 64 / 下 56 / 左 72 / 右 72.",
+      brief: "PPT 16:9 1280 × 720 deck, 28 pages. Style: 合规卷宗（Compliance Dossier）——米白纸面上的编辑式法规卷宗，左侧贯穿的纵向卷宗轨承接章节编号，章节页整版反转为深墨底，印章红只用于红线与警示. Mode/visual style: custom (editorial, swiss-minimal, data-journalism) — swiss-minimal 负责严格的基线网格、非对称栏宽与大留白，方角、单一线重、少量大面积几何平面；editorial 负责刊头式眉标、细规则线、边注栏、引块与超大编号的排版层级；data-journalism 负责证据页的密度组织——图表作为页面脊柱而非被框住的插图、全幅 hero 数字、每页底部一条来源行。全卷靠规则线粗细与实色块拉开层级，不用阴影与发光；章节页整版反转为深墨实底承接超大编号. Theme: 卷宗轨——每页左侧一条从上贯到下的纵向细线，线上按当前章节落一个编号刻度；章节推进时刻度下移，章节页把这条轨放大成整页的编号轴。它的连续性职责是让 28 页在视觉上始终能回答\"我现在在第几章\"，复用方式为固定位置、按章变化刻度. Tone: 克制、可核验、带分量；像一份被人反复批注过的法规汇编，而不是一场安全产品发布会. Palette: Background #F7F4EE; Surface #EBE6DC; Primary #1F2A37; Accent #C0392B; Secondary accent #1D6A73; Body text #232A31; Secondary text #5A6068. Type: SimSun (EN: Cambria) titles / Microsoft YaHei (EN: Arial) body (body 24px, title 44px). Layout: 视线从左侧卷宗轨的章节刻度起步，横入眉标与判断句标题，再落到页面主体的单一 primary 载体，最后沉到底部来源行 非对称栏宽（窄边注栏 + 宽主栏）为常态，证据页让图表或表格占据主栏全宽充当页面脊柱，结论页改为大留白单焦点，章节页整版反转 Spacing anchors: 页边距 72 / 区块间距 28 / 栏间距 32 / 圆角 0 / 正文行高 1.65. Icons: chunk-filled.",
     },
     "jilin-geohazard-rules": {
       label: "Jilin Geohazard Rules",
-      brief: "16:9 1280×720 deck, 20 pages. Style: 政务条文手册（源稿复刻方向）：白底、源稿政务蓝为主色、红色标注关键时限与禁止事项，以山形折线为跨页母题. Tone: 庄重、清楚、便于查找. Palette: Background #FFFFFF; Primary #0070C0; Accent #D7141A; Secondary accent #E07A1F; Body text #1F2328; Secondary text #5A6472. Type: Arial titles / Arial body (body 24px, title 36px). Margins: 左右 56px；上 24px（页眉区）；下 32px.",
+      brief: "PPT 16:9 1280 × 720 deck, 20 pages. Style: 政务条文手册（源稿复刻方向）：白底、源稿政务蓝为主色、红色标注关键时限与禁止事项，以山形折线为跨页母题. Mode/visual style: custom — 政务条文手册：白色纸面，页眉用左侧深色主题标题 + 蓝色章节标签 + 右上角圆形厅徽，页眉下一条细分隔线，其左段由一段蓝色山形折线（取自厅徽的山形）替代直线，作为全篇母题；条款抬头用满宽蓝色条带（白字、黄色高亮关键词），并列条款用同尺寸浅蓝底面板或编号行，编号用大号蓝色数字或圆形编号牌，流程用竖向或横向编号轨道并以连接线表达先后；小圆角（6px）、无投影或仅截图卡片有轻微投影. Theme: 吉林省自然资源厅政务蓝身份延续——源稿蓝色页眉、红色强调、厅徽；把源稿零散的色块与艺术字统一为一套条文手册版式. Tone: 庄重、清楚、便于查找. Palette: Background #FFFFFF; Surface #EEF4FB; Primary #0070C0; Accent #D7141A; Secondary accent #E07A1F; Body text #1F2328; Secondary text #5A6472. Type: Microsoft YaHei (EN: Arial) titles / Microsoft YaHei (EN: Arial) body (body 24px, title 36px). Layout: 页眉主题标题 → 条款条带/小标题 → 编号条目或段落；读者先定位\"在讲哪一章哪一条\"，再逐条读 条款页用\"蓝色条款条带 + 编号网格/编号轨道\"；流程与时限页用带连接线的编号轨道；带图页用图文分栏，截图以卡片呈现；封面与封底用满宽蓝色带承载标题 Spacing anchors: page margin 56px · block gap 24px · column gutter 32px · corner radius 6px · body leading 1.45×（24px 正文行距约 35px）. Icons: tabler-filled. Images: 吉林省自然资源厅厅徽（封面、目录、封底及内容页页眉的机构标识）; Logo.",
     },
     "lora-hu": {
       label: "LoRA: Low-Rank Adaptation of Large Language Models",
-      brief: "16:9 1280×720 deck, 15 pages. Style: B) 通用咨询(数据清晰优先)+ 学术技术极简. Tone: 严谨、可信、工程化、analytical. Palette: Background #FFFFFF; Primary #1B3A5C; Accent #E8743B; Secondary accent #3E7CB1; Body text #1D2733; Secondary text #5B6776. Type: Arial titles / Arial body (body 18px, title 32px). Margins: 左右 64px,上下 56px.",
+      brief: "PPT 16:9 1280×720 deck, 15 pages. Style: B) 通用咨询(数据清晰优先)+ 学术技术极简. Theme: Light theme(白底). Tone: 严谨、可信、工程化、analytical. Palette: Background #FFFFFF; Surface #F4F7FA; Primary #1B3A5C; Accent #E8743B; Secondary accent #3E7CB1; Body text #1D2733; Secondary text #5B6776. Type: Microsoft YaHei (EN: Arial) titles / Microsoft YaHei (EN: Arial) body (body 18px, title 60px). Images: blueprint; cool-corporate.",
     },
     "mid-autumn-papercut": {
       label: "Mid Autumn Papercut",
-      brief: "16:9 1280×720 deck, 16 pages. Style: 月出东山 — 夜色剪纸叙事（custom narrative + custom paper-cut）. Tone: 沉静、有夜气、可触摸；不喜庆化，不做贺卡. Palette: Background #131A33; Surface #26305A; Primary #E8B04B; Accent #D4453A; Secondary accent #7FA8C9; Body text #F2ECE0. Type: Georgia titles / Arial body (body 24px, title 42px). Margins: 上下 56，左右 72.",
+      brief: "PPT 16:9 1280 × 720 deck, 16 pages. Style: 月出东山 — 夜色剪纸叙事（custom narrative + custom paper-cut）. Mode/visual style: custom (paper-cut) — 完整采用 paper-cut 的分层剪纸体系——形体由略不规则的剪切边定义、不画描边，每个色值是一张纸，层与层之间落 8–12% 柔影，纸面带细颗粒；构图上用「一枚大剪圆（月）锚定画面」「模切窗口露出下层」「层叠波形纸自下而上堆叠」三种几何。唯一的定制是把 paper-cut 通常的暖白桌面换成深靛夜场：底层纸是夜，上层纸是月光金、朱砂红与米白，使剪纸的层叠关系靠明度而非暖度拉开. Theme: 月自海面升起，一路盈满 — 全卷保留一枚剪纸月亮作为连续状态，从封面右下的一弯细牙，经各幕逐页改变相位、尺寸与位置，到末页升至画面中央成为最大的满月；云带、桂枝、远山脊三个剪纸构件在不同页复用，构成前景/中景/背景三层纸的注册深度. Tone: 沉静、有夜气、可触摸；不喜庆化，不做贺卡. Palette: Background #131A33; Surface #1E2748; Primary #E8B04B; Accent #D4453A; Secondary accent #7FA8C9; Body text #F2ECE0; Secondary text #B9C2D8. Type: KaiTi (EN: Georgia) titles / Microsoft YaHei (EN: Arial) body (body 24px, title 42px). Layout: 每页先有一个占据视觉重量的剪纸物件（月、饼、人物或整幅夜景），再由它引出一句判断句标题，最后才是解释文字；视线自图向文、自上而下或自右向左（跟随月亮所在的一侧） 内容坐在裁切纸片上而不是卡片网格里；纸片允许出血、轻微旋转、互相压边；每页至少有一处「模切窗口」或「大剪圆」承担聚焦；禁止把一页平均切成等宽等重的多列格子 Spacing anchors: 页边距 72px；块间距 32px；分栏间隙 40px；圆角半径 0px（剪纸不留圆角，边界靠不规则剪切路径）；正文行高 1.65. Icons: none. Images: 分层剪纸工艺 — 形体由略带手工不规则的剪切边界定，无任何描边；每一色为一张独立纸片，层间落 8–12% 柔影产生真实厚度；纸面带 10–15% 不透明度的纸纤维颗粒；造型简化为可辨的剪纸而非插画。全部元素在夜靛底纸上以月光金、朱砂红、米白、月色青四张纸构成; 夜里的手工灯笼纸 — 温度来自纸的质地而非色温；像民间剪纸窗花被逆光照亮，安静、可触摸、带一点仪式感.",
     },
     "china-economy-2025-briefing": {
       label: "NBS 2025 Communique Briefing",
-      brief: "16:9 1280×720 deck, 17 pages. Style: 数据新闻简报：出版级信息密度 + 中性陈述语气；宋体标题承担权威感，无衬线正文与衬线数字承担精度，图表是版面的脊椎. Tone: 冷静、克制、可核查。. Palette: Background #F4F1EA; Surface #FFFFFF; Primary #123B57; Accent #C0392B; Secondary accent #2E6F4E; Body text #1F2A30. Type: Times New Roman titles / Segoe UI body (body 24px, title 42px). Margins: 上 56 / 下 52 / 左右 64.",
+      brief: "PPT 16:9 1280 × 720 deck, 17 pages. Style: 数据新闻简报：出版级信息密度 + 中性陈述语气；宋体标题承担权威感，无衬线正文与衬线数字承担精度，图表是版面的脊椎. Mode/visual style: custom (data-journalism) — 出版级密度。多栏栅格承载图表与数据表，图表是页面的脊椎——版面绕着可视化排，而不是把图表装进卡片盒子里；发丝分隔线代替重卡片，整幅横贯的规则线落进统计带；侧栏切进栅格承载口径与注释；小倍数条带代替单个大图。装饰只有一条强调规则线和克制的标注。数字按含义着色（升 / 降 / 焦点），图表用同族色阶而非彩虹。整体平面，无发光、无装饰阴影. Theme: 官方统计公报的纸面出版感——暖白纸底、深墨蓝正文、砖红标记关键与下行、深绿标记上行；每页右下角一条细的来源脚注线构成跨页母题. Tone: 冷静、克制、可核查. Palette: Background #F4F1EA; Surface #FFFFFF; Primary #123B57; Accent #C0392B; Secondary accent #2E6F4E; Body text #1F2A30; Secondary text #5F6B72. Type: SimSun (EN: Times New Roman) titles / Microsoft YaHei (EN: Segoe UI) body (body 24px, title 42px). Layout: 左上角标题与主题标签先落地，视线沿栅格向右下走到可视化主体，末端收在右下角来源脚注行 图表作脊椎——先定可视化占据的主栏，再让文字沿它的边缘排；英雄数按整栏尺度放；横贯规则线把页面切成上部叙述带与下部统计带；侧栏切进栅格承载口径 Spacing anchors: 页边距 64px、块间距 32px、栏间距 24px、圆角 0px、正文行高 36px. Icons: tabler-outline.",
     },
     "nev-export": {
       label: "NEV Export",
-      brief: "16:9 1280×720 deck, 15 pages. Style: 方向一「双语公报 / Bilingual Gazette」——数据新闻式栅格公报,中文主行与英文副行成对分层. Tone: 克制、可核查、供双方引用;不渲染胜利叙事,也不淡化壁垒. Palette: Background #FFFFFF; Surface #FAFBFC; Primary #0E3A66; Accent #D4541E; Secondary accent #2E7D8F; Body text #1B2430. Type: Cambria titles / Cambria body (body 22px, title 40px). Margins: 上 56 / 下 64 / 左右 72;底部 64 含常驻来源条.",
+      brief: "PPT 16:9 1280 × 720 deck, 15 pages. Style: 方向一「双语公报 / Bilingual Gazette」——数据新闻式栅格公报,中文主行与英文副行成对分层. Mode/visual style: custom (data-journalism, swiss-minimal, editorial) — 以 data-journalism 负责多栏证据密度、微型图注与常驻来源条;swiss-minimal 负责 12 栏硬栅格、大留白与近零装饰,使同页双语不靠色块分区而靠栅格与细规则线分层;editorial 负责中文衬线标题与拉丁衬线副标题的层级互文、细规则线与边注。中文主行与英文副行永远上下成对,英文行以更小字号、次级文字色与 0.5px 细线左缘标记为副层,不另起色块. Theme: 出海年鉴——用公报式栅格承载两种语言,同一栏里中文在上、英文在下,数字与来源常驻可引用. Tone: 克制、可核查、供双方引用;不渲染胜利叙事,也不淡化壁垒. Palette: Background #FFFFFF; Surface #F2F4F7; Primary #0E3A66; Accent #D4541E; Secondary accent #2E7D8F; Body text #1B2430; Secondary text #5C6673. Type: SimSun (EN: Cambria) titles / Microsoft YaHei (EN: Cambria) body (body 22px, title 40px). Layout: 左上判断句 → 右侧或下方证据(图/表/数字)→ 底部来源条;同一栏内永远中文在上、英文在下,读者选定语言后只需垂直扫一列 12 栏硬栅格上的双语成对分层;每页一个焦点数字或一个证据对象,其余为支撑栏;部分首页在右上角标出部分序号与双语部分名 Spacing anchors: 页边距 72px;块间距 28px;栏间距 32px;圆角 0px(公报硬边);正文行距 34px. Icons: chunk-filled. Images: 扁平矢量编辑插画——只用简化的几何体块与 1.5px 轮廓表现滚装码头、厂房与充电阵列,平面无渐变,单一光源方向的浅色块面,不含任何真实品牌标识、车标与文字; 克制的行业年鉴插图,像《经济学人》图表页旁的说明插画,而非广告主视觉.",
     },
     "pixel-atlas": {
       label: "Pixel Breakfast Atlas",
-      brief: "16:9 1280×720 deck, 16 pages. Style: 8-bit 图鉴：briefing 的并列等重骨架 + pixel-art 的严格像素网格与有限色板；深色瓷砖底上放大号食物 sprite，配 HUD 属性面板与图鉴进度条. Tone: 轻松、克制、可查；游戏机的中性播报感，不煽情不排名. Palette: Background #1A1C2C; Surface #232741; Primary #EF8A3C; Accent #FFCD4D; Secondary accent #41A6B5; Body text #F4F0E6. Type: Microsoft YaHei titles / Microsoft YaHei body (body 24px, title 44px). Margins: 上下左右各 64px；底部瓷砖地带占 y=656..720，正文不进入.",
+      brief: "PPT 16:9 1280 × 720 deck, 16 pages. Style: 8-bit 图鉴：briefing 的并列等重骨架 + pixel-art 的严格像素网格与有限色板；深色瓷砖底上放大号食物 sprite，配 HUD 属性面板与图鉴进度条. Mode/visual style: custom (pixel-art) — 严格像素网格、无抗锯齿、块状轮廓、无渐变无滤镜无阴影；深色夜蓝底上铺一条底部瓷砖地带，条目页由 HUD 角括号框出内容区、阶梯像素分隔线切分栏位、底部一条 11 格图鉴进度条高亮当前条目；大号食物 sprite 稳稳压住页面左侧并留出四周空白，深浅只靠调色板分层（亮顶暗底）实现. Theme: 图鉴（Pokédex）——每页一格档案：编号、名称、城市、sprite、HUD 属性面板、要点。跨页母题是\"图鉴进度条 + HUD 角括号\"，在 11 张条目页上逐格推进，复用模式为固定复现、仅高亮格位变化. Tone: 轻松、克制、可查；游戏机的中性播报感，不煽情不排名. Palette: Background #1A1C2C; Surface #2B2F4A; Primary #EF8A3C; Accent #FFCD4D; Secondary accent #41A6B5; Body text #F4F0E6; Secondary text #A0A8C0. Type: Microsoft YaHei titles / Microsoft YaHei body (body 24px, title 44px). Layout: 条目页从左侧大 sprite 起读 → 右上编号与名称 → 右中 HUD 属性面板 → 右下要点两三句 → 底部进度条定位；视线一次横穿，不做 Z 字回折 左重右轻的双区结构，左区放尺寸压场的单一 sprite 并四周留白，右区用 HUD 角括号框出信息栈；封面、共性页、争议页、表格页与结尾页各自另立构图，不套条目模板 Spacing anchors: 页边距 64px；块间距 32px；分栏槽 32px；圆角 0px（像素纪律，一律直角）；正文行距 36px. Icons: none. Images: 深色底上的高对比像素 sprite——食物成为可辨认的图标化实体（碗口、面条纹理、蒸汽块都由离散像素块构成），配件与 HUD 元件是同一网格上的小尺寸块状图形; 怀旧、克制、可收集——像 90 年代掌机 RPG 的道具图鉴页，物品静静躺在暗色格子里等着被翻阅.",
     },
     "pritzker": {
       label: "Pritzker 2026",
-      brief: "16:9 1280×720 deck, 11 pages. Style: A) General Versatile + 编辑设计 / 杂志感 / 建筑摄影主导. Tone: 克制、克难、克重——大图说话，文字点题；混凝土质感的米白底色 + 墨黑文字 + 暖金强调. Palette: Background #F5F2EC; Primary #1C1C1C; Accent #B8935A; Secondary text #5C5852; Border/divider #D4CFC4; Secondary bg #EDE8DE. Type: Georgia titles / Arial body (body 22px, title 40px). Margins: 左右 60px / 上下 50px.",
+      brief: "PPT 16:9 1280×720 deck, 11 pages. Style: A) General Versatile + 编辑设计 / 杂志感 / 建筑摄影主导. Theme: Light theme. Tone: 克制、克难、克重——大图说话，文字点题；混凝土质感的米白底色 + 墨黑文字 + 暖金强调. Palette: Background #F5F2EC; Surface #EDE8DE; Primary #1C1C1C; Accent #B8935A; Body text #1C1C1C; Secondary text #5C5852. Type: Microsoft YaHei (EN: Georgia) titles / Microsoft YaHei (EN: Arial) body (body 22px, title 72px). Icons: tabler-outline. Images: P01 封面背景（混凝土水景）; Photography.",
     },
     "researchstudio-reel-paper": {
       label: "ResearchStudio-Reel paper reading",
-      brief: "16:9 1280×720 deck, 18 pages. Style: Research-talk restraint on a Swiss grid: white field, hairline rules, one claim line per page in a fixed position, figures dominant…. Tone: precise, sober, checkable; the paper's own numbers and hedges…. Palette: Background #FFFFFF; Surface #F3F5F8; Primary #1B2430; Accent #1D4ED8; Secondary accent #0E9F8A; Body text #2F3A48. Type: Arial titles / Arial body (body 16px, title 28px). Margins: top 48 / bottom 40 / left 56 / right 56.",
+      brief: "PPT 16:9 1280 × 720 deck, 18 pages. Style: Research-talk restraint on a Swiss grid: white field, hairline rules, one claim line per page in a fixed position, figures dominant, color used only to encode condition (our Claude Code configuration, our Codex configuration, baselines. Mode/visual style: custom + swiss-minimal — . Theme: a research talk that reads like a well-set paper: a fixed title band with the assertion in bold and one claim line beneath it, a hairline under both. Tone: precise, sober, checkable; the paper's own numbers and hedges, no added enthusiasm. Palette: Background #FFFFFF; Surface #F3F5F8; Primary #1B2430; Accent #1D4ED8; Secondary accent #0E9F8A; Body text #2F3A48; Secondary text #6B7684. Type: Arial titles / Arial body (body 16px, title 28px). Layout: title assertion first, then the claim line naming the evidence, then the evidence itself (figure, table, chart), then the reading column beside it fixed title band; the field splits asymmetrically — evidence dominant (about two thirds) with a narrow reading column — on figure and table pages Spacing anchors: page margin 56; block gap 24; column gutter 32; corner radius 0; body leading 22. Icons: none. Images: Cover evidence strip, left cell: a generated poster (Figure 1a); Screenshot.",
     },
     "russia-demography": {
       label: "Russia Demography",
-      brief: "16:9 1280×720 deck, 15 pages. Style: «Статистическая сводка» — публикационная плотность данных на светлом бумажном поле: сетка колонок, встроенные графики как основа страницы, тонкие линейки…. Tone: Сдержанный, документальный, без драматизации…. Palette: Background #FBFAF7; Primary #1B2B3A; Accent #B3121B; Secondary accent #2E6F8E; Body text #232A31; Secondary text #5B6670. Type: Times New Roman titles / Arial body (body 24px, title 40px). Margins: 72 px по горизонтали, 56 px по вертикали.",
+      brief: "PPT 16:9 1280 × 720 deck, 15 pages. Style: «Статистическая сводка» — публикационная плотность данных на светлом бумажном поле: сетка колонок, встроенные графики как основа страницы, тонкие линейки, служебная строка источника на каждой странице данных. Mode/visual style: custom (data-journalism, swiss-minimal) — data-journalism задаёт основу: график — хребет страницы, вокруг него верстается текст; тонкие линейки вместо карточек; врезка-сайдбар с одной ключевой величиной; постоянная служебная строка источника внизу. Theme: Разворот статистического бюллетеня: светлая бумага, графитовый текст, красный акцент для смертности и убыли. Tone: Сдержанный, документальный, без драматизации; язык фиксирует наблюдение и его источник. Palette: Background #FBFAF7; Surface #F0EDE6; Primary #1B2B3A; Accent #B3121B; Secondary accent #2E6F8E; Body text #232A31; Secondary text #5B6670. Type: Times New Roman titles / Arial body (body 24px, title 40px). Layout: Сверху вниз: заголовок-вывод → одна строка-итог → доказательство (график, таблица или крупное число) → служебная строка источника. Взгляд входит в График или таблица занимает бо́льшую часть полосы контента, а текст верстается вокруг него, а не в отдельной карточке Spacing anchors: поле страницы 72 px, межблочный зазор 20 px, межколоночный зазор 32 px, радиус скругления 0 px, межстрочное расстояние основного текста 1,45. Icons: tabler-outline. Images: Плоские геометрические поля и тонкие линии, читаемые как обобщённый статистический разворот: убывающая ступенчатая полоса; Спокойная документальная строгость — как обложка годового статистического бюллетеня или.",
     },
     "sanxingdui-kiosk": {
       label: "Sanxingdui Kiosk",
-      brief: "16:9 1280×720 deck, 16 pages. Style: 方向 0「青铜夜展」：深场金光——以近黑墨绿为底，黄金与青铜锈两色承担全部注意力，几何精准、装饰克制，文物照片浮在暗场上. Tone: 庄重、可靠、克制；博物馆标牌的语气，不是营销页的语气. Palette: Background #0E1512; Surface #1D2A24; Primary #C9A227; Accent #4FB9A5; Secondary accent #C6704A; Body text #E9E5D9. Type: Arial titles / Arial body (body 24px, title 42px). Margins: 上下左右各 64 px；底部导航条占用 y=624..704，正文内容不进入该带.",
+      brief: "PPT 16:9 1280 × 720 deck, 16 pages. Style: 方向 0「青铜夜展」：深场金光——以近黑墨绿为底，黄金与青铜锈两色承担全部注意力，几何精准、装饰克制，文物照片浮在暗场上. Mode/visual style: custom (dark-tech) — 取 dark-tech 的暗场—发光—几何精准三件事，换成青铜与黄金的语汇：近黑墨绿满铺作深度，细金线与低透明度巨大编号浮在内容层之后，卡片用 1px 金色描边而非填充块，边角近直角（8px）；注意力靠局部高对比的金色发光承担，其余一律压低；纵深靠外发光与层叠，不用投影；文物照片以暗场直接承托、加极轻的暗角压边，不套框。等宽体只用于尺寸与坑号这类需要精确读数的标签，正文保持中文黑体的清晰度. Theme: 深场金光——观众在偏暗的展厅里抬眼看屏，屏幕本身是一盏灯；金色只出现在「可点」和「关键数字」两处，从而让导航与事实自己发光. Tone: 庄重、可靠、克制；博物馆标牌的语气，不是营销页的语气. Palette: Background #0E1512; Surface #17211D; Primary #C9A227; Accent #4FB9A5; Secondary accent #C6704A; Body text #E9E5D9; Secondary text #A8A396. Type: SimHei (EN: Arial) titles / Microsoft YaHei (EN: Arial) body (body 24px, title 42px). Layout: 视线先落在页面上三分之一的标题或主图，再向下走到事实块，最后才到底部导航条；导航条位置全卷恒定，观众一旦学会就不必再找 内容页偏向「左事实 / 右图像」或「上主视觉 / 下四栏事实」的双区关系；菜单页与目录页用可点条目的纵向排布承担全部构图；文物页固定同一宏观关系，靠内容差异而非构图差异产生变化 Spacing anchors: page margin 64 px；block gap 28 px；column gutter 32 px；corner radius 8 px；body leading 1.55. Icons: tabler-outline. Images: 首页菜单的场所锚点，让观众确认「我就在这座馆里」; Photo.",
     },
     "sqlite-everywhere": {
       label: "SQLite Everywhere",
-      brief: "16:9 1280×720 deck, 12 pages. Style: Custom \"Drafting Sheet\" — engineering blueprint schematic on dark paper (direction 0 of 3, selected). Tone: precise, calm, quietly confident; technical without hype. Palette: Background #0B1F3A; Primary #8CC4EE; Accent #FFB547; Secondary accent #5ED3C4; Body text #EAF2FB; Secondary text #9FB6CF. Type: Bahnschrift titles / Segoe UI body (body 22px, title 40px). Margins: 64 px left/right, 48 px top, 40 px bottom.",
+      brief: "PPT 16:9 1280 × 720 deck, 12 pages. Style: Custom \"Drafting Sheet\" — engineering blueprint schematic on dark paper (direction 0 of 3, selected). Mode/visual style: custom (blueprint) — Each page is a sheet from one engineering drawing set: deep navy paper with a faint 32 px grid, all structure drawn in thin single-weight pale-cyan line work (1.25–2 px, square or 2 px corners). Theme: SQLite as an engineered object laid open on the drafting table — one file, one library, one stack of layers. Tone: precise, calm, quietly confident; technical without hype. Palette: Background #0B1F3A; Surface #11294B; Primary #8CC4EE; Accent #FFB547; Secondary accent #5ED3C4; Body text #EAF2FB; Secondary text #9FB6CF. Type: Bahnschrift titles / Segoe UI body (body 22px, title 40px). Layout: kicker (sheet code) → title → the drawing → annotations → source line; the eye lands on the amber element first the schematic is the layout — one dominant drawing per page with copy hung on leader lines or set in a narrow side column Spacing anchors: page margin 64 px · block gap 24 px · column gutter 32 px · corner radius 2 px · body leading 1.4. Icons: tabler-outline. Images: an exploded isometric drawing of one database file opened into stacked fixed-size pages, with leader lines and blank callout tags; precise and calm, like an exploded-view sheet in a machinist's manual.",
     },
     "memphis-pop": {
       label: "Sugar Rush Memphis",
-      brief: "16:9 1280×720 deck, 14 pages. Style: A) General Versatile + Memphis / Pop. Tone: 张扬、糖果感、80s 回潮、撞色狂欢. Palette: Background #FFF8EE; Primary #FF3DA5; Accent #00B8D9; Secondary accent #FFD93D; Body text #1A1A2E; Secondary text #5C5C7A. Type: Impact, \"Arial Black\" titles / Arial body (title 44px). Margins: 左右 60px / 上下 50px.",
+      brief: "PPT 16:9 1280×720 deck, 14 pages. Style: A) General Versatile + Memphis / Pop. Theme: Light theme（奶油底）. Tone: 张扬、糖果感、80s 回潮、撞色狂欢. Palette: Background #FFF8EE; Surface #FFE9C7; Primary #FF3DA5; Accent #00B8D9; Secondary accent #FFD93D; Body text #1A1A2E; Secondary text #5C5C7A. Type: Microsoft YaHei (EN: Impact) titles / Microsoft YaHei (EN: Arial) body (body 20px, title 44px). Layout: Patterns: Single column centered, Asymmetric split (3:7 / 2:8), Top-bottom split, Three/four column cards. Images: flat; vivid-launch.",
     },
     "swiss-grid": {
       label: "Swiss Grid Systems",
-      brief: "16:9 1280×720 deck, 14 pages. Style: A) General Versatile + Swiss International Typographic Style / minimalist grid / Müller-Brockmann hommage. Tone: 克制、理性、可读、版面冲击；网格是骨架，留白是语言. Palette: Background #FFFFFF; Primary #1A1A1A; Accent #D9251D; Secondary accent #1A4FA0; Secondary text #666666; Border/divider #E8E8E8. Type: \"Arial Black\" titles / Arial body (body 18px, title 36px). Margins: left/right 64px, top/bottom 56px（4×16 模数）.",
+      brief: "PPT 16:9 1280×720 deck, 14 pages. Style: A) General Versatile + Swiss International Typographic Style / minimalist grid / Müller-Brockmann hommage. Theme: Light theme. Tone: 克制、理性、可读、版面冲击；网格是骨架，留白是语言. Palette: Background #FFFFFF; Surface #F4F4F4; Primary #1A1A1A; Accent #D9251D; Secondary accent #1A4FA0; Body text #1A1A1A; Secondary text #666666. Type: Microsoft YaHei (EN: Arial Black) titles / Microsoft YaHei (EN: Arial) body (body 18px, title 36px). Layout: Patterns: Single column centered, Asymmetric split (2:8 / 3:7), Three/four column cards, Matrix grid (2×2). Icons: tabler-outline. Images: minimalist-swiss; mono-ink.",
     },
     "taiwan-super-aged-society": {
       label: "Taiwan Super Aged Society",
-      brief: "16:9 1280×720 deck, 15 pages. Style: 刻度與證據：暖白紙面上的深藍資料新聞版式，時間刻度尺為跨頁母題，磚紅只標門檻與老年人口. Tone: 冷靜、清楚、可查證；像一篇有溫度的資料報導. Palette: Background #F6F3EC; Surface #FFFFFF; Primary #1F3A5F; Accent #B5462F; Secondary accent #5E8C6A; Body text #1E232B. Type: Segoe UI titles / Segoe UI body (body 24px, title 40px). Margins: 左右 64、上 48、下 40.",
+      brief: "PPT 16:9 1280 × 720 deck, 15 pages. Style: 刻度與證據：暖白紙面上的深藍資料新聞版式，時間刻度尺為跨頁母題，磚紅只標門檻與老年人口. Mode/visual style: custom (data-journalism, editorial) — 暖白紙面上的資料新聞版式：圖表是頁面的脊柱，文字繞著圖表排而不是裝進卡片；以細髮絲線、欄線與一條橫貫的時間刻度尺分區，重點數字用欄寬級的大字，來源列固定在頁尾。磚紅只標門檻、老年人口與關鍵年份，深藍承擔主體與工作年齡，鼠尾草綠承擔出生與幼年；幾乎不用陰影，深度只來自圖片的色調處理與裁切形狀. Theme: 時間刻度尺（7% → 14% → 20% → 30% …）作為跨頁母題，在門檻頁、國際比較與收束頁以不同尺度重現. Tone: 冷靜、清楚、可查證；像一篇有溫度的資料報導. Palette: Background #F6F3EC; Surface #ECE6DA; Primary #1F3A5F; Accent #B5462F; Secondary accent #5E8C6A; Body text #1E232B; Secondary text #5A6270. Type: Microsoft JhengHei (EN: Segoe UI) titles / Microsoft JhengHei (EN: Segoe UI) body (body 24px, title 40px). Layout: 左上判斷句標題 → 大數字或圖表主體 → 右側或下方的解讀 → 頁尾來源列 以不對稱欄位與橫向刻度尺組織頁面；圖表與時間尺佔主要面積，解讀文字貼著資料排；少用等寬卡片 Spacing anchors: 頁邊 64、區塊間距 32、欄距 40、圓角 4、內文行距 1.5. Icons: tabler-filled. Images: 絹印海報式的平塗剪影：深藍、磚紅、紙白與少量鼠尾草綠，過渡處加半調網點，人物以輪廓清楚的剪影呈現，不畫五官細節; 安靜、有尊嚴的日常；像公共圖書館海報上的社區插畫.",
     },
     "thai-jasmine-rice": {
       label: "Thai Jasmine Rice",
-      brief: "16:9 1280×720 deck, 15 pages. Style: เส้นทางเมล็ดข้าว — โครงเรื่องแบบเดินทาง (custom mode จาก narrative + instructional) บนงานพิมพ์เชิงบรรณาธิการอบอุ่นแบบโปสเตอร์การเกษตร (custom visual style จาก editorial + vintage-poster). Tone: อบอุ่น ชัดเจน เคารพข้อเท็จจริง ไม่โฆษณาชาตินิยม พูดถึงจุดอ่อนของพันธุ์และการเสีย…. Palette: Background #FBF7EF; Surface #FFFDF8; Primary #2F5D3A; Accent #C8952B; Secondary accent #8C3B2E; Body text #26241F. Type: Leelawadee UI titles / Leelawadee UI body (body 24px, title 40px). Margins: 64 px ทุกด้าน.",
+      brief: "PPT 16:9 1280 × 720 deck, 15 pages. Style: เส้นทางเมล็ดข้าว — โครงเรื่องแบบเดินทาง (custom mode จาก narrative + instructional) บนงานพิมพ์เชิงบรรณาธิการอบอุ่นแบบโปสเตอร์การเกษตร (custom visual style จาก editorial + vintage-poster). Mode/visual style: custom (editorial, vintage-poster) — หน้ากระดาษแบบนิตยสารเกษตร — เส้นคาดบางเต็มความกว้างคุมลำดับชั้น คอลัมน์ไม่สมมาตร หัวเรื่องวางชิดเส้น และมีแถบที่มาเล็กที่ขอบล่างทุกหน้า ทับด้วยความอบอุ่นแบบโปสเตอร์กลางศตวรรษ คือบล็อกสีแบนไม่กี่สี ขอบแข็ง. Theme: เมล็ดหนึ่งเมล็ดที่เดินทาง — ลวดลายประจำเล่มคือ \"รวงข้าวโน้ม\" เส้นโค้งเดียวที่ปรากฏซ้ำที่มุมขวาบนหรือขอบล่างของหน้า anchor และหน้าเปิดตอน. Tone: อบอุ่น ชัดเจน เคารพข้อเท็จจริง ไม่โฆษณาชาตินิยม พูดถึงจุดอ่อนของพันธุ์และการเสียรางวัลอย่างตรงไปตรงมา. Palette: Background #FBF7EF; Surface #F1E8D6; Primary #2F5D3A; Accent #C8952B; Secondary accent #8C3B2E; Body text #26241F; Secondary text #5F5A50. Type: Leelawadee UI titles / Leelawadee UI body (body 24px, title 40px). Layout: สายตาเข้าที่หัวเรื่องซ้ายบนใต้เส้นคาด ไหลลงไปยังจุดเน้นเดียวของหน้า (ตัวเลข ภาพ หรือแผง) แล้วปิดที่แถบที่มาขอบล่าง คอลัมน์ไม่สมมาตรเป็นทิศทางหลัก ให้ด้านหนึ่งหนักกว่าอีกด้านชัดเจน หน้าเปิดตอนใช้เลขตอนขนาดใหญ่ถ่วงกับข้อความสั้น Spacing anchors: page margin 64 px · block gap 28 px · column gutter 32 px · corner radius 4 px · body leading 42 px (1.75 เท่าของขนาดเนื้อความ. Icons: chunk-filled. Images: ฉากเกษตรกรรมไทยในรูปแบบภาพพิมพ์แบน ทุ่งนา รวงข้าว มือคนที่กอบเมล็ด และท่าเรือส่งออก จัดองค์ประกอบให้มีบริเวณเรียบกว้างพอรองรับตัวอักษรไทยที่วางทับ; อบอุ่น สงบ และน่าเชื่อถือ เทียบเคียงได้กับโปสเตอร์ส่งเสริมการปลูกข้าวขององค์การระหว่างประเ.",
     },
     "night-shelf": {
       label: "The Night Shelf",
-      brief: "16:9 1280×720 deck, 13 pages. Style: Showcase argument in a photo-editorial deck whose own voice stays quiet so the campaign's identity is the only thing with colour and character. Tone: Quiet, unhurried, confident. The deck never explains a picture it has just shown…. Palette: Background #0E0E10; Primary #E9C877; Accent #7FA69B; Secondary accent #C4553F; Body text #EDEAE3; Secondary text #A29E97. Type: Georgia titles / Arial body (body 30px, title 48px). Margins: 72 px on all four sides; full-bleed imagery may cross them.",
+      brief: "PPT 16:9 1280 × 720 deck, 13 pages. Style: Showcase argument in a photo-editorial deck whose own voice stays quiet so the campaign's identity is the only thing with colour and character. Mode/visual style: showcase + photo-editorial — . Theme: The deck is a dark room with one light in it. The presentation's own field is night ink and stays neutral so the campaign's colours are seen accurately. Tone: Quiet, unhurried, confident. The deck never explains a picture it has just shown. Palette: Background #0E0E10; Surface #F4F1EA; Primary #E9C877; Accent #7FA69B; Secondary accent #C4553F; Body text #EDEAE3; Secondary text #A29E97. Type: Georgia titles / Arial body (body 30px, title 84px). Layout: One thing per page arrives first and everything else is subordinate to it. On creative pages the work arrives first and the line second Alternate between full-frame work with a single line of type in a quiet corner Spacing anchors: page margin 72 px; block gap 32 px; column gutter 40 px; corner radius 0 px (the phone-screen mockup's rounded corners are a property of the depicted. Icons: tabler-outline. Images: Photographic night interiors and streets at low key, lit by one practical warm light — a shaded lamp, a shop window, a bedside bulb — with true depth of field; The last hour before sleep, with one lamp on. The reference is the window of a bookshop.",
     },
     "tokaido-shinkansen-60": {
       label: "Tokaido Shinkansen 60",
-      brief: "16:9 1280×720 deck, 15 pages. Style: 昭和の記念ポスター — custom mode(narrative 基盤)+ custom visual style(vintage-poster 基盤)+ custom rendering(vintage-poster 基盤). Tone: 温かく、誇らしく、しかし事実に厳密. Palette: Background #F3ECDD; Primary #1F3F74; Accent #C8442C; Secondary accent #D9A33A; Body text #22262E; Secondary text #5E5A52. Type: Times New Roman titles / Segoe UI body (body 28px, title 48px). Margins: 左右 64px、上 56px、下 48px.",
+      brief: "PPT 16:9 1280 × 720 deck, 15 pages. Style: 昭和の記念ポスター — custom mode(narrative 基盤)+ custom visual style(vintage-poster 基盤)+ custom rendering(vintage-poster 基盤). Mode/visual style: custom (vintage-poster) — 昭和の記念ポスター。クリーム色の紙の地に、藍の大きな平面ブロック・朱の太陽円盤・黄土の帯を少数だけ重ね、角の丸い幾何形とやや斜めの帯でレトロな緊張を出す。数字はポスター級の大きさで一点に置き、細い二重罫と丸いバッジで出典や年代を添える。網点(ハーフトーン)と紙の粒子を低い不透明度で重ねて印刷物の質感を出し、影やグラデーションは使わず重なりで奥行きを出す。見出しは明朝の落ち着き、本文はゴシックの読みやすさ、巨大数字は極太のサンセリフ. Theme: 60年目の記念ポスター — 藍の軌道線(横に走る一本の太い帯)が各ページを貫き、年表の軸・グラフの基線・区切りとして役割を変えて繰り返す. Tone: 温かく、誇らしく、しかし事実に厳密. Palette: Background #F3ECDD; Surface #E6DCC6; Primary #1F3F74; Accent #C8442C; Secondary accent #D9A33A; Body text #22262E; Secondary text #5E5A52. Type: Yu Mincho (EN: Times New Roman) titles / Yu Gothic (EN: Segoe UI) body (body 28px, title 48px). Layout: 左上の判断文の見出し → 一つの主役(巨大数字・図・画像) → 補足と出典の順に視線が流れる 大きな平面ブロックと太陽円盤で紙面を二つか三つのゾーンに分け、主役は一点に集中させる。均等なカードの格子は避ける Spacing anchors: page margin 64px / block gap 32px / column gutter 40px / corner radius 16px / body leading 1.5. Icons: chunk-filled. Images: 富士山・朝日・高架橋・軌道・ガイドウェイを記号化した平面ポスター画; 懐かしく前向き — 1964年の観光ポスターを60年後に新しく刷り直したような温かさ.",
     },
     "uv-launch": {
       label: "UV Launch",
-      brief: "16:9 1280×720 deck, 14 pages. Style: Direction 2「终端里的深色发布会」:showcase 叙事 + dark-tech 视觉,深底之上让终端块与倍数数字自己发光. Tone: 克制、工程口吻、有把握但不吹;所有倍数与版本号都紧挨着出处和日期出现。. Palette: Background #0B1220; Primary #4CC9F0; Accent #FF8A3D; Secondary accent #A78BFA; Body text #E6EDF3; Secondary text #9BA9BC. Type: Arial titles / Arial body (body 24px, title 42px). Margins: 上下 56px,左右 72px.",
+      brief: "PPT 16:9 1280 × 720 deck, 14 pages. Style: Direction 2「终端里的深色发布会」:showcase 叙事 + dark-tech 视觉,深底之上让终端块与倍数数字自己发光. Mode/visual style: custom (dark-tech) — 深色画布上做几何精确的分区:整页由一个近黑蓝底 + 若干抬起一档的面板构成,面板用 1px 细线勾边而不是投影堆叠。终端块是本卷的主角载体——等宽字、左侧命令提示符列、深一档的窗口底、顶部一条极细的窗口条,窗口边缘用主色发一层很淡的辉光标记\"这是正在跑的东西\"。强调色只用在三处:reveal 的那一件事、改善的那一侧、结尾的那一个动作。数字用等宽字放到很大,靠字号而不是装饰建立层级. Theme: 一个二进制把一摊工具收干净——整卷的连续物是\"终端窗口\":它在张力页是六个各自为政的小窗,在定位页合成一个,在能力页放大成主角,在结尾缩回一条可以照抄的命令. Tone: 克制、工程口吻、有把握但不吹;所有倍数与版本号都紧挨着出处和日期出现. Palette: Background #0B1220; Surface #131C2E; Primary #4CC9F0; Accent #FF8A3D; Secondary accent #A78BFA; Body text #E6EDF3; Secondary text #9BA9BC. Type: Microsoft YaHei (EN: Arial) titles / Microsoft YaHei (EN: Arial) body (body 24px, title 42px). Layout: 视线先落在页面主角(终端块、大数字、对照表),再上移读标题,最后下移到出处行;标题与主角不争夺同一区域 单焦点为主——reveal 与 demonstration 页给主角整幅或近整幅,说明退到一侧的窄栏;landscape、availability、来源页允许多区,但每区仍只讲一件事 Spacing anchors: 页边距 72px;块间距 32px;栏间距 40px;圆角 4px;正文行高 1.6(38px). Icons: tabler-outline.",
     },
     "arabic-coffee": {
       label: "القهوة العربية",
-      brief: "16:9 1280×720 deck, 15 pages. Style: اتجاه «مجلس الضيافة»: تحريري دافئ تقوده صور طبيعة صامتة منخفضة الإضاءة، ونوافذ صور على شكل قوس المجلس، وخطوط نحاسية رفيعة، وقراءة من اليمين إلى اليسار. Tone: دافئ، رصين، مضياف. Palette: Background #F6EFE4; Primary #4A2C1D; Accent #B8862B; Secondary accent #5E7D4F; Body text #2B1D15; Secondary text #6E5A4C. Type: Times New Roman titles / Segoe UI body (body 26px, title 48px). Margins: 72 px يميناً ويساراً، 56 px أعلى وأسفل.",
+      brief: "PPT 16:9 1280 × 720 deck, 15 pages. Style: اتجاه «مجلس الضيافة»: تحريري دافئ تقوده صور طبيعة صامتة منخفضة الإضاءة، ونوافذ صور على شكل قوس المجلس، وخطوط نحاسية رفيعة، وقراءة من اليمين إلى اليسار. Mode/visual style: custom (editorial, photo-editorial) — هيكل تحريري من اليمين إلى اليسار: مِسطرة رأسية نحاسية رفيعة على الحافة اليمنى يتدلّى منها النص، وعنوان نسخي كبير مع نص متن بلا زوائد، وكيكر صغير فوق العنوان، وأعمدة غير متساوية؛ الصور صامتة دافئة تحتلّ النصف الأيسر أو. Theme: مجلس الضيافة — رمل دافئ، بنّ محمّص، نحاس الدلّة، وخضرة الهيل. Tone: دافئ، رصين، مضياف. Palette: Background #F6EFE4; Surface #EADCC6; Primary #4A2C1D; Accent #B8862B; Secondary accent #5E7D4F; Body text #2B1D15; Secondary text #6E5A4C. Type: Times New Roman titles / Segoe UI body (body 26px, title 48px). Layout: من اليمين إلى اليسار — الكيكر والعنوان عند الحافة اليمنى، ثم المتن، ثم الدليل البصري أو الصورة في الجهة اليسرى؛ التسلسلات والخطوط الزمنية تبدأ من أعمدة غير متساوية (نص ⅖ يمين، صورة أو دليل ⅗ يسار) أو مجال صورة كامل مع منطقة نص على شكل حرف L؛ مِسطرة رأسية نحاسية يتدلّى منها النص Spacing anchors: هامش الصفحة 72 px؛ فجوة الكتل 32 px؛ فاصل الأعمدة 40 px؛ نصف قطر الزوايا 4 px؛ تباعد أسطر المتن 1.6. Icons: tabler-outline. Images: طبيعة صامتة لأدوات القهوة (الدلّة، الفنجان، التاوة، الهيل) ومشهد مدرّجات جبلية، بالدفعة نفسها والإضاءة نفسها; دفء مجلس مسائي، كصفحة مصوّرة في مجلة ثقافية عن التراث.",
     },
     "china-rail": {
       label: "中国铁路 2024:数据与现场",
-      brief: "16:9 1280×720 deck, 15 pages. Style: 数据新闻式的证据版面 + 瑞士栅格的克制留白 + 照片主导的现场页,构成\"数据\"与\"现场\"两种质地交替的汇报. Tone: 克制、可核对、有现场温度. Palette: Background #FFFFFF; Surface #F8FAFC; Primary #0B3A6F; Accent #C8102E; Secondary accent #1E6FB8; Body text #1E2733. Type: Arial titles / Arial body (body 24px, title 40px). Margins: 左右 72px,上 64px,下 56px.",
+      brief: "PPT 16:9 1280 × 720 deck, 15 pages. Style: 数据新闻式的证据版面 + 瑞士栅格的克制留白 + 照片主导的现场页,构成\"数据\"与\"现场\"两种质地交替的汇报. Mode/visual style: custom (data-journalism, swiss-minimal, photo-editorial) — 由 data-journalism 负责数据页的多栏证据密度、边注与每页底部的来源条;由 swiss-minimal 负责统一的左对齐栅格、直角容器、发丝分隔线与大留白,容器只用直角矩形和 1px 规则线,不用圆角卡片堆叠;由 photo-editorial 负责现场页——照片整幅出血、文字只作为压在照片安静区的点与说明,署名以极小字号贴在照片边缘。两种质地交替出现:数据页白底高密度,现场页深色照片低密度. Theme: 铁轨的水平线——每页顶部一条 2px 主色横规则线贯穿版心,页码与板块名坐在这条线下方,像时刻表的表头;数据页在这条线下展开栅格,现场页让照片穿过这条线. Tone: 克制、可核对、有现场温度. Palette: Background #FFFFFF; Surface #F2F5F9; Primary #0B3A6F; Accent #C8102E; Secondary accent #1E6FB8; Body text #1E2733; Secondary text #5A6775. Type: SimHei (EN: Arial) titles / Microsoft YaHei (EN: Arial) body (body 24px, title 40px). Layout: 从顶部规则线下的判断句标题开始,向下进入左侧的主证据(图/表/大数),右侧或下方接解释与结构拆分,最后落到页底来源条 数据页用两栏或\"主证据 + 右侧窄解释栏\"的不对称分割;现场页取消栅格,照片整幅出血,文字收到一角 Spacing anchors: 页边距 72px;块间距 32px;栏间距 40px;圆角半径 0px;正文行高 1.7em(≈41px). Icons: chunk-filled. Images: 封面主视觉,并在总览页以同一张照片的窄立幅延续; Photography.",
     },
     "solar-terms-year": {
       label: "二十四节气·全年手账",
-      brief: "16:9 1280×720 deck, 31 pages. Style: 圆角手账（instructional × soft-rounded）：圆角卡片＋柔和抬升＋pill 标签＋大色块出血，四季四个语义色，其余系统整卷不变. Tone: 温和、笃定、有生活气；讲事实时精确到分钟，讲怎么过时说人话. Palette: Background #FBF8F3; Surface #FFFFFF; Primary #7A5C3E; Accent #7A5470; Secondary accent #9C8B7A; Body text #3A332C. Type: Trebuchet MS titles / Trebuchet MS body (body 24px, title 44px). Margins: 64 px 四边.",
+      brief: "PPT 16:9 1280 × 720 deck, 31 pages. Style: 圆角手账（instructional × soft-rounded）：圆角卡片＋柔和抬升＋pill 标签＋大色块出血，四季四个语义色，其余系统整卷不变. Mode/visual style: instructional + soft-rounded — . Theme: 一本可以翻一年的纸质手账——暖白纸底上浮着一叠圆角卡片，四季各占一个语义色，年轮环是贯穿整卷的连续母题（连续职责：让任意一页都能被定位回全年的哪一格；复用方式：封面与总览为完整环，四季分隔页为该季 1/4 弧，节气页缩为右上角的小环＋指针）. Tone: 温和、笃定、有生活气；讲事实时精确到分钟，讲怎么过时说人话. Palette: Background #FBF8F3; Surface #FFFFFF; Primary #7A5C3E; Accent #7A5470; Secondary accent #9C8B7A; Body text #3A332C; Secondary text #8A8078. Type: Microsoft YaHei (EN: Trebuchet MS) titles / Microsoft YaHei (EN: Trebuchet MS) body (body 24px, title 44px). Layout: 节气页从左上的题字＋原生标题起手，向右下依次交出“什么时候（时刻）→ 古人看见什么（三候）→ 今人做什么（时令＋怎么过）”；总览与分隔页反过来，先给整体图形再落到文字 圆角卡片叠在暖白纸底上，靠柔和抬升而非描边分层；半径家族整卷统一为 12／24／40 三档（pill 与小标签 12，内容卡 24，出血大板 40），任何页不引入第四档 Spacing anchors: page margin 64；block gap 28；column gutter 32；corner radius 24；body leading 38. Icons: tabler-filled. Images: 减法造型的扁平矢量：圆润轮廓、无描边或极粗的同色描边、2–3 个平涂色域＋一层更浅的同色块做体积，无渐变、无投影、无透视；物象只保留最能被认出的两三个特征; 像一套纸质节气日历上的小图标，或无印良品季节手账内页的插图——安静、可爱但不幼稚.",
     },
     "what-is-ppt": {
       label: "什么是 PPT",
-      brief: "16:9 1280×720 deck, 17 pages. Style: 自定义\"蓝图×编辑\"：editorial 杂志栅格与层级为底，讲结构/对象模型的页面叠加 blueprint 示意线稿与标注语汇；墨蓝暖纸浅色场，红色作单一强调. Tone: 清晰、理性、可信，有工程质感而不冰冷；克制的编辑红只标记结构与强调. Palette: Background #FFFFFF; Primary #1A2B4A; Accent #C8102E; Secondary accent #5E7089; Body text #22262B; Secondary background #F4F1EA. Type: Arial titles / Consolas body (body 24px, title 42px). Margins: 上下左右安全边距 40px.",
+      brief: "PPT 16:9 1280 × 720 deck, 17 pages. Style: 自定义\"蓝图×编辑\"：editorial 杂志栅格与层级为底，讲结构/对象模型的页面叠加 blueprint 示意线稿与标注语汇；墨蓝暖纸浅色场，红色作单一强调. Mode/visual style: custom (editorial, blueprint) — 在 editorial 的杂志栅格、细分隔线、眉题（kicker）→标题→引言→正文的强纵向层级基础上，为讲\"结构/对象模型\"的页面叠加 blueprint 的示意线稿与标注语汇——细单色线框、等距/等轴示意、尺寸标注线、引线箭头、坐标/代号标签、极低透明度网格背景。正文区保持编辑体清晰留白；结构图区让线稿在浅场上呼吸。单一编辑红作强调色，遵循工程图\"一个高亮色\"的惯例. Theme: 技术编辑体——把\"PPT 是有结构的原生包\"这一核心隐喻贯穿版式：正文区是清晰的杂志栅格，结构区是精细的工程蓝图示意. Tone: 清晰、理性、可信，有工程质感而不冰冷；克制的编辑红只标记结构与强调. Palette: Background #FFFFFF; Surface #F4F1EA; Primary #1A2B4A; Accent #C8102E; Secondary accent #5E7089; Body text #22262B. Type: Microsoft YaHei (EN: Arial) titles / Microsoft YaHei (EN: Consolas) body (body 24px, title 42px). Icons: tabler-outline. Images: 技术蓝图线稿融合杂志信息图：细的示意线条+等距结构+少量实色块与标注; 清晰、理性、有工程质感，像一份被精心排版的技术说明.",
     },
     "solar-cheapest-power": {
       label: "光伏为什么成了最便宜的电",
-      brief: "16:9 1280×720 deck, 15 pages. Style: pyramid × swiss-minimal：结论先行的咨询式论证，配严格瑞士网格、单一强调色与大而准的排版. Tone: 克制、精确、不留装饰余地；语气是顾问在董事会上给判断，不是科普。. Palette: Background #FFFFFF; Primary #111111; Accent #C8102E; Secondary accent #6E6E6E; Body text #1A1A1A; Divider #D4D4D4. Type: Arial titles / Arial body (body 24px, title 44px). Margins: 上下左右 72px（栅格外边距）.",
+      brief: "PPT 16:9 1280 × 720 deck, 15 pages. Style: pyramid × swiss-minimal：结论先行的咨询式论证，配严格瑞士网格、单一强调色与大而准的排版. Mode/visual style: pyramid + swiss-minimal — . Theme: 一张十二列栅格上的成本论证。整卷用同一套模数（12 列 × 84px 列宽 + 24px 沟槽）作为构图骨架，其中两页把栅格线本身画出来当可见结构；每页一个大而准的几何面或一个建筑尺度的数字承担视觉重量，红色只做标点. Tone: 克制、精确、不留装饰余地；语气是顾问在董事会上给判断，不是科普. Palette: Background #FFFFFF; Surface #F2F2F2; Primary #111111; Accent #C8102E; Secondary accent #6E6E6E; Body text #1A1A1A; Secondary text #6E6E6E. Type: Microsoft YaHei (EN: Arial) titles / Microsoft YaHei (EN: Arial) body (body 24px, title 44px). Layout: 每页从左上角的断言标题起读，向下或向右交给一个占版面主导的几何面（图表、表格、巨大数字）；红色标点标出这一页唯一要被记住的数值 非对称分割，内容齐同一条轴；每页恰好一个建筑尺度的元素（大几何面 / 巨大数字 / 满宽图表）；有意留出 40–60% 负空间的页与信息密集页交替 Spacing anchors: page margin 72px；block gap 32px；column gutter 24px；corner radius 0px（瑞士方角，圆角为 0 是本卷的身份）；body leading 36px. Icons: tabler-outline.",
     },
     "bauhaus-archive": {
       label: "包豪斯 1919–1933",
-      brief: "16:9 1280×720 deck, 13 pages. Style: 设计史档案册（custom）：纸本编辑排版 + 编辑式摄影裁切，包豪斯基本形作为页面场与图片窗口. Tone: 冷静、精确、带一点印刷品的温度. Palette: Background #F2EEE5; Primary #161616; Accent #C23B22; Secondary accent #B8862B; Body text #1E1E1C; Secondary text #6B665C. Type: Arial titles / Arial body (body 22px, title 40px). Margins: 64 px left/right, 56 px top, 48 px bottom.",
+      brief: "PPT 16:9 1280 × 720 deck, 13 pages. Style: 设计史档案册（custom）：纸本编辑排版 + 编辑式摄影裁切，包豪斯基本形作为页面场与图片窗口. Mode/visual style: custom (editorial, photo-editorial) — 暖白纸本底色上的编辑排版：细规则线、栏线、小号编号 kicker、大号年份数字（Arial Black）锚定页面；照片做编辑式裁切——放进圆/方/三角窗口、跨越栏线、或以双色调（墨黑×纸白）满版铺底；圆、方、三角作为页面场与图片遮罩出现，每页至多一个主形，红色只用于一个焦点，绝不散布成彩色几何贴纸；无阴影，层次靠规则线粗细与留白. Theme: 设计史专题刊物——像一本印刷精良的包豪斯展览图录. Tone: 冷静、精确、带一点印刷品的温度. Palette: Background #F2EEE5; Surface #E4DDCF; Primary #161616; Accent #C23B22; Secondary accent #B8862B; Body text #1E1E1C; Secondary text #6B665C. Type: Microsoft YaHei (EN: Arial) titles / Microsoft YaHei (EN: Arial) body (body 22px, title 40px). Layout: kicker（编号+章节）→ 判断句标题 → 一个焦点（年份/图片/基本形）→ 正文与图注 不对称编辑栏；照片跨栏或嵌入基本形窗口；暗场页（P11）与满版照片页（P07）打断纸本节奏 Spacing anchors: page margin 64 px · block gap 32 px · column gutter 40 px · corner radius 0 px · body leading 1.5. Icons: none. Images: 晨光中的空旷工坊——织机、金属车床、木工台，双色调印刷质感; 像展览图录里一张翻拍的旧照片：安静、克制、有温度.",
     },
     "beidou-navigation": {
       label: "北斗卫星导航系统:从一颗星到全球组网",
-      brief: "16:9 1280×720 deck, 14 pages. Style: 深空仪表台(custom mode + custom visual style):近黑深蓝的太空场作底,信号蓝画轨道与结构,暖金只留给关键数字;页面像一台精密仪器的读数面板,而不是一叠卡片。. Tone: 克制、精确、有分量。解说的语气是\"我把事实摆给你看\",不是\"你看我们多厉害\"。. Palette: Background #060B1A; Surface #111C38; Primary #4EA8FF; Accent #FFC24B; Secondary accent #35D0A5; Body text #D8E0F0. Type: Arial titles / Arial body (body 30px). Margins: 72 px 四边安全边.",
+      brief: "PPT 16:9 1280 × 720 deck, 14 pages. Style: 深空仪表台(custom mode + custom visual style):近黑深蓝的太空场作底,信号蓝画轨道与结构,暖金只留给关键数字;页面像一台精密仪器的读数面板,而不是一叠卡片. Mode/visual style: custom (dark-tech, blueprint, data-journalism) — 近黑深蓝的连续天场(dark-tech 的暗场与发光强调),其上用 blueprint 的示意线语言——细实线、细虚线、刻度、引出线与标注,几何一律用原生形状画(圆、椭圆弧、连接线、预设形状),不用卡片网格承载概念;面板只在需要把读数与天场分开时出现,直角无圆角,靠一条 1px 分隔线而不是阴影抬起. Theme: 一台观测仪的读数面。全片共用一个\"深空观测\"心智地图:近黑深蓝的天场恒定不变,地球与轨道是反复出现的锚点,每一页只改变这台仪器正在读的那一个量。跨页母题是一条贯穿页面的细水平基线(y 固定),时间轴、轨道剖面、精度刻度、报文长度条都挂在这同一条线上——它是本片的\"仪器横梁\". Tone: 克制、精确、有分量。解说的语气是\"我把事实摆给你看\",不是\"你看我们多厉害\". Palette: Background #060B1A; Surface #0E1730; Primary #4EA8FF; Accent #FFC24B; Secondary accent #35D0A5; Body text #D8E0F0; Secondary text #8FA0C0. Type: SimHei (EN: Arial) titles / Microsoft YaHei (EN: Arial) body (body 30px, title 52px). Layout: 先读标题(陈述句,一眼拿到主张)→ 再读页面上那一个被暖金标出的读数或焦点 → 最后读挂在仪器横梁上的结构与标注。中途加入的观众在两秒内应当拿到前两级 每页只允许一个主体占据画面主导,其余元素退成结构与标注。避免把要点平均分进等宽格子——这是本片最需要躲开的失败模式。天场是连续的,构图靠\"在这片天上把东西放在哪儿\"决定,而不是靠给内容加边框 Spacing anchors: 页边距 72 px;块间距 32 px;分栏槽 40 px;圆角半径 0 px(直角,示意图与仪表台的语言);正文行高 1.6. Icons: tabler-outline. Images: 电影级夜景摄影的光与景深。极低照度,单一冷蓝主光,画面里只允许一处暖金点光源;真实大气、真实噪点、真实镜头景深,不是插画也不是三维渲染。每张图都必须留出一块大面积近黑的安静区供叠字,主体推到画面一侧。画面内不得出现任何文字、界面、标注、logo 或可识别的真实人物面孔; 安静、辽阔、有人在值守的感觉。参照物是纪录片里的夜间观测镜头——不是宣传片的高饱和英雄镜头.",
     },
     "ink-scroll": {
       label: "千里江山图·十八岁的青绿",
-      brief: "16:9 1280×720 deck, 14 pages. Style: 青绿绢本·叙事讲述：narrative 模式承载\"熟悉—张力—转折—回望—邀请\"的弧线；视觉以 ink-wash 的留白与印章纪律为底，用石青、石绿、赭石三种矿物色替代水墨的近单色，绢本暖底为主场，深青墨场只在张力与收束处出现. Tone: 静、克制、带一点惊叹；像在展柜前压低声音说话. Palette: Background #F3ECDA; Primary #2B5C8A; Accent #B5382B; Secondary accent #3F8F6C; Body text #1F2422; Secondary text #6E675B. Type: Times New Roman titles / Arial body (body 28px, title 48px). Margins: 72 px 左右，64 px 上下（满版图页可出血）.",
+      brief: "PPT 16:9 1280 × 720 deck, 14 pages. Style: 青绿绢本·叙事讲述：narrative 模式承载\"熟悉—张力—转折—回望—邀请\"的弧线；视觉以 ink-wash 的留白与印章纪律为底，用石青、石绿、赭石三种矿物色替代水墨的近单色，绢本暖底为主场，深青墨场只在张力与收束处出现. Mode/visual style: custom (ink-wash) — 取 ink-wash 的绢纸留白、极少装饰、一枚印章作焦点的纪律，但把近单色水墨换成青绿重彩：石青作主色块与大面积字色，石绿作第二色带，赭石作衬底与暖色过渡，朱砂只在印章与一处强调出现。页面主要用三类载体：出血的画卷视窗（真迹局部）、绢面暖底上的大字与一枚印章、透明底的矿物与画具插画元素；构图靠一条低矮的横向\"水平线\"（画卷带、细横线或赭石底带）统一节奏，标题大而透气，正文极少. Theme: 绢本青绿——暖米绢面为主场，深青墨场为张力与收束，横向长卷视窗与一枚朱砂印章作为贯穿全卷的母题（印章在 P04/P09/P10/P11 之间保持身份、改变位置，承担\"谁在这幅画上留下了名字\"的连续叙事）. Tone: 静、克制、带一点惊叹；像在展柜前压低声音说话. Palette: Background #F3ECDA; Surface #10282C; Primary #2B5C8A; Accent #B5382B; Secondary accent #3F8F6C; Body text #1F2422; Secondary text #6E675B. Type: KaiTi (EN: Times New Roman) titles / Microsoft YaHei (EN: Arial) body (body 28px, title 48px). Layout: 先看画或大字，再看一行标题，最后才是一两行说明；每页只有一个主导元素 横向长卷感——出血的画卷视窗、低矮的横向带、贴近下缘或上缘的标题；大量绢面留白；印章作为不对称的配重 Spacing anchors: page margin 72 px；block gap 32 px；column gutter 40 px；corner radius 0 px；body leading 44 px. Icons: none. Images: 透明底的矿物原石、颜料碟、毛笔、印章、绢卷与一个伏案的少年，以及\"千里江山\"四字的瘦金体式题字; 安静、工致、带宫廷画院的精细感——像故宫修复室的工作台上摆着的几件实物.",
     },
     "fire-control-room-duty-manual": {
       label: "消防控制室值班手册",
-      brief: "16:9 1280×720 deck, 16 pages. Style: Duty Manual(勤务手册)Style:判断句标题、机制先于规则、规则回溯机制页;深底硬网格、零圆角细线容器、左缘进度指示条、两种强调色分工固定. Tone: 克制、准确、可执行;不煽情,不用\"务必\"\"切记\"一类空词,用条款号与代价说话. Palette: Background #0E1B2E; Surface #16273D; Primary #4A9FD8; Accent #D8F04A; Secondary accent #E85D2B; Body text #DCE6F0. Type: Arial titles / Arial body (body 24px, title 40px). Margins: 上 56 / 下 56 / 左 96(含左缘指示条 24 + 间距)/ 右 64.",
+      brief: "PPT 16:9 1280 × 720 deck, 16 pages. Style: Duty Manual(勤务手册)Style:判断句标题、机制先于规则、规则回溯机制页;深底硬网格、零圆角细线容器、左缘进度指示条、两种强调色分工固定. Mode/visual style: custom (swiss-minimal, blueprint, dark-tech) — 深底之上的严格网格手册。swiss-minimal 负责基线栏、硬左对齐边与大留白;blueprint 负责细线网格、引出线注解与剖面式图解排布;dark-tech 负责深底上的荧光级强调与几何精度。容器一律为零圆角的细线方框,无投影无辉光。左缘固定一条分节进度指示条,当前节以强调色点亮,离轴内容整条转为警示色. Theme: 一本挂在值班台上的技术手册:线是信息,不是装饰;判断轴贯穿全书,读者随时知道自己在哪一格. Tone: 克制、准确、可执行;不煽情,不用\"务必\"\"切记\"一类空词,用条款号与代价说话. Palette: Background #0E1B2E; Surface #1A2C46; Primary #4A9FD8; Accent #D8F04A; Secondary accent #E85D2B; Body text #DCE6F0; Secondary text #8FA3BC. Type: Microsoft YaHei (EN: Arial) titles / Microsoft YaHei (EN: Arial) body (body 24px, title 40px). Layout: 左缘指示条先回答\"在哪一节\",标题横贯顶部给出判断句,证据与图解向右下展开,页面以底部一行可执行结论收口 硬左对齐的两栏或不对称分割;图与文在相邻页之间左右互换以形成阅读节奏;机制页图解约占半页 Spacing anchors: 页边距 56px · 块间距 28px · 栏间距 32px · 圆角 0px · 正文行高 1.55. Icons: tabler-outline. Images: 两个互补的登记册共享同一深底与同一组强调色——其一是白色等线宽技术线图(无填充、正交连线、端点圆点、引出线注解),其二是冷光深色的实景画面(值班台、报警控制器面板、状态旋钮),画面内一律无文字; 像一份工程图册和一组夜班现场记录被装订在同一本手册里;前者的参照是工程蓝图,后者的参照是夜间值班室里只有屏幕发光的那种冷静.",
     },
     "ev-market-priorities": {
       label: "电动车增长的下一站",
-      brief: "16:9 1280×720 deck, 14 pages. Style: 麦肯锡式咨询决策文档:金字塔论证 + 瑞士网格的克制版式,行动标题、编号图表、每页来源行、追踪器与页码. Tone: 冷静、精确、克制;每一句都可追溯到工作簿里的一个单元格或一个公式. Palette: Background #FFFFFF; Surface #F7F7F7; Primary #051C2C; Accent #2251FF; Secondary accent #8FB8FF; Body text #333333. Type: Arial titles / Arial body (body 14px, title 24px). Margins: 上 56 / 下 48 / 左 56 / 右 56.",
+      brief: "PPT 16:9 1280 × 720 deck, 14 pages. Style: 麦肯锡式咨询决策文档:金字塔论证 + 瑞士网格的克制版式,行动标题、编号图表、每页来源行、追踪器与页码. Mode/visual style: pyramid + custom (swiss-minimal) — 白底黑字的咨询决策文档,取文档密度而非演示密度(正文 14px ≈ 10.5pt,与咨询公司 11–12pt 的惯例一致)。每页一个两行以内的行动标题(陈述句,写清\"所以呢\")顶在页首,标题下一行灰色单位/副题行,再一条深色细横线;右上角追踪器与「讨论稿」贴纸,页脚编号脚注加来源行,右下角页码. Theme: 一份把答案写在标题里的决策文档——读者只读 14 个标题就能复述结论,再往下看是逐页的证据. Tone: 冷静、精确、克制;每一句都可追溯到工作簿里的一个单元格或一个公式. Palette: Background #FFFFFF; Surface #F2F2F2; Primary #051C2C; Accent #2251FF; Secondary accent #8FB8FF; Body text #333333; Secondary text #7F7F7F. Type: Microsoft YaHei (EN: Arial) titles / Microsoft YaHei (EN: Arial) body (body 14px, title 24px). Layout: 先读行动标题,再读被电蓝标出的那个数字或系列,最后读图表其余部分与来源行 标题区固定在页首;正文区一到三个证据区块沿 12 列网格横向排布,图表占大区块、结论要点占窄栏;结论与建议页用编号列表占满宽度 Spacing anchors: 页边距 48;区块间距 20;栏间距 24;圆角 0;正文行距 20. Icons: none.",
     },
     "chalkboard": {
       label: "粉笔写下的节日 · 教师节黑板报",
-      brief: "16:9 1280×720 deck, 13 pages. Style: 黑板报:深板面 + 干涩粉笔笔触 + 粉质彩粉点缀;每页一块板报版面(报头 + 主栏 + 小栏目 + 粉笔花边). Tone: 怀旧、亲切、课堂气;不端着,也不卖萌. Palette: Background #1E2B27; Surface #2B3A34; Primary #F4F1E8; Accent #F3C969; Secondary accent #9FD0C0; Body text #E8E4D8. Type: Trebuchet MS titles / Arial body (body 24px, title 44px). Margins: 上下左右各 56px;板面木框内侧再留 20px 粉笔留白.",
+      brief: "PPT 16:9 1280 × 720 deck, 13 pages. Style: 黑板报:深板面 + 干涩粉笔笔触 + 粉质彩粉点缀;每页一块板报版面(报头 + 主栏 + 小栏目 + 粉笔花边). Mode/visual style: custom + chalkboard — . Theme: 教室后墙的一整排黑板报——深板面、木框、粉笔槽;报头是手写粉笔艺术字,主栏用手绘粉笔框圈住,小栏目用非对齐点的粉笔线框,页脚有粉笔灰与半截粉笔头. Tone: 怀旧、亲切、课堂气;不端着,也不卖萌. Palette: Background #1E2B27; Surface #26352F; Primary #F4F1E8; Accent #F3C969; Secondary accent #9FD0C0; Body text #E8E4D8; Secondary text #B4AE9E. Type: KaiTi (EN: Trebuchet MS) titles / Microsoft YaHei (EN: Arial) body (body 24px, title 44px). Layout: 视线从左上角报头(艺术字 + 原生标题)进入,沿主栏向右下读完,再被粉笔花边引到右侧或下方的小栏目;每页只有一个主栏 一版多栏的板报式分区——主栏占约三分之二,小栏目沿一条边排开;分区靠粉笔线与留白,不靠卡片堆叠 Spacing anchors: 页边距 56px;区块间距 32px;分栏槽 40px;圆角 12px;正文行高 38px. Icons: tabler-outline. Images: 粉笔画在深色石板上——干涩起毛的白色主线、粉质彩色点染、笔画末端有断续与粉尘,没有渐变与高光,没有描边外框; 课间刚被人画完的那块黑板报,粉笔灰还浮在空气里;像小学教室后墙拍下来的一角.",
     },
     "jeju-haenyeo": {
       label: "제주 해녀",
-      brief: "16:9 1280×720 deck, 15 pages. Style: 방향 A「수심의 기록」 — custom mode(narrative 기반) + custom visual style(editorial 기반) + custom 이미지 렌더링(screen-print 기반). Tone: 담담하고 단단함. 감상보다 사실이 먼저 말하고, 사람의 무게는 이미지와 숫자 하나가 짊어진다. Palette: Background #F4F1EA; Primary #123B4A; Accent #E0662B; Secondary accent #3F8C8A; Body text #1E2A30; Secondary text #5B6970. Type: Cambria titles / Segoe UI body (body 24px, title 40px). Margins: 좌우 64, 위 56, 아래 48.",
+      brief: "PPT 16:9 1280 × 720 deck, 15 pages. Style: 방향 A「수심의 기록」 — custom mode(narrative 기반) + custom visual style(editorial 기반) + custom 이미지 렌더링(screen-print 기반). Mode/visual style: custom (editorial) — 소금기 밴 종이색 바탕 위의 잡지형 편집. 가는 수평 규칙선과 비대칭 2단, 세리프 제목 × 산세리프 본문, 제목 위 킥커와 쪽 아래 출처 줄이 위계를 만든다. 교차 모티프는 '수면선' — 쪽마다 한 줄의 수평선이 수면 역할을 하고, 수심이 의미를 가질 때만 0·5·10m 눈금이 붙는다. 이미지는 실크스크린 판화처럼 평면 색 블록으로 들어와 원형·아치 창이나 넓은 띠로 잘리고. Theme: 수심의 기록 — 바다의 단면, 판화 같은 해녀 이미지, 신문 지면 같은 사실 기록. Tone: 담담하고 단단함. 감상보다 사실이 먼저 말하고, 사람의 무게는 이미지와 숫자 하나가 짊어진다. Palette: Background #F4F1EA; Surface #E3ECEB; Primary #123B4A; Accent #E0662B; Secondary accent #3F8C8A; Body text #1E2A30; Secondary text #5B6970. Type: Batang (EN: Cambria) titles / Malgun Gothic (EN: Segoe UI) body (body 24px, title 40px). Layout: 킥커 → 판단 문장 제목 → 리드 한 줄 → 증거(이미지·차트·표) → 쪽 아래 출처 줄 비대칭 2단(좁은 글 단 + 넓은 증거 단)과 전면 반전 면의 교대; 한 쪽에 초점 하나 Spacing anchors: 쪽 여백 64 · 블록 간격 32 · 단 사이 40 · 모서리 반경 0 · 본문 행간 36. Icons: tabler-outline. Images: 스텐실 실루엣 해녀 + 평면 색 블록 바다 + 하프톤 물빛; 담담하고 단단한 1960년대 문화 포스터 — 해양 박물관 기획전 포스터를 떠올리게 하는 분위기.",
     },
     "fourier-transform-formulas": {
       label: "Fourier Transform Formulas",
-      brief: "4:3 1024×768 deck, 15 pages. Style: 方向二「科学期刊」— 教科书跨页式栅格,细分隔线,衬线标题配黑体正文,公式独占带状区并留边注栏. Tone: 克制、精确、可被复制;像一份排得很好的讲义而不是发布会. Palette: Background #FFFFFF; Primary #123B63; Accent #C2452D; Secondary accent #2E7D7B; Body text #1B2027; Secondary text #5A6472. Type: Cambria titles / Cambria body (body 24px, title 42px). Margins: 上下 56 px,左右 64 px.",
+      brief: "PPT 4:3 1024 × 768 deck, 15 pages. Style: 方向二「科学期刊」— 教科书跨页式栅格,细分隔线,衬线标题配黑体正文,公式独占带状区并留边注栏. Mode/visual style: custom (swiss-minimal, editorial, data-journalism) — 教科书跨页语言:swiss-minimal 定 12 栅格、硬边直角与大留白;editorial 提供细规则线、边注栏、小节序号与衬线/黑体互文的层级;data-journalism 只负责公式与图表下方的来源行与刻度注记。公式独占一条浅底带状区(secondary_bg)并以左侧 3 px 主色竖条起头,右侧留 200 px 边注栏写\"读法\";装饰只有细线、带状区和刻度,没有卡片阴影、没有圆角、没有渐变. Theme: 一本摊开的讲义:左页讲道理,右页留公式与边注. Tone: 克制、精确、可被复制;像一份排得很好的讲义而不是发布会. Palette: Background #FFFFFF; Surface #F2F4F7; Primary #123B63; Accent #C2452D; Secondary accent #2E7D7B; Body text #1B2027; Secondary text #5A6472. Type: SimSun (EN: Cambria) titles / Microsoft YaHei (EN: Cambria) body (body 24px, title 42px). Layout: 自上而下——页标题(陈述句)→ 一句直觉 → 公式带状区 → 边注读法 / 来源行;视线先落在公式带上,再回到左侧文字 主栏 + 边注栏的讲义式双区;公式页让公式带横贯主栏、边注栏写\"每个符号读作什么\";图表页反过来,图占上三分之二、公式与结论在下 Spacing anchors: 页边距 64 px,块间距 32 px,栏间距 24 px,圆角 0 px,正文行距 1.55. Icons: tabler-outline. Images: 一条复合波形在左,向右逐渐分解成若干等间距的单频正弦,末端收成一排高低不同的频率竖线;浅网格与刻度暗示坐标系; 冷静、可验证,像教科书扉页的示意图或科学期刊的图 1.",
     },
     "sleep-science-explainer": {
       label: "我们为什么要睡觉",
-      brief: "4:3 1024×768 deck, 15 pages. Style: 纸层夜谈:分层剪纸的暖纸底,深夜蓝与暖橙两色各自承担固定的解释职责,每页一层新纸盖上去. Tone: 温和、具体、克制;不吓唬,不许诺,不把小鼠实验说成人类结论。. Palette: Background #FBF5E9; Surface #FFFDF7; Primary #2E4A7D; Accent #E08A32; Secondary accent #B4553E; Body text #2A2622. Type: Trebuchet MS titles / Verdana body (body 28px, title 52px). Margins: 上下左右各 56px.",
+      brief: "PPT 4:3 1024 × 768 deck, 15 pages. Style: 纸层夜谈:分层剪纸的暖纸底,深夜蓝与暖橙两色各自承担固定的解释职责,每页一层新纸盖上去. Mode/visual style: custom (paper-cut) — 每个元素都是一张剪下来的纸,层叠而非描边:形状用略不规则的 polygon/path 切边,层与层之间只用 8–12% 的柔影表示高度;暖纸底作为\"桌面\",内容纸盖在上面;跨页保留一条底部的夜色波浪纸带作为累积容器,同一元素在相邻页保持同位置以便叠加;顶层允许小块镂空口子(die-cut window)露出下层。装饰即层次,不额外加边框与图标网格. Theme: 一夜是一张张叠上去的纸:白天那张纸越叠越厚(睡眠压力),另一张纸每天准点起落(生物钟),两张纸叠在一起才决定你什么时候睡着. Tone: 温和、具体、克制;不吓唬,不许诺,不把小鼠实验说成人类结论. Palette: Background #FBF5E9; Surface #F0E4CE; Primary #2E4A7D; Accent #E08A32; Secondary accent #B4553E; Body text #2A2622; Secondary text #5C554C. Type: Microsoft YaHei (EN: Trebuchet MS) titles / Microsoft YaHei (EN: Verdana) body (body 28px, title 52px). Layout: 视线先落在页面唯一的那个视觉物(插画、图表或大数字),再向下读一行白话结论;标题在顶部横幅纸上,是入口不是重点 每页一个想法一个视觉;大量留白由暖纸底承担;避免卡片网格与并列多栏,除非内容本身就是并列 Spacing anchors: 页边距 56px;块间距 32px;栏间距 40px;圆角 12px;正文行高 42px. Icons: tabler-filled. Images: 彩色卡纸剪贴:形状由略不规则的剪切边定义,不画轮廓线;每层纸带 10–15% 纸纹,层与层之间落 8–12% 柔影;造型极简到能一眼认出的程度,不追求写实。所有插画都要在解释一件事(容器里的水位、被挡住的接收口、方向盘上打盹的手),不出现漂浮分子、发光大脑、实验室器皿这类只标示学科不解释内容的装饰; 温暖、可触摸、手工感——像 Eric Carle 绘本里那种用彩色卡纸剪贴出来的夜晚场景.",
     },
     "four-day-week-decision-memo": {
       label: "Four-Day Week Decision Memo",
-      brief: "A4 print 1240×1754 deck, 10 pages. Style: Printed decision record — swiss-minimal grid discipline in a portrait print memo: a fixed running header and footer, a two-column measure on evidence pages, hairline rules instead of cards…. Tone: Sober, exact, unsold. Assertion titles state a judgement…. Palette: Background #FFFFFF; Surface #F7F6F3; Primary #16232E; Accent #B4471C; Secondary accent #4A6B7C; Secondary text #5C6871. Type: Arial titles / Arial body (body 26px, title 44px). Margins: 80 px on all four sides (≈13.5 mm at 150 dpi-equivalent prin….",
+      brief: "A4 Print 1240 × 1754 deck, 10 pages. Style: Printed decision record — swiss-minimal grid discipline in a portrait print memo: a fixed running header and footer, a two-column measure on evidence pages, hairline rules instead of cards. Mode/visual style: pyramid + swiss-minimal — . Theme: A printed decision record. The page is a document, not a slide: a fixed masthead carrying the memo title, date and page number. Tone: Sober, exact, unsold. Assertion titles state a judgement; annotations state a basis. Nothing is claimed more strongly than its source. Palette: Background #FFFFFF; Surface #F2F0EB; Primary #16232E; Accent #B4471C; Secondary accent #4A6B7C; Body text #16232E; Secondary text #5C6871. Type: Arial titles / Arial body (body 26px, title 44px). Layout: Top-down and answer-first. The assertion title is read first and is always a complete judgement One to three primary regions per page, stacked in the portrait direction rather than columned. Evidence pages use a narrow evidence margin (labels Spacing anchors: page margin 80 px · block gap 40 px · column gutter 40 px · corner radius 0 px · body leading 38 px. Icons: chunk-filled；chunk-filled is chosen over the stroke library on print grounds: the icon README records that tabler-outline's thin strokes weaken when printed, and this artifact's primary delivery is paper. Icons are used only where they encode a state, never as decoration or as a grid..",
     },
     "tea-six-classes": {
       label: "Tea Six Classes",
-      brief: "A4 print 1240×1754 deck, 9 pages. Style: ink-notes 手写墨线 × instructional 教学分解：近单色黑墨线承担全部结构，每类只给一个语义色（该类汤色），无纸纹、无投影、无渐变. Tone: 克制、笃定、可照做；像一位讲得清楚的老师在纸上边写边画，不像商业图表. Palette: Background #FAF9F5; Primary #1C1A17; Accent #A62F1F; Secondary accent #6E9B3A; Secondary text #6B665C; Divider #C9C3B4. Type: Georgia titles / Segoe UI body (body 46px, title 84px). Margins: 上下左右各 72px.",
+      brief: "A4 Print 1240 × 1754 deck, 9 pages. Style: ink-notes 手写墨线 × instructional 教学分解：近单色黑墨线承担全部结构，每类只给一个语义色（该类汤色），无纸纹、无投影、无渐变. Mode/visual style: instructional + ink-notes — . Theme: 一本摊开的手写茶记——墨线画结构，色只用来指认汤色。整册靠一条\"发酵度轴\"贯穿：封面预告它，总览页画全它，六个类页各取它的一段放大. Tone: 克制、笃定、可照做；像一位讲得清楚的老师在纸上边写边画，不像商业图表. Palette: Background #FAF9F5; Surface #F0EDE4; Primary #1C1A17; Accent #A62F1F; Secondary accent #6E9B3A; Body text #1C1A17; Secondary text #6B665C. Type: KaiTi (EN: Georgia) titles / Microsoft YaHei (EN: Segoe UI) body (body 46px, title 84px). Layout: 先看到大类名与它在轴上的位置，再看工序链，再看参数，最后看那句怎么挑；视线自上而下但每页有一处偏心的焦点，避免六页同构 每页换一种 ink-notes 构图语汇——圆心概念加分支箭头、大括号归组、划掉重写、轴段放大、贯穿流线、层叠堆——不做\"上题字下三行\"的重复排版 Spacing anchors: 页边距 72px；块间距 40px；分栏间距 48px；圆角 6px；正文行高 70px. Icons: tabler-outline. Images: 纯净纸场上的黑墨线小图与手写题字：中锋起落有轻微抖动的单色线条，无填色块、无投影、无渐变，形体靠线的疏密与顿挫立起来; 像一位茶人在白纸上用秀丽笔随手写画的备忘——克制、笃定、有手的温度；接近 Mike Rohde 视觉笔记落在中文茶记本上的样子.",
     },
     "autumn-solar-terms": {
       label: "二十四节气手账·秋",
-      brief: "vertical 1080×1920 deck, 14 pages. Style: showcase 视觉主导叙事 × sketch-notes 手绘手账视觉. Tone: 亲切、慢、带点手写的随意；不端着，也不卖萌. Palette: Background #FBF6EA; Primary #A8502A; Accent #E39A1F; Secondary accent #6F8C5A; Body text #33302A; Secondary text #6B6355. Type: Georgia titles / Trebuchet MS body (body 56px, title 100px). Margins: 左右 80；表意文字、标题与行动提示守 y=120..1740，纸底与插画可出血.",
+      brief: "Story/Vertical 1080 × 1920 deck, 14 pages. Style: showcase 视觉主导叙事 × sketch-notes 手绘手账视觉. Mode/visual style: showcase + sketch-notes — . Theme: 一本翻开的秋日手账——暖纸底、黑墨抖线、蜡笔色块；六个节气是路线上的六站，一条手绘波浪路线贯穿全卷作为跨页母题，节气页取其中一段作为页面骨架. Tone: 亲切、慢、带点手写的随意；不端着，也不卖萌. Palette: Background #FBF6EA; Surface #F1E5CE; Primary #A8502A; Accent #E39A1F; Secondary accent #6F8C5A; Body text #33302A; Secondary text #6B6355. Type: KaiTi (EN: Georgia) titles / Microsoft YaHei (EN: Trebuchet MS) body (body 56px, title 100px). Layout: 竖屏自上而下——题字或主视觉先抓眼，接住日期，再落到三候，最后一行口语提示收尾 每页换一种 sketch-notes 几何：波浪箭头旅程路线、放射思维图、手绘横幅、编号圆沿虚线跳、云朵框；不允许连续两页用同一种 Spacing anchors: 页边距 80；块间距 56；分栏槽 40；圆角 28；正文行距 84. Icons: tabler-outline. Images: 暖奶油纸上黑色手绘抖线，蜡笔／粉彩色块略微溢出线框；简笔卡通造型，无渐变、无投影、无高光; 温暖、可亲、像一位耐心的老师在笔记本边缘随手画的插图.",
     },
     "nine-heritage-goods": {
       label: "Nine Heritage Goods",
-      brief: "square 1080×1080 deck, 11 pages. Style: 方向 A「国营门市」：showcase 叙事 × vintage-poster 视觉，暖土色三主色平涂 + 黑体美术字标题；九件按诞生年份排成一条线，编号徽章逐页承接. Tone: 温热、笃定、不煽情；像柜台上贴了三十年的那张纸，褪色但字还很硬. Palette: Background #F4E7CE; Primary #B3402F; Accent #E0952B; Secondary accent #2F6B5E; Body text #2A2420; Secondary text #6B5C4A. Type: SimHei titles / Microsoft YaHei body (body 30px, title 54px). Margins: 72px on all sides.",
+      brief: "Moments/Instagram 1080 × 1080 deck, 11 pages. Style: 方向 A「国营门市」：showcase 叙事 × vintage-poster 视觉，暖土色三主色平涂 + 黑体美术字标题；九件按诞生年份排成一条线，编号徽章逐页承接. Mode/visual style: showcase + vintage-poster — . Theme: 国营门市部的印刷海报——牛皮纸色纸面、三块暖土色平涂、略微离轴的圆角几何、半调网点当油墨；一件物、一个年份、一枚编号徽章，九张连成一条 1935→1972 的时间线. Tone: 温热、笃定、不煽情；像柜台上贴了三十年的那张纸，褪色但字还很硬. Palette: Background #F4E7CE; Surface #E3CFA4; Primary #B3402F; Accent #E0952B; Secondary accent #2F6B5E; Body text #2A2420; Secondary text #6B5C4A. Type: SimHei titles / Microsoft YaHei body (body 30px, title 54px). Layout: 先看见一件物与它的名字，再看见年份，最后才读到四行小字；视线从大色块的重心走向标签行 每页换一种 vintage-poster 的构图母题（太阳盘／拱门／射线楔／地平线带／徽章封印／取景框／离轴叠块／同心弧），九件不重复；一件物永远压着某条边或某个块缝，不居正中 Spacing anchors: 页边距 72、块间距 32、栏间距 40、圆角半径 24、正文行距 46. Icons: chunk-filled. Images: 中世纪现代主义海报的减法造型——厚而带手感的轮廓线、圆角有机边、限定三到五块平涂色、网点或纸纹叠在填色上；实物一律画成图形化剪影而非写实，题字为中文美术字，字形本身就是画面; 温暖、笃定、怀旧而不媚俗——1950–70 年代旅行海报与国营商店门头的气质，接近 Saul Bass 与老上海月份牌之间.",
     },
     "typst-series-banners": {
       label: "Typst Series Banners",
-      brief: "WeChat banner 900×383 deck, 6 pages. Style: custom 模式 + custom 视觉风格：「校样台」——Swiss 网格上的排版校样纸，墨黑 + 校对红（委托决定，理由见 §III）. Tone: 冷静、精确、带一点手艺人的温度；不做通用科技蓝. Palette: Background #F3EEE3; Primary #1D1A17; Accent #CF3B2A; Secondary accent #A87A2A; Body text #27231F; Secondary text #6B6358. Type: Cambria titles / Arial body (body 24px, title 50px). Margins: 左右 40，上下 32；公众号转发卡片会取中间近方形区域….",
+      brief: "wechat（WeChat Article Header） 900 × 383 deck, 6 pages. Style: custom 模式 + custom 视觉风格：「校样台」——Swiss 网格上的排版校样纸，墨黑 + 校对红（委托决定，理由见 §III）. Mode/visual style: custom (swiss-minimal) — 「校样台」：swiss-minimal 负责严格的模块网格、左对齐与大留白；在此之上加入排版校样语言——四角裁切线、极细基线网格、校对红的插入光标块与下划校记，代码放在墨黑\"排字条\"上用等宽字，标题用宋体大字承担排版气质；平面、无阴影、无渐变，装饰只来自排版工具本身的记号. Theme: 排版工具的工作台——纸、墨、校对红、等宽源码条；一个红色光标块在各张横幅间延续，章节轨道上的红色标记逐篇前移. Tone: 冷静、精确、带一点手艺人的温度；不做通用科技蓝. Palette: Background #F3EEE3; Surface #E6DECD; Primary #1D1A17; Accent #CF3B2A; Secondary accent #A87A2A; Body text #27231F; Secondary text #6B6358. Type: SimSun (EN: Cambria) titles / Microsoft YaHei (EN: Arial) body (body 24px, title 50px). Layout: 左上章节标签 → 大标题 → 代码排字条 → 右侧效果/要点；视线从左到右一次扫完 矮宽横向分区：左侧约 45% 放标题组，右侧放代码条与效果；头图与文末可打破分区，用大字系列名横贯 Spacing anchors: 页边距 40；块间距 20；栏间距 32；圆角 0；正文行距 1.35. Icons: none.",
     },
     "first-aid-kit": {
       label: "First Aid Kit",
-      brief: "3:4 1242×1660 deck, 9 pages. Style: 手帐急救课(custom mode + custom visual style,暖米纸手绘手帐). Tone: 可靠、克制、不吓人;像社区里一位耐心的护士在纸上一条条写给你. Palette: Background #FBF6EC; Primary #1F6F5C; Accent #D94F3D; Secondary accent #E8A33D; Body text #2B2A26; Secondary text #6B6558. Type: Arial Black titles / Arial body (body 44px, title 80px). Margins: 上下左右各 88px;底部另留 104px 出处条带.",
+      brief: "小红书 1242 × 1660 deck, 9 pages. Style: 手帐急救课(custom mode + custom visual style,暖米纸手绘手帐). Mode/visual style: custom (sketch-notes, editorial) — 由 sketch-notes 提供主体质地——暖米纸底、带轻微手抖的黑墨轮廓、略微溢出边线的柔和色块、稀疏的手绘小装饰与波浪箭头、全平面无投影;由 editorial 提供竖版所需的纵向层级——眉题(kicker)、发丝分隔线、一条贯穿页面的纵向标尺挂载内容、超大序号或数字作为页面锚点、非均分的不对称分栏。两者的分工是:形状与质地归手绘,秩序与层级归编辑排版,避免手帐感变成散乱的涂鸦板. Theme: 一本摊开的家庭急救手帐——每一页都像手写在暖米纸上的一页笔记,靠一条贯穿左侧的纵向标尺和统一的手绘圆角卡片维持九页的同一性;跨页母题是\"急救箱开合\":封面是合着的箱子,P02 打开成四格,P07/P08 变成同一条手绘步骤链,P09 收拢成一张可保存的总表. Tone: 可靠、克制、不吓人;像社区里一位耐心的护士在纸上一条条写给你. Palette: Background #FBF6EC; Surface #F2E8D5; Primary #1F6F5C; Accent #D94F3D; Secondary accent #E8A33D; Body text #2B2A26; Secondary text #6B6558. Type: SimHei (EN: Arial Black) titles / Microsoft YaHei (EN: Arial) body (body 44px, title 80px). Layout: 竖版从上往下读——眉题 → 页标题 → 一句核心判断 → 分块内容 → 底部出处条;每页只给一个视觉主角(一张插画、一个英雄数字、一条步骤链或一张表),其余元素退为支撑 纵向堆叠优先,横向最多二等分;左侧一条贯穿全页的纵向标尺(墨绿细线加节点)承担\"这是同一本手帐\"的连续性;分类内容用非均分的上下带状分区而不是均匀卡片网格;每页至少有一处让内容越出分区边界(插画压线、序号出框)以打破网格感 Spacing anchors: page margin 88px · block gap 48px · column gutter 40px · corner radius 28px · body leading 72px. Icons: tabler-outline. Images: 暖米纸底上的黑墨手绘线稿,线条带轻微手抖、粗细均匀;色块是从墨绿/暖橙/急救红派生出的低饱和柔和平涂,并略微溢出轮廓线,呈手绘上色的错位感;物体简化到可辨识即可,不追求解剖级细节;画面留白充裕,无投影、无渐变、无高光; 温和、可靠、像社区诊室墙上贴的手绘科普图,或一位老师在教学笔记本上画给你看的示意图.",
     },
   };
 
@@ -2824,6 +2999,8 @@
     $("tone").value = "";
     $("language").value = "en-US";
     $("notes").value = "";
+    ["audience", "intent", "coreMessage", "styleRefs", "colorRoles", "typeRoles", "layoutSpec"].forEach((id) => { $(id).value = ""; });
+    ["delivery", "readingMode", "iconLib", "imageStrategy"].forEach((id) => { $(id).value = ""; });
     if ($("route").value === "template") $("route").value = "create";
     toast("Design spec reset to defaults.");
   });
@@ -2840,6 +3017,18 @@
       tone: $("tone").value,
       language: $("language").value,
       notes: $("notes").value.trim(),
+      // advanced design-spec fields
+      audience: $("audience").value.trim(),
+      delivery: $("delivery").value,
+      intent: $("intent").value.trim(),
+      core_message: $("coreMessage").value.trim(),
+      reading_mode: $("readingMode").value,
+      icon_library: $("iconLib").value,
+      style_refs: $("styleRefs").value.trim(),
+      color_roles: $("colorRoles").value.trim(),
+      type_roles: $("typeRoles").value.trim(),
+      layout_spec: $("layoutSpec").value.trim(),
+      image_strategy: $("imageStrategy").value,
     };
   }
 
@@ -2873,7 +3062,25 @@
     if (spec.tone) reqs.push("- Tone: " + spec.tone);
     if (spec.language && spec.language !== "auto") reqs.push("- Language: " + spec.language);
     else if (spec.language === "auto") reqs.push("- Language: match the source files");
+    // advanced design-spec fields — the detail that turns a thin spec into a
+    // full design contract (project info, theme, type, layout, icons, images).
+    if (spec.audience) reqs.push("- Target audience: " + spec.audience);
+    if (spec.intent) reqs.push("- Communication intent & desired outcome: " + spec.intent);
+    if (spec.core_message) reqs.push("- Core message / ask: " + spec.core_message);
+    if (spec.delivery) reqs.push("- Delivery context: " + spec.delivery);
+    if (spec.reading_mode) reqs.push("- Reading mode: " + spec.reading_mode);
+    if (spec.style_refs) reqs.push("- Visual style references: " + spec.style_refs);
+    if (spec.color_roles) reqs.push("- Colour roles: " + spec.color_roles);
+    if (spec.type_roles) reqs.push("- Typography roles & size hierarchy: " + spec.type_roles);
+    if (spec.layout_spec) reqs.push("- Layout & spacing anchors: " + spec.layout_spec);
+    if (spec.icon_library) reqs.push("- Icon library: " + spec.icon_library);
+    if (spec.image_strategy) reqs.push("- Image strategy: " + spec.image_strategy);
     if (spec.notes) reqs.push("- Additional constraints: " + spec.notes);
+    reqs.push("- Write the design spec at full reference depth: cover all sections I–XI "
+      + "(project information, canvas, visual theme with 10-12 colour roles, typography "
+      + "system with a font plan and size hierarchy, layout principles with spacing anchors, "
+      + "icon usage, visualization references, image resources, content outline, speaker "
+      + "notes, technical constraints). Fill every section for this deck — no placeholders.");
     lines.push("", "Design spec requirements:", ...reqs);
     return lines.join("\n");
   }
@@ -2947,13 +3154,22 @@
   function promptWithOutline(base, outline) {
     const lines = [base.trim(), "", "Approved outline (follow this structure exactly):"];
     lines.push("Deck title: " + (outline.title || "(untitled)"));
+    if (outline.narrative) lines.push("Narrative through-line: " + String(outline.narrative).replace(/\s+/g, " ").trim());
+    if (Array.isArray(outline.parts) && outline.parts.length) lines.push("Parts: " + outline.parts.join(" · "));
     outline.slides.forEach((s, i) => {
       lines.push((i + 1) + ". " + (s.title || "(untitled slide)"));
+      if (s.audience_move) lines.push("   audience move: " + String(s.audience_move).replace(/\s+/g, " ").trim());
+      if (s.relationships) lines.push("   relationships: " + String(s.relationships).replace(/\s+/g, " ").trim());
+      if (s.layout) lines.push("   layout / composition: " + String(s.layout).replace(/\s+/g, " ").trim());
+      if (s.core_message) lines.push("   core message: " + String(s.core_message).replace(/\s+/g, " ").trim());
       (s.bullets || []).forEach((b) => lines.push("   - " + b));
       if (s.data) {
         lines.push("   data:");
         String(s.data).split("\n").forEach((d) => { if (d.trim()) lines.push("     * " + d.trim()); });
       }
+      if (s.visualization) lines.push("   visualization: " + String(s.visualization).replace(/\s+/g, " ").trim());
+      if (s.images) lines.push("   images: " + String(s.images).replace(/\s+/g, " ").trim());
+      if (s.motion) lines.push("   motion: " + String(s.motion).replace(/\s+/g, " ").trim());
       if (s.context) lines.push("   context: " + String(s.context).replace(/\s+/g, " ").trim());
     });
     lines.push("", "Build every slide from this outline in order. You may refine wording and visual design, but do not add, remove, or reorder slides.");
