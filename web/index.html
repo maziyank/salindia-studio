@@ -747,7 +747,18 @@
     border-top: 1.5px dashed var(--rule);
   }
   .wizard-actions .spacer { flex: 1; }
-  .wizard-actions .btn-generate { width: auto; }
+  /* In the action bar the primary button sits beside ghost buttons; drop its
+     full-width margin and force a matching height so the row lines up. */
+  .wizard-actions .btn-generate { width: auto; margin-top: 0; }
+  .wizard-actions .btn-generate,
+  .wizard-actions .btn-ghost {
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
 
   /* ---------- Outline editor ---------- */
   .outline-status {
@@ -1121,11 +1132,12 @@
       <div class="wizard-actions">
         <button type="button" class="btn-ghost" id="backTo1">← Back</button>
         <span class="spacer"></span>
+        <button type="button" class="btn-ghost" id="skipOutline" title="Skip the outline review and let the agent plan and build the deck in one pass">Skip outline &amp; build →</button>
         <button type="submit" class="btn-generate" id="genBtn">
           <span id="genLabel">Generate outline</span>
         </button>
       </div>
-      <p class="wizard-note">Next you'll review and edit the outline before any slide is built.</p>
+      <p class="wizard-note">Next you'll review and edit the outline before any slide is built. Prefer to let the agent decide? Use <strong>Skip outline</strong> to build directly.</p>
     </section>
 
   </form>
@@ -1340,6 +1352,7 @@
     phase: "idle",          // "idle" | "outline" | "build"
     outline: null,          // { title, slides: [{ title, bullets: [], data, context }] }
     outlineReady: false,
+    skippedOutline: false,  // true when the user bypassed the outline review
     prompt: "",             // composed prompt used to generate the outline
     spec: null,             // design spec reused for the build phase
     route: "create",
@@ -1814,6 +1827,7 @@
   function onOutlineComplete(d) {
     stopTimer();
     state.outlineReady = true;
+    state.skippedOutline = false;
     state.done = true;
     closeStreams();
     setBusy(false);
@@ -1932,6 +1946,8 @@
     const btn = $("genBtn");
     btn.disabled = busy;
     $("cancelBtn").disabled = !busy;
+    const sk = $("skipOutline");
+    if (sk) sk.disabled = busy;
     if (busy) {
       const lbl = state.phase === "build" ? "Building…" : "Generating…";
       btn.innerHTML = '<span class="spinner"></span><span>' + lbl + "</span>";
@@ -1979,7 +1995,9 @@
     clearLog();
     state.done = false;
     state.phase = "build";
+    state.skippedOutline = false;
     state.jobId = jobId;
+    $("backToOutline").textContent = "← Back to outline";
     showStep(4);
     $("jobId").textContent = jobId.slice(0, 16) + "…";
     setState("running");
@@ -2327,6 +2345,7 @@
     state.phase = "outline";
     state.outline = null;
     state.outlineReady = false;
+    state.skippedOutline = false;
     state.done = false;
     $("outlineWrap").hidden = true;
     $("approveBtn").disabled = true;
@@ -2395,6 +2414,31 @@
     if (!outline || !outline.slides.length) { toast("Add at least one slide before building.", true); return; }
     state.outline = outline;
     state.outlineReady = true;
+    await runBuild(promptWithOutline(state.prompt, outline), false);
+  }
+
+  // Skip the outline review entirely: build straight from the prompt and let
+  // the agent decide the deck's structure in the build phase.
+  async function buildWithoutOutline() {
+    const basePrompt = $("prompt").value.trim();
+    if (!basePrompt) { showStep(1); toast("Please enter a prompt.", true); $("prompt").focus(); return; }
+    if (!apiKey()) { showStep(1); $("keyBox").open = true; toast("Enter your API key first.", true); return; }
+    state.spec = readSpec();
+    state.prompt = composePrompt(basePrompt, state.spec);
+    state.route = $("route").value;
+    state.provider = $("provider").value;
+    state.outline = null;
+    state.outlineReady = false;
+    // Stop any outline job that may still be running before starting a build.
+    cancelRunningOutline();
+    closeStreams();
+    await runBuild(state.prompt, true);
+  }
+
+  // Shared build-phase submission used by both the approved-outline and the
+  // skip-outline paths.
+  async function runBuild(prompt, skipped) {
+    state.skippedOutline = !!skipped;
     state.phase = "build";
     state.done = false;
     state.jobId = null;
@@ -2406,10 +2450,11 @@
     setBusy(true);
     startTimer();
     showStep(4);
+    $("backToOutline").textContent = skipped ? "← Back to design spec" : "← Back to outline";
 
-    const prompt = promptWithOutline(state.prompt, outline);
     const fd = jobFormData(prompt, {});
-    logLine("meta", "Approved outline · " + outline.slides.length + " slides.");
+    if (skipped) logLine("meta", "Outline skipped — the agent will plan and build the deck in one pass.");
+    else logLine("meta", "Approved outline · " + state.outline.slides.length + " slides.");
     logLine("meta", "Building the deck" + (state.files.length ? " with " + state.files.length + " file(s)" : "") + "…");
 
     try {
@@ -2460,9 +2505,10 @@
     await submitOutline();
   });
   $("approveBtn").addEventListener("click", approveAndBuild);
+  $("skipOutline").addEventListener("click", buildWithoutOutline);
   $("addSlide").addEventListener("click", addSlide);
   $("refineAll").addEventListener("click", refineAll);
-  $("backToOutline").addEventListener("click", () => showStep(3));
+  $("backToOutline").addEventListener("click", () => showStep(state.skippedOutline ? 2 : 3));
   $("stepper").addEventListener("click", (e) => {
     const pill = e.target.closest(".step-pill");
     if (!pill || pill.disabled) return;
