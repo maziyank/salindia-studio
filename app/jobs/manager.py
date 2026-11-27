@@ -236,8 +236,13 @@ class JobManager:
     def get(self, job_id: str) -> Optional[JobRecord]:
         return self._records.get(job_id)
 
-    def list_jobs(self, limit: int = 100) -> List[JobRecord]:
-        return list(self._records.values())[-limit:]
+    def list_jobs(self, limit: int = 100, offset: int = 0) -> List[JobRecord]:
+        """Return job records newest-first, with optional pagination."""
+        recs = list(self._records.values())[::-1]
+        return recs[offset:offset + limit]
+
+    def count_jobs(self) -> int:
+        return len(self._records)
 
     async def _webhook_dispatcher(self, job_id: str, url: str, secret: Optional[str]) -> None:
         """Subscribe to the bus for this job and POST each event to the webhook."""

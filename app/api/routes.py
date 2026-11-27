@@ -221,9 +221,17 @@ async def refine_outline_endpoint(req: OutlineRefineRequest) -> dict:
 # ---------------------------------------------------------------------------
 
 @router.get("/jobs", tags=["jobs"], dependencies=[Depends(require_api_key)])
-async def list_jobs(limit: int = 100) -> dict:
+async def list_jobs(limit: int = 100, offset: int = 0) -> dict:
+    """List jobs, newest-first. Supports pagination via `limit`/`offset`;
+    the response includes `total` so clients can compute page counts."""
     mgr = get_job_manager()
-    return {"jobs": [r.to_dict() for r in mgr.list_jobs(limit=limit)]}
+    jobs = mgr.list_jobs(limit=limit, offset=offset)
+    return {
+        "jobs": [r.to_dict() for r in jobs],
+        "total": mgr.count_jobs(),
+        "limit": limit,
+        "offset": offset,
+    }
 
 
 @router.get("/jobs/{job_id}", tags=["jobs"], dependencies=[Depends(require_api_key)])

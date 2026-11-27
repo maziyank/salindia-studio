@@ -494,6 +494,83 @@
   .recent li .rtime { font-family: "JetBrains Mono", monospace; font-size: .68rem; color: var(--muted); flex: none; }
   .recent .empty { color: var(--muted); font-size: .82rem; font-style: italic; }
 
+  /* ---------- Jobs history page ---------- */
+  .wrap[hidden] { display: none; }
+  .hist-meta { font-size: .78rem; color: var(--muted); margin-bottom: 14px; }
+  .hist { display: flex; flex-direction: column; gap: 10px; }
+  .hist .empty {
+    color: var(--muted); font-size: .85rem; font-style: italic;
+    border: 1.5px dashed #cdbfa3; border-radius: 4px; padding: 28px; text-align: center;
+  }
+  .hist-row {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    background: var(--paper); border: 1.5px solid #cdbfa3; border-radius: 4px;
+    padding: 12px 14px; transition: border-color .15s, background .15s;
+  }
+  .hist-row:hover { border-color: var(--clay); background: #fbf6ea; }
+  .hist-main { flex: 1 1 300px; min-width: 0; }
+  .hist-title {
+    font-weight: 600; font-size: .9rem;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .hist-sub {
+    font-family: "JetBrains Mono", monospace; font-size: .68rem; color: var(--muted);
+    margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .hist-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+  .hist-actions button, .hist-actions a {
+    font-family: inherit; font-size: .76rem; font-weight: 600;
+    color: var(--ink); background: var(--paper-2);
+    border: 1.5px solid var(--rule); border-radius: 3px;
+    padding: 5px 11px; cursor: pointer; text-decoration: none;
+    transition: background .15s, transform .1s;
+  }
+  .hist-actions button:hover:not(:disabled), .hist-actions a:hover { background: var(--card); }
+  .hist-actions button:active, .hist-actions a:active { transform: translate(1px,1px); }
+  .hist-actions button:disabled { opacity: .4; cursor: not-allowed; }
+  .hist-actions a.dl { color: var(--okc); border-color: var(--okc); }
+  .hist-refresh { margin-left: auto; }
+  #historyOpen::before { background: var(--clay); }
+  .placeholder {
+    color: var(--muted); font-size: .85rem; font-style: italic;
+    border: 1.5px dashed #cdbfa3; border-radius: 4px; padding: 28px; text-align: center;
+  }
+  .pager { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+  .pager button {
+    font-family: inherit; font-size: .78rem; font-weight: 600;
+    color: var(--ink); background: var(--paper);
+    border: 1.5px solid var(--rule); border-radius: 3px;
+    padding: 6px 13px; cursor: pointer; transition: background .15s, transform .1s;
+  }
+  .pager button:hover:not(:disabled) { background: var(--paper-2); }
+  .pager button:active:not(:disabled) { transform: translate(1px,1px); }
+  .pager button:disabled { opacity: .4; cursor: not-allowed; }
+  .pager button.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .pager .pg-info { font-family: "JetBrains Mono", monospace; font-size: .72rem; color: var(--muted); padding: 0 2px; }
+
+  /* ---------- Job detail ---------- */
+  .job-grid { display: grid; grid-template-columns: 128px minmax(0, 1fr); gap: 10px 16px; align-items: baseline; }
+  .job-grid dt {
+    font-size: .64rem; font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .job-grid dd { font-size: .86rem; word-break: break-word; }
+  .job-sec { margin-top: 22px; }
+  .job-sec h3 {
+    font-size: .72rem; font-weight: 700; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+  }
+  .job-pre {
+    font-family: "JetBrains Mono", monospace; font-size: .78rem; line-height: 1.6;
+    background: var(--paper); border: 1.5px solid #cdbfa3; border-radius: 4px;
+    padding: 12px 14px; white-space: pre-wrap; word-break: break-word; margin: 0;
+  }
+  .job-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .job-list li { background: var(--paper); border: 1.5px solid #cdbfa3; border-radius: 4px; padding: 10px 12px; font-size: .82rem; }
+  .job-list .sm-num { font-family: "JetBrains Mono", monospace; color: var(--clay-deep); margin-right: 7px; }
+  .job-list .sm-sub { color: var(--muted); font-size: .78rem; margin-top: 4px; }
+  .job-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+
   /* ---------- MCP ---------- */
   .header-actions { display: flex; align-items: center; gap: 12px; }
   .mcp-trigger {
@@ -735,6 +812,7 @@
     <span class="sub">Studio</span>
   </div>
   <div class="header-actions">
+    <button type="button" class="btn-ghost mcp-trigger" id="historyOpen">History</button>
     <button type="button" class="btn-ghost mcp-trigger" id="mcpOpen" hidden>MCP</button>
     <div class="status-pill" id="svc">
       <span class="dot" id="svcDot"></span>
@@ -743,7 +821,7 @@
   </div>
 </header>
 
-<div class="wrap wizard">
+<div class="wrap wizard" id="wizardView">
 
   <section class="hero">
     <h1>Turn a prompt into a editable <em>deck</em> — one step at a time.</h1>
@@ -1141,6 +1219,46 @@
 
 </div>
 
+<!-- ============ Jobs history page ============ -->
+<div class="wrap wizard" id="historyView" hidden>
+  <section class="hero">
+    <h1>Slide generation <em>history</em>.</h1>
+    <p>Every deck the studio has produced — open a job for full details, re-download its <strong>.pptx</strong>, or cancel one that is still running.</p>
+  </section>
+
+  <section class="panel" aria-label="Jobs history">
+    <div class="panel-title">
+      <span class="num">✦</span>
+      <h2>Jobs</h2>
+      <button type="button" class="btn-ghost hist-refresh" id="historyRefresh">↻ Refresh</button>
+    </div>
+    <div class="hist-meta" id="historyMeta"></div>
+    <div class="hist" id="historyList">
+      <div class="empty">Loading jobs…</div>
+    </div>
+    <div class="pager" id="historyPager"></div>
+    <div class="wizard-actions">
+      <button type="button" class="btn-ghost" id="historyBack">← Back to studio</button>
+    </div>
+  </section>
+</div>
+
+<!-- ============ Job detail page ============ -->
+<div class="wrap wizard" id="jobView" hidden>
+  <section class="hero">
+    <h1>Job <em>detail</em>.</h1>
+    <p>Everything the studio recorded for this generation — status, usage, sources, and the outline it produced.</p>
+  </section>
+
+  <section class="panel" aria-label="Job detail">
+    <div class="panel-title">
+      <span class="num">✦</span>
+      <h2>Job</h2>
+    </div>
+    <div id="jobDetail"><div class="placeholder">Loading job…</div></div>
+  </section>
+</div>
+
 <!-- ============ MCP dialog ============ -->
 <dialog class="mcp-dialog" id="mcpDialog" aria-labelledby="mcpTitle">
   <div class="dialog-head">
@@ -1226,7 +1344,9 @@
     spec: null,             // design spec reused for the build phase
     route: "create",
     provider: "",
+    page: 1,                // history pagination (1-based)
   };
+  const PAGE_SIZE = 10;
 
   // -------- toast --------
   let toastTimer;
@@ -2396,8 +2516,379 @@
     }
   });
 
+  // -------- routing (URL params) --------
+  // Views are addressable so they can be deep-linked / bookmarked:
+  //   /                       -> studio (wizard)
+  //   /?view=history&page=2   -> history page, page 2
+  //   /?job=<job_id>          -> job detail page
+  function readURL() {
+    const p = new URLSearchParams(location.search);
+    const job = p.get("job") || "";
+    return {
+      view: p.get("view") || (job ? "job" : "studio"),
+      page: Math.max(1, parseInt(p.get("page") || "1", 10) || 1),
+      job,
+    };
+  }
+  function writeURL(params, replace) {
+    const p = new URLSearchParams();
+    const view = params.view || "studio";
+    if (view !== "studio") p.set("view", view);
+    if (params.page && params.page > 1) p.set("page", String(params.page));
+    if (params.job) p.set("job", params.job);
+    const q = p.toString();
+    const url = location.pathname + (q ? "?" + q : "");
+    if (replace) history.replaceState(null, "", url);
+    else history.pushState(null, "", url);
+  }
+  async function route() {
+    const { view, page, job } = readURL();
+    if (job) { await openJob(job, true); return; }
+    if (view === "history") { await openHistory(page, true); return; }
+    showView("studio");
+  }
+  function showView(name) {
+    $("wizardView").hidden = name !== "studio";
+    $("historyView").hidden = name !== "history";
+    $("jobView").hidden = name !== "job";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // -------- jobs history page --------
+  function histStatusClass(s) {
+    return ["completed", "failed", "running", "cancelled", "queued"].includes(s) ? s : "";
+  }
+  function fmtTime(iso) {
+    if (!iso) return "—";
+    const d = new Date(iso);
+    return isNaN(d) ? iso : d.toLocaleString([], { hour12: false });
+  }
+  async function openHistory(page, fromRoute) {
+    state.page = page || 1;
+    showView("history");
+    if (!fromRoute) writeURL({ view: "history", page: state.page });
+    await loadHistory();
+  }
+  function goHistoryPage(n) {
+    state.page = Math.max(1, n);
+    writeURL({ view: "history", page: state.page });
+    loadHistory();
+  }
+  async function loadHistory() {
+    const box = $("historyList"), meta = $("historyMeta");
+    box.innerHTML = '<div class="empty">Loading jobs…</div>';
+    meta.textContent = "";
+    $("historyPager").innerHTML = "";
+    const offset = (state.page - 1) * PAGE_SIZE;
+    try {
+      const r = await fetch("/jobs?limit=" + PAGE_SIZE + "&offset=" + offset, { headers: authHeaders() });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      const d = await r.json();
+      const jobs = d.jobs || [];
+      const total = Number(d.total != null ? d.total : jobs.length);
+      const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      // Requested page fell out of range (e.g. after deletes) — snap to the last page.
+      if (!jobs.length && state.page > pages) {
+        state.page = pages;
+        writeURL({ view: "history", page: state.page }, true);
+        return loadHistory();
+      }
+      if (!jobs.length) {
+        box.innerHTML = '<div class="empty">No slide generations yet. Build a deck and it will appear here.</div>';
+        return;
+      }
+      meta.textContent = total + (total === 1 ? " job" : " jobs");
+      box.innerHTML = "";
+      jobs.forEach((job) => box.appendChild(historyRow(job)));
+      renderPager(total, pages);
+    } catch (e) {
+      box.innerHTML = "";
+      const err = document.createElement("div");
+      err.className = "empty";
+      err.textContent = "Could not load jobs: " + (e.message || e) + " — check your API key.";
+      box.appendChild(err);
+    }
+  }
+  function renderPager(total, pages) {
+    const el = $("historyPager");
+    el.innerHTML = "";
+    if (!total) return; // nothing to page through
+    el.appendChild(pagerButton("← Prev", state.page <= 1, () => goHistoryPage(state.page - 1)));
+    pageList(state.page, pages).forEach((p) => {
+      if (p === "…") {
+        const s = document.createElement("span");
+        s.className = "pg-info";
+        s.textContent = "…";
+        el.appendChild(s);
+        return;
+      }
+      const b = pagerButton(String(p), false, () => goHistoryPage(p));
+      if (p === state.page) b.classList.add("active");
+      el.appendChild(b);
+    });
+    el.appendChild(pagerButton("Next →", state.page >= pages, () => goHistoryPage(state.page + 1)));
+  }
+  function pagerButton(label, disabled, onClick) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = label;
+    b.disabled = disabled;
+    b.onclick = onClick;
+    return b;
+  }
+  // Page numbers to show, with "…" gaps: first, last, and a window around current.
+  function pageList(current, pages) {
+    const nums = new Set([1, pages]);
+    for (let i = current - 1; i <= current + 1; i++) {
+      if (i >= 1 && i <= pages) nums.add(i);
+    }
+    const sorted = [...nums].sort((a, b) => a - b);
+    const out = [];
+    let prev = 0;
+    for (const n of sorted) {
+      if (n - prev > 1) out.push("…");
+      out.push(n);
+      prev = n;
+    }
+    return out;
+  }
+  function historyRow(job) {
+    const spec = job.spec || {};
+    const prompt = spec.prompt || "(no prompt)";
+    const route = spec.route || "create";
+    const row = document.createElement("div");
+    row.className = "hist-row";
+    row.style.cursor = "pointer";
+    row.title = "View job detail";
+    row.onclick = () => openJob(job.job_id);
+
+    const main = document.createElement("div");
+    main.className = "hist-main";
+    const title = document.createElement("div");
+    title.className = "hist-title";
+    title.textContent = String(prompt).split("\n")[0];
+    title.title = prompt;
+    const sub = document.createElement("div");
+    sub.className = "hist-sub";
+    const bits = [job.job_id.slice(0, 12) + "…", route, fmtTime(job.created_at)];
+    if (job.duration_seconds != null) bits.push(job.duration_seconds + "s");
+    const u = job.usage || {};
+    const tok = Number(u.input_tokens || 0) + Number(u.output_tokens || 0);
+    if (tok) bits.push(fmtTokens(tok) + " tokens");
+    sub.textContent = bits.join("  ·  ");
+    if (job.error) sub.title = job.error;
+    main.append(title, sub);
+
+    const badge = document.createElement("span");
+    badge.className = "badge " + histStatusClass(job.status);
+    badge.textContent = job.status;
+
+    const actions = document.createElement("div");
+    actions.className = "hist-actions";
+
+    if (job.status === "completed") {
+      const dl = document.createElement("a");
+      dl.className = "dl";
+      dl.textContent = "↓ .pptx";
+      dl.href = "/jobs/" + job.job_id + "/export";
+      dl.setAttribute("download", job.export_name || job.job_id + ".pptx");
+      dl.onclick = (e) => e.stopPropagation();
+      actions.appendChild(dl);
+    }
+
+    if (job.status === "running" || job.status === "queued") {
+      const cancel = document.createElement("button");
+      cancel.type = "button";
+      cancel.textContent = "Cancel";
+      cancel.onclick = async (e) => {
+        e.stopPropagation();
+        try {
+          const r = await fetch("/jobs/" + job.job_id + "/cancel", { method: "POST", headers: authHeaders() });
+          if (r.ok) { toast("Cancellation requested."); await loadHistory(); }
+          else toast("Cancel failed (" + r.status + ")", true);
+        } catch (err) { toast("Cancel failed", true); }
+      };
+      actions.appendChild(cancel);
+    }
+
+    const open = document.createElement("button");
+    open.type = "button";
+    open.textContent = "Details";
+    open.onclick = (e) => { e.stopPropagation(); openJob(job.job_id); };
+    actions.appendChild(open);
+
+    row.append(main, badge, actions);
+    return row;
+  }
+
+  // -------- job detail page --------
+  async function openJob(jobId, fromRoute) {
+    showView("job");
+    if (!fromRoute) writeURL({ job: jobId });
+    const box = $("jobDetail");
+    box.innerHTML = '<div class="placeholder">Loading job…</div>';
+    try {
+      const r = await fetch("/jobs/" + jobId, { headers: authHeaders() });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      const job = await r.json();
+      renderJobDetail(job);
+    } catch (e) {
+      box.innerHTML = "";
+      const err = document.createElement("div");
+      err.className = "placeholder";
+      err.textContent = "Could not load job: " + (e.message || e) + " — check your API key.";
+      box.appendChild(err);
+    }
+  }
+  function jobSection(title, node) {
+    const wrap = document.createElement("div");
+    wrap.className = "job-sec";
+    const h = document.createElement("h3");
+    h.textContent = title;
+    wrap.append(h, node);
+    return wrap;
+  }
+  function jobPre(text) {
+    const el = document.createElement("pre");
+    el.className = "job-pre";
+    el.textContent = text;
+    return el;
+  }
+  function detailRow(dl, label, value, mono) {
+    const dt = document.createElement("dt");
+    dt.textContent = label;
+    const dd = document.createElement("dd");
+    if (value instanceof Node) dd.appendChild(value);
+    else dd.textContent = value == null || value === "" ? "—" : String(value);
+    if (mono) dd.style.fontFamily = '"JetBrains Mono", monospace';
+    dl.append(dt, dd);
+    return dd;
+  }
+  function renderJobDetail(job) {
+    const box = $("jobDetail");
+    box.innerHTML = "";
+    const spec = job.spec || {};
+    const u = job.usage || {};
+
+    const grid = document.createElement("dl");
+    grid.className = "job-grid";
+    const badge = document.createElement("span");
+    badge.className = "badge " + histStatusClass(job.status);
+    badge.textContent = job.status;
+    detailRow(grid, "Status", badge);
+    detailRow(grid, "Job ID", job.job_id, true);
+    detailRow(grid, "Route", spec.route || "create");
+    detailRow(grid, "Provider", spec.provider_override || "default");
+    detailRow(grid, "Created", fmtTime(job.created_at));
+    detailRow(grid, "Started", fmtTime(job.started_at));
+    detailRow(grid, "Finished", fmtTime(job.finished_at));
+    detailRow(grid, "Duration", job.duration_seconds != null ? job.duration_seconds + "s" : "—");
+    const inTok = Number(u.input_tokens || 0), outTok = Number(u.output_tokens || 0);
+    detailRow(grid, "Tokens", fmtTokens(inTok + outTok) + " (" + fmtTokens(inTok) + " in / " + fmtTokens(outTok) + " out)");
+    detailRow(grid, "Tool calls", u.tool_calls != null ? fmtTokens(u.tool_calls) : "—");
+    detailRow(grid, "Iterations", u.iterations != null ? fmtTokens(u.iterations) : "—");
+    box.appendChild(grid);
+
+    if (job.error) box.appendChild(jobSection("Error", jobPre(job.error)));
+    box.appendChild(jobSection("Prompt", jobPre(String(spec.prompt || "(no prompt)"))));
+
+    const sources = job.source_files || spec.sources || [];
+    if (sources.length) {
+      const ul = document.createElement("ul");
+      ul.className = "job-list";
+      sources.forEach((s) => {
+        const li = document.createElement("li");
+        li.textContent = String(s).split("/").pop();
+        li.title = s;
+        ul.appendChild(li);
+      });
+      box.appendChild(jobSection("Sources", ul));
+    }
+
+    const outline = job.outline;
+    if (outline && Array.isArray(outline.slides) && outline.slides.length) {
+      const ul = document.createElement("ul");
+      ul.className = "job-list";
+      outline.slides.forEach((s, i) => {
+        const li = document.createElement("li");
+        const line = document.createElement("div");
+        const num = document.createElement("span");
+        num.className = "sm-num";
+        num.textContent = String(i + 1).padStart(2, "0");
+        line.append(num, document.createTextNode(s.title || "(untitled)"));
+        li.appendChild(line);
+        const bullets = (s.bullets || []).filter(Boolean);
+        if (bullets.length) {
+          const sub = document.createElement("div");
+          sub.className = "sm-sub";
+          sub.textContent = bullets.join(" · ");
+          li.appendChild(sub);
+        }
+        ul.appendChild(li);
+      });
+      box.appendChild(jobSection("Outline — " + (outline.title || "Untitled"), ul));
+    }
+
+    const actions = document.createElement("div");
+    actions.className = "job-actions";
+
+    if (job.status === "completed") {
+      const dl = document.createElement("a");
+      dl.className = "btn-download";
+      dl.textContent = "↓ Download .pptx";
+      dl.href = "/jobs/" + job.job_id + "/export";
+      dl.setAttribute("download", job.export_name || job.job_id + ".pptx");
+      actions.appendChild(dl);
+    }
+
+    const open = document.createElement("button");
+    open.type = "button";
+    open.className = "btn-ghost";
+    open.textContent = "Open in studio";
+    open.onclick = () => {
+      writeURL({}, true);
+      showView("studio");
+      reopen(job.job_id);
+    };
+    actions.appendChild(open);
+
+    if (job.status === "running" || job.status === "queued") {
+      const cancel = document.createElement("button");
+      cancel.type = "button";
+      cancel.className = "btn-ghost danger";
+      cancel.textContent = "Cancel job";
+      cancel.onclick = async () => {
+        try {
+          const r = await fetch("/jobs/" + job.job_id + "/cancel", { method: "POST", headers: authHeaders() });
+          if (r.ok) { toast("Cancellation requested."); openJob(job.job_id, true); }
+          else toast("Cancel failed (" + r.status + ")", true);
+        } catch (e) { toast("Cancel failed", true); }
+      };
+      actions.appendChild(cancel);
+    }
+
+    const back = document.createElement("button");
+    back.type = "button";
+    back.className = "btn-ghost";
+    back.textContent = "← Back to history";
+    back.onclick = () => openHistory(state.page);
+    actions.appendChild(back);
+
+    box.appendChild(actions);
+  }
+
+  // -------- history / detail handlers --------
+  $("historyOpen").addEventListener("click", () => openHistory(1));
+  $("historyRefresh").addEventListener("click", loadHistory);
+  $("historyBack").addEventListener("click", () => {
+    writeURL({}, true);
+    showView("studio");
+  });
+  window.addEventListener("popstate", route);
+
   // init
   loadHealth();
+  route();
 })();
 </script>
 </body>
