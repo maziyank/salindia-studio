@@ -118,8 +118,8 @@ class OpenAIProvider(LLMProvider):
             kwargs["tools"] = oa_tools
         # Some models (gpt-5/o-series) reject `max_tokens` (want `max_completion_tokens`)
         # and/or a custom `temperature` (only the default is supported). Adapt as we
-        # learn about the model, then retry (up to 2 corrections per call).
-        for _ in range(3):
+        # learn about the model, then retry (up to 3 corrections per call).
+        for _ in range(4):
             try:
                 resp = await client.chat.completions.create(**kwargs)
                 break
@@ -135,6 +135,11 @@ class OpenAIProvider(LLMProvider):
                     self.use_max_completion_tokens = True
                 elif (param == "temperature" or "temperature" in message) and "temperature" in kwargs:
                     kwargs.pop("temperature")
+                elif (param == "reasoning_effort" or "reasoning_effort" in message) and oa_tools:
+                    # gpt-6 family: function tools over /v1/chat/completions are only
+                    # allowed when reasoning_effort is 'none'. Disable reasoning for
+                    # tool-calling turns and retry.
+                    kwargs["reasoning_effort"] = "none"
                 else:
                     raise
         choice = resp.choices[0]
